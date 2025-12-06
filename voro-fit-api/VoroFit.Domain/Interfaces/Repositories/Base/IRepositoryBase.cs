@@ -1,0 +1,22 @@
+﻿using System.Linq.Expressions;
+
+namespace VoroFit.Domain.Interfaces.Repositories.Base
+{
+    public interface IRepositoryBase<T> where T : class
+    {
+        Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true);
+        Task<T?> GetByIdAsync(params object[] keyValues);
+        IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null, bool asNoTracking = true);
+        IQueryable<T> Include(params Expression<Func<T, object>>[] includes);
+
+        Task AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entities);
+        void Update(T entity);
+        void UpdateRange(IEnumerable<T> entities);
+        Task DeleteAsync(params object[] keyValues);
+        void Delete(T entity);
+        void DeleteRange(IEnumerable<T> entities);
+
+        Task<int> SaveChangesAsync();
+    }
+}

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="VoroFit.API/VoroFit.API.csproj" />
+  <Project Path="VoroFit.Application/VoroFit.Application.csproj" />
+  <Project Path="VoroFit.Domain/VoroFit.Domain.csproj" />
+  <Project Path="VoroFit.Infrastructure/VoroFit.Infrastructure.csproj" />
+  <Project Path="VoroFit.Shared/VoroFit.Shared.csproj" Id="5c2730a9-2d3a-4329-8b91-4910993e8ce8" />
+</Solution>
