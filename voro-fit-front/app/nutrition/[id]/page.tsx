@@ -10,10 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Clock, Edit, User, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useMealPlans } from "@/hooks/use-meal-plans.hook"
-import { MealPlanStatusEnum, type MealPlanDto } from "@/types/DTOs/meal-plan.interface"
-import { DayOfWeekEnum } from "@/types/DTOs/meal-plan-day.interface"
-import { MealPeriodEnum } from "@/types/DTOs/meal-plan-meal.interface"
+import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
+import { MealPlanStatusEnum } from "@/types/Enums/mealPlanStatusEnum.enum"
+import { MealPeriodEnum } from "@/types/Enums/mealPeriodEnum.enum"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { MealPlanDto } from "@/types/DTOs/meal-plan.interface"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 const daysOfWeek = [
   { key: DayOfWeekEnum.Segunda, label: "Segunda" },
@@ -53,19 +55,7 @@ export default function MealPlanDetailPage() {
     return day?.meals?.sort((a, b) => a.order - b.order) || []
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-screen">
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !mealPlan) {
+  if (error) {
     return (
       <div className="flex h-screen">
         <div className="flex flex-1 flex-col overflow-hidden">
@@ -86,7 +76,8 @@ export default function MealPlanDetailPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
+      <Loading isLoading={loading}></Loading>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -107,31 +98,31 @@ export default function MealPlanDetailPage() {
                     <h1 className="text-2xl font-bold">Plano Alimentar</h1>
                     <Badge
                       className={
-                        mealPlan.status === MealPlanStatusEnum.Active
+                        mealPlan?.status === MealPlanStatusEnum.Active
                           ? "bg-accent text-accent-foreground"
                           : "bg-muted text-muted-foreground"
                       }
                     >
-                      {mealPlan.status === MealPlanStatusEnum.Active ? "Ativo" : "Inativo"}
+                      {mealPlan?.status === MealPlanStatusEnum.Active ? "Ativo" : "Inativo"}
                     </Badge>
                   </div>
 
-                  {mealPlan.student && (
+                  {mealPlan?.student && (
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
                         <AvatarImage
-                          src={mealPlan.student.avatarUrl || "/placeholder.svg"}
-                          alt={mealPlan.student.name}
+                          src={mealPlan?.student.userExtension?.user.avatarUrl || "/placeholder.svg"}
+                          alt={`${mealPlan?.student.userExtension?.user.userName}`}
                         />
                         <AvatarFallback>
-                          {mealPlan.student.name
+                          {`${mealPlan?.student.userExtension?.user.userName}`
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{mealPlan.student.name}</p>
+                        <p className="font-medium">{`${mealPlan?.student.userExtension?.user.userName}`}</p>
                         <p className="text-sm text-muted-foreground">Plano semanal completo</p>
                       </div>
                     </div>
@@ -139,16 +130,16 @@ export default function MealPlanDetailPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  {mealPlan.student && (
+                  {mealPlan?.student && (
                     <Button asChild variant="outline">
-                      <Link href={`/students/${mealPlan.studentId}`}>
+                      <Link href={`/students/${mealPlan?.studentId}`}>
                         <User className="mr-2 h-4 w-4" />
                         Ver Aluno
                       </Link>
                     </Button>
                   )}
                   <Button asChild>
-                    <Link href={`/nutrition/${mealPlan.id}/edit`}>
+                    <Link href={`/nutrition/${mealPlan?.id}/edit`}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Link>

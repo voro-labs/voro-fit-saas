@@ -25,8 +25,8 @@ namespace VoroFit.Application.Services.Evolution
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
-            await this.AddAsync(chat);
-            await this.SaveChangesAsync();
+            await base.AddAsync(chat);
+            await base.SaveChangesAsync();
 
             return chat;
         }

@@ -12,7 +12,7 @@ export const API_CONFIG = {
     STUDENTS: "/students",
     EXERCISES: "/exercises",
     WORKOUTS: "/workouts",
-    MEAL_PLANS: "/meal-plans",
+    MEAL_PLANS: "/mealplans",
     MEASUREMENTS: "/measurements",
     CHAT: "/chat",
     MESSAGE: "/message",

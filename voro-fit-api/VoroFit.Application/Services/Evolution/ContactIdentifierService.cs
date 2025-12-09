@@ -16,7 +16,7 @@ namespace VoroFit.Application.Services.Evolution
         {
             var contactIdentifier = mapper.Map<ContactIdentifier>(contactIdentifierDto);
 
-            return this.AddAsync(contactIdentifier);
+            return base.AddAsync(contactIdentifier);
         }
 
         // Cria ou retorna um Contact já existente
@@ -91,9 +91,9 @@ namespace VoroFit.Application.Services.Evolution
                 );
             }
             
-            await this.AddRangeAsync(identPrimaries);
+            await base.AddRangeAsync(identPrimaries);
 
-            await this.SaveChangesAsync();
+            await base.SaveChangesAsync();
 
             return identPrimaries
                 .FirstOrDefault(item => item.IsPrimary)!;
@@ -101,7 +101,7 @@ namespace VoroFit.Application.Services.Evolution
 
         private async Task<ContactIdentifier?> GetIdentifierAsync(string jid)
         {
-            return await this.Query(ci => ci.Jid == jid)
+            return await base.Query(ci => ci.Jid == jid)
                 .Include(ci => ci.Contact)
                 .FirstOrDefaultAsync();
         }
@@ -119,8 +119,8 @@ namespace VoroFit.Application.Services.Evolution
                 IsPrimary = false
             };
 
-            await this.AddAsync(newIdent);
-            await this.SaveChangesAsync();
+            await base.AddAsync(newIdent);
+            await base.SaveChangesAsync();
         }
 
         private string ExtractNumber(string jid)

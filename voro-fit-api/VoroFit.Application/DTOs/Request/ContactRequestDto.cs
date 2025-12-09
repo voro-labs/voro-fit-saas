@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace VoroFit.Application.DTOs.Request
+﻿namespace VoroFit.Application.DTOs.Request
 {
     public class ContactRequestDto
     {

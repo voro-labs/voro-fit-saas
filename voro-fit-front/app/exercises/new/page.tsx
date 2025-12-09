@@ -50,7 +50,7 @@ export default function NewExercisePage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">

@@ -39,7 +39,7 @@ export function Main({ children }: MainProps) {
     )
   }
 
-  if (pathname === "/" || pathname.startsWith("/proposals")) {
+  if (pathname.startsWith("/proposals")) {
     return (
       <div className="min-h-screen">
         <main className="flex-1">{children}</main>

@@ -58,9 +58,9 @@ export default function MessagesPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="flex flex-1 overflow-hidden">
+    <AuthGuard requiredRoles={["Trainer"]}>
+      <div className="bg-background">
+        <div className="flex min-h-screen">
           {/* Contacts List */}
           <div className="w-80 border-r flex flex-col bg-card">
             <div className="p-4 border-b">
@@ -130,85 +130,87 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col">
-            {selectedContact ? (
-              <>
-                {/* Chat Header */}
-                <div className="h-16 border-b flex items-center justify-between px-6 bg-card">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage
-                        src={selectedContact.profilePictureUrl || "/placeholder.svg"}
-                        alt={selectedContact.displayName}
-                      />
-                      <AvatarFallback>
-                        {`${selectedContact.displayName}`
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{selectedContact.displayName}</p>
-                      <p className="text-xs text-muted-foreground">{selectedContact.number}</p>
+          <div className="h-screen w-full">
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col">
+              {selectedContact ? (
+                <>
+                  {/* Chat Header */}
+                  <div className="h-16 border-b flex items-center justify-between px-6 bg-card">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage
+                          src={selectedContact.profilePictureUrl || "/placeholder.svg"}
+                          alt={selectedContact.displayName}
+                        />
+                        <AvatarFallback>
+                          {`${selectedContact.displayName}`
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{selectedContact.displayName}</p>
+                        <p className="text-xs text-muted-foreground">{selectedContact.number}</p>
+                      </div>
                     </div>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Ver perfil do aluno</DropdownMenuItem>
+                        <DropdownMenuItem>Ver treinos</DropdownMenuItem>
+                        <DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Ver perfil do aluno</DropdownMenuItem>
-                      <DropdownMenuItem>Ver treinos</DropdownMenuItem>
-                      <DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto p-6 bg-muted/20">
+                    {currentMessages.length === 0 ? (
+                      <div className="flex items-center justify-center h-full">
+                        <p className="text-muted-foreground">Nenhuma mensagem ainda</p>
+                      </div>
+                    ) : (
+                      currentMessages.map((msg) => (
+                        <MessageBubble
+                          key={msg.id}
+                          message={msg.content}
+                          timestamp={formatTime(msg.sentAt)}
+                          type={msg.isFromMe ? "sent" : "received"}
+                          isAutomatic={false}
+                        />
+                      ))
+                    )}
+                  </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 bg-muted/20">
-                  {currentMessages.length === 0 ? (
-                    <div className="flex items-center justify-center h-full">
-                      <p className="text-muted-foreground">Nenhuma mensagem ainda</p>
-                    </div>
-                  ) : (
-                    currentMessages.map((msg) => (
-                      <MessageBubble
-                        key={msg.id}
-                        message={msg.content}
-                        timestamp={formatTime(msg.sentAt)}
-                        type={msg.isFromMe ? "sent" : "received"}
-                        isAutomatic={false}
+                  {/* Message Input */}
+                  <div className="border-t bg-card p-4">
+                    <form onSubmit={handleSendMessage} className="flex gap-2">
+                      <Input
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        placeholder="Digite sua mensagem..."
+                        className="flex-1"
                       />
-                    ))
-                  )}
+                      <Button type="submit" size="icon" disabled={!messageText.trim()}>
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </form>
+                    <p className="text-xs text-muted-foreground mt-2">Integrado com WhatsApp via Evolution API</p>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center bg-muted/20">
+                  <p className="text-muted-foreground">Selecione uma conversa para começar</p>
                 </div>
-
-                {/* Message Input */}
-                <div className="border-t bg-card p-4">
-                  <form onSubmit={handleSendMessage} className="flex gap-2">
-                    <Input
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Digite sua mensagem..."
-                      className="flex-1"
-                    />
-                    <Button type="submit" size="icon" disabled={!messageText.trim()}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
-                  <p className="text-xs text-muted-foreground mt-2">Integrado com WhatsApp via Evolution API</p>
-                </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center bg-muted/20">
-                <p className="text-muted-foreground">Selecione uma conversa para começar</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

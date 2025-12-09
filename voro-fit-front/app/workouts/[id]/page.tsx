@@ -9,8 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, Edit, User, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useWorkouts } from "@/hooks/use-workouts.hook"
-import { WorkoutStatusEnum, type WorkoutHistoryDto } from "@/types/DTOs/workout-history.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { WorkoutHistoryDto } from "@/types/DTOs/workout-history.interface"
+import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 export default function WorkoutDetailPage() {
   const params = useParams()
@@ -30,21 +32,7 @@ export default function WorkoutDetailPage() {
     return new Date(date).toLocaleDateString("pt-BR")
   }
 
-  if (loading) {
-    return (
-      <AuthGuard requiredRoles={["Admin"]}>
-        <div className="flex h-screen">
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex-1 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          </div>
-        </div>
-      </AuthGuard>
-    )
-  }
-
-  if (error || !workout) {
+  if (error) {
     return (
       <div className="flex h-screen">
         <div className="flex flex-1 flex-col overflow-hidden">
@@ -65,7 +53,8 @@ export default function WorkoutDetailPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
+      <Loading isLoading={loading}></Loading>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -83,36 +72,36 @@ export default function WorkoutDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h1 className="text-2xl font-bold text-balance">{workout.name}</h1>
+                    <h1 className="text-2xl font-bold text-balance">{workout?.name}</h1>
                     <Badge
                       className={
-                        workout.status === WorkoutStatusEnum.Active
+                        workout?.status === WorkoutStatusEnum.Active
                           ? "bg-accent text-accent-foreground"
                           : "bg-muted text-muted-foreground"
                       }
                     >
-                      {workout.status === WorkoutStatusEnum.Active
+                      {workout?.status === WorkoutStatusEnum.Active
                         ? "Ativo"
-                        : workout.status === WorkoutStatusEnum.Completed
+                        : workout?.status === WorkoutStatusEnum.Completed
                           ? "Concluído"
                           : "Inativo"}
                     </Badge>
                   </div>
 
-                  {workout.student && (
+                  {workout?.student && workout?.student.userExtension?.user && (
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={workout.student.avatarUrl || "/placeholder.svg"} alt={workout.student.name} />
+                        <AvatarImage src={workout?.student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${workout?.student.userExtension?.user.firstName}`} />
                         <AvatarFallback>
-                          {workout.student.name
+                          {`${workout?.student.userExtension?.user.firstName}`
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{workout.student.name}</p>
-                        <p className="text-sm text-muted-foreground">{workout.exercises?.length || 0} exercícios</p>
+                        <p className="font-medium">{`${workout?.student.userExtension?.user.firstName}`}</p>
+                        <p className="text-sm text-muted-foreground">{workout?.exercises?.length || 0} exercícios</p>
                       </div>
                     </div>
                   )}
@@ -120,28 +109,28 @@ export default function WorkoutDetailPage() {
                   <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Criado em {formatDate(workout.createdAt)}
+                      Criado em {formatDate(workout?.createdAt)}
                     </div>
-                    {workout.updatedAt && (
+                    {workout?.updatedAt && (
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        Atualizado {formatDate(workout.updatedAt)}
+                        Atualizado {formatDate(workout?.updatedAt)}
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  {workout.student && (
+                  {workout?.student && (
                     <Button asChild variant="outline">
-                      <Link href={`/students/${workout.studentId}`}>
+                      <Link href={`/students/${workout?.studentId}`}>
                         <User className="mr-2 h-4 w-4" />
                         Ver Aluno
                       </Link>
                     </Button>
                   )}
                   <Button asChild>
-                    <Link href={`/workouts/${workout.id}/edit`}>
+                    <Link href={`/workouts/${workout?.id}/edit`}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Link>
@@ -153,8 +142,8 @@ export default function WorkoutDetailPage() {
 
           {/* Exercises List */}
           <div className="space-y-4 max-w-4xl">
-            {workout.exercises && workout.exercises.length > 0 ? (
-              workout.exercises
+            {workout?.exercises && workout?.exercises.length > 0 ? (
+              workout?.exercises
                 .sort((a, b) => a.order - b.order)
                 .map((workoutExercise, index) => (
                   <Card key={workoutExercise.id}>

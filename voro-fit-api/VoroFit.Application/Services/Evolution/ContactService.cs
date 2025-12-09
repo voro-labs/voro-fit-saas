@@ -15,19 +15,19 @@ namespace VoroFit.Application.Services.Evolution
         {
             var contact = mapper.Map<Contact>(contactDto);
 
-            return this.AddAsync(contact);
+            return base.AddAsync(contact);
         }
 
         public Task AddRangeAsync(IEnumerable<ContactDto> contactDtos)
         {
             var contacts = mapper.Map<IEnumerable<Contact>>(contactDtos);
 
-            return this.AddRangeAsync(contacts);
+            return base.AddRangeAsync(contacts);
         }
 
         public async Task<Contact?> FindByAnyAsync(string jid)
         {
-            return await this.Query(c =>
+            return await base.Query(c =>
                     c.RemoteJid == jid ||
                     c.Identifiers.Any(i => i.Jid == jid))
                 .Include(c => c.Identifiers)
@@ -51,7 +51,7 @@ namespace VoroFit.Application.Services.Evolution
 
                 contact.UpdatedAt = DateTimeOffset.UtcNow;
                 
-                this.Update(contact);
+                base.Update(contact);
             }
 
 
@@ -78,8 +78,8 @@ namespace VoroFit.Application.Services.Evolution
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
-            await this.AddAsync(contact);
-            await this.SaveChangesAsync();
+            await base.AddAsync(contact);
+            await base.SaveChangesAsync();
 
             return contact;
         }

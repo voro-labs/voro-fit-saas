@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Json;
 using System.Text.Json;
 using VoroFit.Application.DTOs.Evolution.API;
 using VoroFit.Application.DTOs.Request;

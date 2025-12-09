@@ -11,7 +11,7 @@ import { LoadingSimple } from "../ui/custom/loading/loading-simple"
 
 interface AuthGuardProps {
   children: React.ReactNode
-  requiredRoles?: ("Admin" | "User")[]
+  requiredRoles?: ("Admin" | "User" | "Trainer" | "Student")[]
 }
 
 export function AuthGuard({ children, requiredRoles }: AuthGuardProps) {
@@ -43,7 +43,7 @@ export function AuthGuard({ children, requiredRoles }: AuthGuardProps) {
         : false
 
       if (!hasRequiredRole && !hasAllowedRole) {
-        router.push("/admin/dashboard") // Redireciona para dashboard padrão
+        router.push("/") // Redireciona para dashboard padrão
         return
       }
     }

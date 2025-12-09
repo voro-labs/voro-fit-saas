@@ -14,9 +14,9 @@ import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useStudents } from "@/hooks/use-students.hook"
 import { useWorkouts } from "@/hooks/use-workouts.hook"
-import { WorkoutStatusEnum } from "@/types/DTOs/workout-history.interface"
 import type { WorkoutExerciseDto } from "@/types/DTOs/workout-exercise.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
 
 export default function NewWorkoutPage() {
   const router = useRouter()
@@ -44,7 +44,7 @@ export default function NewWorkoutPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -81,8 +81,8 @@ export default function NewWorkoutPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {students.map((student) => (
-                          <SelectItem key={student.id} value={student.id}>
-                            {student.name}
+                          <SelectItem key={student.userExtensionId} value={student.userExtensionId}>
+                            {student.userExtension?.user.firstName}
                           </SelectItem>
                         ))}
                       </SelectContent>

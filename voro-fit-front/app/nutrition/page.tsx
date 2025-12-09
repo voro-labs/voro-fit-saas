@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Apple, Plus, Eye, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useMealPlans } from "@/hooks/use-meal-plans.hook"
-import { MealPlanStatusEnum } from "@/types/DTOs/meal-plan.interface"
-import { DayOfWeekEnum } from "@/types/DTOs/meal-plan-day.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
+import { MealPlanStatusEnum } from "@/types/Enums/mealPlanStatusEnum.enum"
 
 export default function NutritionPage() {
   const { mealPlans, loading, error } = useMealPlans()
@@ -49,7 +49,7 @@ export default function NutritionPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -112,16 +112,16 @@ export default function NutritionPage() {
                     {plan.student && (
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={plan.student.avatarUrl || "/placeholder.svg"} alt={plan.student.name} />
+                          <AvatarImage src={plan.student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${plan.student.userExtension?.user.userName}`} />
                           <AvatarFallback>
-                            {plan.student.name
+                            {`${plan.student.userExtension?.user.userName}`
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{plan.student.name}</p>
+                          <p className="font-medium text-sm truncate">{`${plan.student.userExtension?.user.userName}`}</p>
                           <p className="text-xs text-muted-foreground">{getMealsCount(plan.days)} refeições por dia</p>
                         </div>
                       </div>

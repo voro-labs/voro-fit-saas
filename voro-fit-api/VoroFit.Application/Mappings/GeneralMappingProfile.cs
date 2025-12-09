@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Evolution;
+using VoroFit.Domain.Entities;
 using VoroFit.Domain.Entities.Evolution;
 
 namespace VoroFit.Application.Mappings
@@ -25,6 +27,16 @@ namespace VoroFit.Application.Mappings
             CreateMap<Instance, InstanceDto>().ReverseMap();
             CreateMap<MessageReaction, MessageReactionDto>().ReverseMap();
             CreateMap<Message, MessageDto>().ReverseMap();
+            
+            CreateMap<UserExtension, UserExtensionDto>().ReverseMap();
+            CreateMap<Student, StudentDto>().ReverseMap();
+            CreateMap<Measurement, MeasurementDto>().ReverseMap();
+            CreateMap<Exercise, ExerciseDto>().ReverseMap();
+            CreateMap<WorkoutExercise, WorkoutExerciseDto>().ReverseMap();
+            CreateMap<WorkoutHistory, WorkoutHistoryDto>().ReverseMap();
+            CreateMap<MealPlan, MealPlanDto>().ReverseMap();
+            CreateMap<MealPlanDay, MealPlanDayDto>().ReverseMap();
+            CreateMap<MealPlanMeal, MealPlanMealDto>().ReverseMap();
         }
     }
 }

@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, Plus, Eye, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useWorkouts } from "@/hooks/use-workouts.hook"
-import { WorkoutStatusEnum } from "@/types/DTOs/workout-history.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
 
 export default function WorkoutsPage() {
   const { workouts, loading, error } = useWorkouts()
@@ -26,7 +26,7 @@ export default function WorkoutsPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -89,18 +89,18 @@ export default function WorkoutsPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage
-                            src={workout.student.avatarUrl || "/placeholder.svg"}
-                            alt={workout.student.name}
+                            src={workout.student.userExtension?.user.avatarUrl || "/placeholder.svg"}
+                            alt={`${workout.student.userExtension?.user.firstName}`}
                           />
                           <AvatarFallback>
-                            {workout.student.name
+                            {`${workout.student.userExtension?.user.firstName}`
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{workout.student.name}</p>
+                          <p className="font-medium text-sm truncate">{`${workout.student.userExtension?.user.firstName}`}</p>
                           <p className="text-xs text-muted-foreground">{workout.exercises?.length || 0} exercícios</p>
                         </div>
                       </div>

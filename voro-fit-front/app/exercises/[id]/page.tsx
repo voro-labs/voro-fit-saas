@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Edit, Globe, User, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useExercises } from "@/hooks/use-exercises.hook"
-import { ExerciseTypeEnum, type ExerciseDto } from "@/types/DTOs/exercise.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { ExerciseDto } from "@/types/DTOs/exercise.interface"
+import { ExerciseTypeEnum } from "@/types/Enums/exerciseTypeEnum.enum"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 export default function ExerciseDetailPage() {
   const params = useParams()
@@ -24,19 +26,7 @@ export default function ExerciseDetailPage() {
     }
   }, [params.id, fetchExerciseById])
 
-  if (loading) {
-    return (
-      <div className="flex h-screen">
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !exercise) {
+  if (error) {
     return (
       <div className="flex h-screen">
         <div className="flex flex-1 flex-col overflow-hidden">
@@ -57,7 +47,8 @@ export default function ExerciseDetailPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
+      <Loading isLoading={loading}></Loading>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -74,9 +65,9 @@ export default function ExerciseDetailPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-3xl font-bold text-balance">{exercise.name}</h1>
+                  <h1 className="text-3xl font-bold text-balance">{exercise?.name}</h1>
                   <Badge variant="secondary" className="flex items-center gap-1">
-                    {exercise.type === ExerciseTypeEnum.Public ? (
+                    {exercise?.type === ExerciseTypeEnum.Public ? (
                       <>
                         <Globe className="h-3 w-3" />
                         Exercício Público
@@ -90,13 +81,13 @@ export default function ExerciseDetailPage() {
                   </Badge>
                 </div>
                 <p className="text-muted-foreground">
-                  Grupo muscular: <span className="font-medium text-foreground">{exercise.muscleGroup}</span>
+                  Grupo muscular: <span className="font-medium text-foreground">{exercise?.muscleGroup}</span>
                 </p>
               </div>
 
-              {exercise.type === ExerciseTypeEnum.Custom && (
+              {exercise?.type === ExerciseTypeEnum.Custom && (
                 <Button asChild>
-                  <Link href={`/exercises/${exercise.id}/edit`}>
+                  <Link href={`/exercises/${exercise?.id}/edit`}>
                     <Edit className="mr-2 h-4 w-4" />
                     Editar
                   </Link>
@@ -105,15 +96,15 @@ export default function ExerciseDetailPage() {
             </div>
 
             {/* Media */}
-            {(exercise.thumbnailUrl || exercise.videoUrl) && (
+            {(exercise?.thumbnailUrl || exercise?.videoUrl) && (
               <Card className="overflow-hidden">
                 <div className="aspect-video bg-muted">
-                  {exercise.videoUrl ? (
-                    <video src={exercise.videoUrl} controls className="w-full h-full object-cover" />
+                  {exercise?.videoUrl ? (
+                    <video src={exercise?.videoUrl} controls className="w-full h-full object-cover" />
                   ) : (
                     <img
-                      src={exercise.thumbnailUrl || "/placeholder.svg"}
-                      alt={exercise.name}
+                      src={exercise?.thumbnailUrl || "/placeholder.svg"}
+                      alt={exercise?.name}
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -122,38 +113,38 @@ export default function ExerciseDetailPage() {
             )}
 
             {/* Description */}
-            {exercise.description && (
+            {exercise?.description && (
               <Card>
                 <CardHeader>
                   <CardTitle>Descrição</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="leading-relaxed">{exercise.description}</p>
+                  <p className="leading-relaxed">{exercise?.description}</p>
                 </CardContent>
               </Card>
             )}
 
             {/* Technical Notes */}
-            {exercise.notes && (
+            {exercise?.notes && (
               <Card>
                 <CardHeader>
                   <CardTitle>Observações Técnicas</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="leading-relaxed">{exercise.notes}</p>
+                  <p className="leading-relaxed">{exercise?.notes}</p>
                 </CardContent>
               </Card>
             )}
 
             {/* Alternatives */}
-            {exercise.alternatives && (
+            {exercise?.alternatives && (
               <Card>
                 <CardHeader>
                   <CardTitle>Alternativas de Execução</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {exercise.alternatives.split("\n").map((alt, i) => (
+                    {exercise?.alternatives.split("\n").map((alt, i) => (
                       <p key={i} className="leading-relaxed">
                         {alt}
                       </p>

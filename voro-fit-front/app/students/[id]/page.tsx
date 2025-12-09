@@ -22,8 +22,10 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useStudents } from "@/hooks/use-students.hook"
-import { StudentStatusEnum, type StudentDto } from "@/types/DTOs/student.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
+import { StudentDto } from "@/types/DTOs/student.interface"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 export default function StudentDetailPage() {
   const params = useParams()
@@ -39,6 +41,7 @@ export default function StudentDetailPage() {
   }, [params.id, fetchStudentById])
 
   const statusConfig = {
+    [StudentStatusEnum.Unspecified]: { label: "Não definido", color: "bg-muted text-muted-foreground", },
     [StudentStatusEnum.Active]: { label: "Ativo", color: "bg-accent text-accent-foreground" },
     [StudentStatusEnum.Inactive]: { label: "Inativo", color: "bg-muted text-muted-foreground" },
     [StudentStatusEnum.Pending]: { label: "Pendente", color: "bg-destructive/10 text-destructive" },
@@ -61,19 +64,7 @@ export default function StudentDetailPage() {
     return new Date(date).toLocaleDateString("pt-BR")
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-screen">
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !student) {
+  if (error) {
     return (
       <div className="flex h-screen">
         <div className="flex flex-1 flex-col overflow-hidden">
@@ -94,7 +85,8 @@ export default function StudentDetailPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
+      <Loading isLoading={loading}></Loading>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -112,9 +104,9 @@ export default function StudentDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={student.avatarUrl || "/placeholder.svg"} alt={student.name} />
+                    <AvatarImage src={student?.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user.userName}`} />
                     <AvatarFallback>
-                      {student.name
+                      {`${student?.userExtension?.user.userName}`
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
@@ -123,21 +115,21 @@ export default function StudentDetailPage() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold">{student.name}</h1>
-                      <Badge className={statusConfig[student.status].color}>{statusConfig[student.status].label}</Badge>
+                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user.userName}`}</h1>
+                      <Badge className={statusConfig[student?.status ?? 100].color}>{statusConfig[student?.status ?? 100].label}</Badge>
                     </div>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      {student.email && (
+                      {student?.userExtension?.user.email && (
                         <p className="flex items-center gap-2">
                           <Mail className="h-4 w-4" />
-                          {student.email}
+                          {student?.userExtension?.user.email}
                         </p>
                       )}
-                      {student.phone && (
+                      {student?.userExtension?.user.phoneNumber && (
                         <p className="flex items-center gap-2">
                           <Phone className="h-4 w-4" />
-                          {student.phone}
+                          {student?.userExtension?.user.phoneNumber}
                         </p>
                       )}
                     </div>
@@ -146,13 +138,13 @@ export default function StudentDetailPage() {
 
                 <div className="flex gap-2">
                   <Button variant="outline" asChild>
-                    <Link href={`/messages?student=${student.id}`}>
+                    <Link href={`/messages?student=${student?.userExtensionId}`}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mensagem
                     </Link>
                   </Button>
                   <Button asChild>
-                    <Link href={`/students/${student.id}/edit`}>
+                    <Link href={`/students/${student?.userExtensionId}/edit`}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Link>
@@ -171,7 +163,7 @@ export default function StudentDetailPage() {
                     <TrendingUp className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{student.weight ? `${student.weight}kg` : "-"}</p>
+                    <p className="text-2xl font-bold">{student?.weight ? `${student?.weight}kg` : "-"}</p>
                     <p className="text-xs text-muted-foreground">Peso Atual</p>
                   </div>
                 </div>
@@ -185,7 +177,7 @@ export default function StudentDetailPage() {
                     <Dumbbell className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{student.workoutHistories?.length || 0}</p>
+                    <p className="text-2xl font-bold">{student?.workoutHistories?.length || 0}</p>
                     <p className="text-xs text-muted-foreground">Treinos</p>
                   </div>
                 </div>
@@ -200,8 +192,8 @@ export default function StudentDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold">
-                      {student.workoutHistories?.[0]?.updatedAt
-                        ? formatDate(student.workoutHistories[0].updatedAt)
+                      {student?.workoutHistories?.[0]?.updatedAt
+                        ? formatDate(student?.workoutHistories[0].updatedAt)
                         : "-"}
                     </p>
                     <p className="text-xs text-muted-foreground">Último Treino</p>
@@ -217,7 +209,7 @@ export default function StudentDetailPage() {
                     <FileText className="h-5 w-5 text-chart-3" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold">{formatDate(student.createdAt)}</p>
+                    <p className="text-sm font-bold">{formatDate(student?.createdAt)}</p>
                     <p className="text-xs text-muted-foreground">Data Início</p>
                   </div>
                 </div>
@@ -244,20 +236,20 @@ export default function StudentDetailPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">Idade</p>
                         <p className="font-medium">
-                          {calculateAge(student.birthDate) ? `${calculateAge(student.birthDate)} anos` : "-"}
+                          {calculateAge(student?.userExtension?.user.birthDate) ? `${calculateAge(student?.userExtension?.user.birthDate)} anos` : "-"}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Altura</p>
-                        <p className="font-medium">{student.height ? `${student.height} cm` : "-"}</p>
+                        <p className="font-medium">{student?.height ? `${student?.height} cm` : "-"}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Peso</p>
-                        <p className="font-medium">{student.weight ? `${student.weight} kg` : "-"}</p>
+                        <p className="font-medium">{student?.weight ? `${student?.weight} kg` : "-"}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Objetivo</p>
-                        <p className="font-medium">{student.goal || "-"}</p>
+                        <p className="font-medium">{student?.goal || "-"}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -270,23 +262,23 @@ export default function StudentDetailPage() {
                   <CardContent>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Meta de {student.goal || "Treino"}</span>
-                        <span className="font-semibold">{student.workoutHistories?.length || 0} treinos</span>
+                        <span className="text-muted-foreground">Meta de {student?.goal || "Treino"}</span>
+                        <span className="font-semibold">{student?.workoutHistories?.length || 0} treinos</span>
                       </div>
-                      <Progress value={Math.min((student.workoutHistories?.length || 0) * 10, 100)} />
+                      <Progress value={Math.min((student?.workoutHistories?.length || 0) * 10, 100)} />
                       <p className="text-xs text-muted-foreground">Continue assim!</p>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {student.notes && (
+              {student?.notes && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Observações</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm leading-relaxed">{student.notes}</p>
+                    <p className="text-sm leading-relaxed">{student?.notes}</p>
                   </CardContent>
                 </Card>
               )}
@@ -298,9 +290,9 @@ export default function StudentDetailPage() {
                   <CardTitle>Histórico de Treinos</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {student.workoutHistories && student.workoutHistories.length > 0 ? (
+                  {student?.workoutHistories && student?.workoutHistories.length > 0 ? (
                     <div className="space-y-4">
-                      {student.workoutHistories.map((workout) => (
+                      {student?.workoutHistories.map((workout) => (
                         <div key={workout.id} className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-1">
                             <p className="font-medium">{workout.name}</p>
@@ -326,9 +318,9 @@ export default function StudentDetailPage() {
                   <CardTitle>Histórico de Medições</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {student.measurements && student.measurements.length > 0 ? (
+                  {student?.measurements && student?.measurements.length > 0 ? (
                     <div className="space-y-4">
-                      {student.measurements.map((measure) => (
+                      {student?.measurements.map((measure) => (
                         <div key={measure.id} className="rounded-lg border p-4">
                           <p className="font-medium mb-3">{formatDate(measure.date)}</p>
                           <div className="grid grid-cols-3 gap-4">

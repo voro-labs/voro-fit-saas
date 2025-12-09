@@ -10,14 +10,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
-import { StudentStatusEnum } from "@/types/DTOs/student.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
 
 export default function StudentsPage() {
   const { students, loading, error } = useStudents()
   const [search, setSearch] = useState("")
 
   const statusConfig = {
+    [StudentStatusEnum.Unspecified]: { label: "Não definido", color: "bg-muted text-muted-foreground", },
     [StudentStatusEnum.Active]: { label: "Ativo", color: "bg-accent text-accent-foreground" },
     [StudentStatusEnum.Inactive]: { label: "Inativo", color: "bg-muted text-muted-foreground" },
     [StudentStatusEnum.Pending]: { label: "Pendente", color: "bg-destructive/10 text-destructive" },
@@ -28,9 +29,9 @@ export default function StudentsPage() {
     const searchLower = search.toLowerCase()
     return students.filter(
       (student) =>
-        student.name.toLowerCase().includes(searchLower) ||
+        student.userExtension?.user.userName.toLowerCase().includes(searchLower) ||
         student.goal?.toLowerCase().includes(searchLower) ||
-        student.email?.toLowerCase().includes(searchLower),
+        student.userExtension?.user.email?.toLowerCase().includes(searchLower),
     )
   }, [students, search])
 
@@ -47,7 +48,7 @@ export default function StudentsPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -106,10 +107,10 @@ export default function StudentsPage() {
               <div className="space-y-3 lg:hidden mb-6">
                 {filteredStudents.map((student) => (
                   <StudentCard
-                    key={student.id}
-                    id={student.id}
-                    name={student.name}
-                    age={calculateAge(student.birthDate)}
+                    key={`${student.userExtensionId}`}
+                    id={student.userExtensionId}
+                    name={student.userExtension?.user.userName || ""}
+                    age={calculateAge(student.userExtension?.user.birthDate)}
                     height={student.height}
                     weight={student.weight}
                     status={
@@ -119,7 +120,7 @@ export default function StudentsPage() {
                           ? "inactive"
                           : "pending"
                     }
-                    avatar={student.avatarUrl}
+                    avatar={student.userExtension?.user.avatarUrl}
                     goal={student.goal}
                   />
                 ))}
@@ -141,23 +142,23 @@ export default function StudentsPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredStudents.map((student) => (
-                      <TableRow key={student.id}>
+                      <TableRow key={student.userExtensionId}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={student.avatarUrl || "/placeholder.svg"} alt={student.name} />
+                              <AvatarImage src={student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${student.userExtension?.user.userName}`} />
                               <AvatarFallback>
-                                {student.name
+                                {`${student.userExtension?.user.userName}`
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">{student.name}</span>
+                            <span className="font-medium">{`${student.userExtension?.user.userName}`}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {calculateAge(student.birthDate) ? `${calculateAge(student.birthDate)} anos` : "-"}
+                          {calculateAge(student.userExtension?.user.birthDate) ? `${calculateAge(student.userExtension?.user.birthDate)} anos` : "-"}
                         </TableCell>
                         <TableCell>{student.height ? `${student.height} cm` : "-"}</TableCell>
                         <TableCell>{student.weight ? `${student.weight} kg` : "-"}</TableCell>
@@ -169,7 +170,7 @@ export default function StudentsPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <Button asChild size="sm" variant="outline">
-                            <Link href={`/students/${student.id}`}>Ver detalhes</Link>
+                            <Link href={`/students/${student.userExtensionId}`}>Ver detalhes</Link>
                           </Button>
                         </TableCell>
                       </TableRow>

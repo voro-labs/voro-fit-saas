@@ -1,12 +1,5 @@
-import type { ContactDto } from "./contact.interface"
-
-export enum MessageStatusEnum {
-  Created = 1,
-  Sent = 2,
-  Delivered = 3,
-  Read = 4,
-  Failed = 5,
-}
+import { MessageStatusEnum } from "../Enums/messageStatusEnum.enum"
+import type { ContactDto } from "./contactDto.interface"
 
 export interface MessageReactionDto {
   reaction: string

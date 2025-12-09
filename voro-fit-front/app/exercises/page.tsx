@@ -8,8 +8,8 @@ import { Plus, Search, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useExercises } from "@/hooks/use-exercises.hook"
-import { ExerciseTypeEnum } from "@/types/DTOs/exercise.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { ExerciseTypeEnum } from "@/types/Enums/exerciseTypeEnum.enum"
 
 export default function ExercisesPage() {
   const { exercises, loading, error } = useExercises()
@@ -36,7 +36,7 @@ export default function ExercisesPage() {
   }, [exercises, search, muscleGroupFilter, typeFilter])
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

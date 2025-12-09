@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Text.Json;
 using VoroFit.Application.DTOs.Evolution.Webhook;
 using VoroFit.Application.Services.Interfaces.Evolution;

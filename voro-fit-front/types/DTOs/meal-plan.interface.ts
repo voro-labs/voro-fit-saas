@@ -1,10 +1,6 @@
+import { MealPlanStatusEnum } from "../Enums/mealPlanStatusEnum.enum"
 import type { MealPlanDayDto } from "./meal-plan-day.interface"
 import type { StudentDto } from "./student.interface"
-
-export enum MealPlanStatusEnum {
-  Active = 1,
-  Inactive = 2,
-}
 
 export interface MealPlanDto {
   id: string

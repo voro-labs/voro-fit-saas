@@ -13,14 +13,14 @@ namespace VoroFit.Application.Services.Evolution
         {
             var message = mapper.Map<Message>(messageDto);
 
-            return this.AddAsync(message);
+            return base.AddAsync(message);
         }
 
         public Task AddRangeAsync(IEnumerable<MessageDto> messageDtos)
         {
             var messages = mapper.Map<IEnumerable<Message>>(messageDtos);
 
-            return this.AddRangeAsync(messages);
+            return base.AddRangeAsync(messages);
         }
     }
 }

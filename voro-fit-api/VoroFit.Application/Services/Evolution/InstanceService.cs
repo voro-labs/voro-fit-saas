@@ -14,14 +14,14 @@ namespace VoroFit.Application.Services.Evolution
         {
             var instance = mapper.Map<Instance>(instanceDto);
 
-            return this.AddAsync(instance);
+            return base.AddAsync(instance);
         }
 
         public Task AddRangeAsync(IEnumerable<InstanceDto> instanceDtos)
         {
             var instances = mapper.Map<IEnumerable<Instance>>(instanceDtos);
 
-            return this.AddRangeAsync(instances);
+            return base.AddRangeAsync(instances);
         }
 
         public async Task<Instance> GetOrCreateInstance(string name)
@@ -37,8 +37,8 @@ namespace VoroFit.Application.Services.Evolution
 
             instance = new Instance { Name = name };
 
-            await this.AddAsync(instance);
-            await this.SaveChangesAsync();
+            await base.AddAsync(instance);
+            await base.SaveChangesAsync();
 
             return instance;
         }

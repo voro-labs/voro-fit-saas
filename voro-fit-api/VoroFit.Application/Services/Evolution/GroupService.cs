@@ -14,14 +14,14 @@ namespace VoroFit.Application.Services.Evolution
         {
             var group = mapper.Map<Group>(groupDto);
 
-            return this.AddAsync(group);
+            return base.AddAsync(group);
         }
 
         public Task AddRangeAsync(IEnumerable<GroupDto> groupDtos)
         {
             var groups = mapper.Map<IEnumerable<Group>>(groupDtos);
 
-            return this.AddRangeAsync(groups);
+            return base.AddRangeAsync(groups);
         }
 
         public async Task<Group> GetOrCreateGroup(string groupJid, string? displayName)
@@ -39,8 +39,8 @@ namespace VoroFit.Application.Services.Evolution
                 RemoteJid = groupJid
             };
 
-            await this.AddAsync(group);
-            await this.SaveChangesAsync();
+            await base.AddAsync(group);
+            await base.SaveChangesAsync();
 
             return group;
         }

@@ -13,9 +13,9 @@ import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useStudents } from "@/hooks/use-students.hook"
 import { useMealPlans } from "@/hooks/use-meal-plans.hook"
-import { DayOfWeekEnum } from "@/types/DTOs/meal-plan-day.interface"
-import { MealPlanStatusEnum } from "@/types/DTOs/meal-plan.interface"
-import { MealPeriodEnum } from "@/types/DTOs/meal-plan-meal.interface"
+import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
+import { MealPlanStatusEnum } from "@/types/Enums/mealPlanStatusEnum.enum"
+import { MealPeriodEnum } from "@/types/Enums/mealPeriodEnum.enum"
 import { AuthGuard } from "@/components/auth/auth.guard"
 
 interface Meal {
@@ -107,7 +107,7 @@ export default function NewMealPlanPage() {
   }
 
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">
@@ -144,8 +144,8 @@ export default function NewMealPlanPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {students.map((student) => (
-                          <SelectItem key={student.id} value={student.id}>
-                            {student.name}
+                          <SelectItem key={student.userExtensionId} value={student.userExtensionId}>
+                            {student.userExtension?.user.userName}
                           </SelectItem>
                         ))}
                       </SelectContent>

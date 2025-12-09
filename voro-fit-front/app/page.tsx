@@ -1,4 +1,3 @@
-import { AppHeader } from "@/components/app-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -99,7 +98,7 @@ const studentProgress = [
 
 export default function DashboardPage() {
   return (
-    <AuthGuard requiredRoles={["Admin"]}>
+    <AuthGuard requiredRoles={["Trainer"]}>
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-balance">Dashboard</h1>
@@ -144,16 +143,16 @@ export default function DashboardPage() {
                 {upcomingWorkouts.map((workout, i) => (
                   <div key={i} className="flex items-center gap-4 rounded-lg border p-4">
                     <Avatar>
-                      <AvatarImage src={workout.avatar || "/placeholder.svg"} alt={workout.student} />
+                      <AvatarImage src={workout.avatar || "/placeholder.svg"} alt={`${workout.student}`} />
                       <AvatarFallback>
-                        {workout.student
+                        {`${workout.student}`
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="font-medium">{workout.student}</p>
+                      <p className="font-medium">{`${workout.student}`}</p>
                       <p className="text-sm text-muted-foreground">{workout.type}</p>
                     </div>
                     <div className="text-right">
@@ -209,20 +208,20 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-6">
                 {studentProgress.map((student) => (
-                  <div key={student.name} className="space-y-2">
+                  <div key={`${student.name}`} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={student.avatar || "/placeholder.svg"} alt={student.name} />
+                          <AvatarImage src={student.avatar || "/placeholder.svg"} alt={`${student.name}`} />
                           <AvatarFallback>
-                            {student.name
+                            {`${student.name}`
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-sm">{student.name}</p>
+                          <p className="font-medium text-sm">{`${student.name}`}</p>
                           <p className="text-xs text-muted-foreground">{student.goal}</p>
                         </div>
                       </div>

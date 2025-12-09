@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http;
-
-namespace VoroFit.Application.DTOs.Request
+﻿namespace VoroFit.Application.DTOs.Request
 {
     public class MediaRequestDto
     {

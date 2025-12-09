@@ -10,10 +10,8 @@ using VoroFit.Application.DTOs.Evolution;
 using VoroFit.Application.DTOs.Evolution.Webhook;
 using VoroFit.Application.DTOs.Request;
 using VoroFit.Application.Services.Interfaces.Evolution;
-using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Domain.Enums;
 using VoroFit.Shared.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VoroFit.API.Controllers.Evolution
 {

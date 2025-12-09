@@ -18,14 +18,14 @@ namespace VoroFit.Application.Services.Evolution
             if (exists)
                 return;
 
-            await this.AddAsync(new GroupMember
+            await base.AddAsync(new GroupMember
             {
                 GroupId = group.Id,
                 ContactId = contact.Id,
                 JoinedAt = DateTimeOffset.UtcNow
             });
 
-            await this.SaveChangesAsync();
+            await base.SaveChangesAsync();
         }
 
     }

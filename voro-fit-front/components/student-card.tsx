@@ -28,9 +28,9 @@ export function StudentCard({ id, name, age, height, weight, status, avatar, goa
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14">
-            <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
+            <AvatarImage src={avatar || "/placeholder.svg"} alt={`${name}`} />
             <AvatarFallback>
-              {name
+              {`${name}`
                 .split(" ")
                 .map((n) => n[0])
                 .join("")}
@@ -38,7 +38,7 @@ export function StudentCard({ id, name, age, height, weight, status, avatar, goa
           </Avatar>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate">{name}</h3>
+            <h3 className="font-semibold truncate">{`${name}`}</h3>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
               {age && <span>{age} anos</span>}
               {age && weight && <span>•</span>}

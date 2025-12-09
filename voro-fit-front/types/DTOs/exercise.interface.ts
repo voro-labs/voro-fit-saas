@@ -1,7 +1,4 @@
-export enum ExerciseTypeEnum {
-  Public = 1,
-  Custom = 2,
-}
+import { ExerciseTypeEnum } from "../Enums/exerciseTypeEnum.enum"
 
 export interface ExerciseDto {
   id: string

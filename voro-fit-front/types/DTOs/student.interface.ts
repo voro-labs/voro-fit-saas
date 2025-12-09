@@ -1,20 +1,12 @@
 import type { MeasurementDto } from "./measurement.interface"
 import type { WorkoutHistoryDto } from "./workout-history.interface"
 import type { MealPlanDto } from "./meal-plan.interface"
-
-export enum StudentStatusEnum {
-  Active = 1,
-  Inactive = 2,
-  Pending = 3,
-}
+import { StudentStatusEnum } from "../Enums/studentStatusEnum.enum"
+import { UserExtensionDto } from "./userExtensionDto.interface"
 
 export interface StudentDto {
-  id: string
-  name: string
-  email?: string
-  phone?: string
-  avatarUrl?: string
-  birthDate?: Date
+  userExtensionId: string
+  userExtension?: UserExtensionDto
   height?: number
   weight?: number
   goal?: string
