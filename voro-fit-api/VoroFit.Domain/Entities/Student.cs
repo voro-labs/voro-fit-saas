@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using VoroFit.Domain.Entities.Identity;
 using VoroFit.Domain.Enums;
 
 namespace VoroFit.Domain.Entities
@@ -20,14 +19,27 @@ namespace VoroFit.Domain.Entities
         [Column(TypeName = "decimal(5,2)")]
         public decimal Weight { get; set; }
 
-        public StudentStatusEnum Status { get; set; } = StudentStatusEnum.Active;
-        
+        public StudentStatusEnum Status { get; set; } 
+            = StudentStatusEnum.Active;
+
         [StringLength(200)]
         public string Goal { get; set; } = string.Empty;
 
-        public ICollection<WorkoutExercise> WorkoutExercises { get; set; } = [];
-        public ICollection<WorkoutHistory> WorkoutHistories { get; set; } = [];
-        public ICollection<Measurement> Measurements { get; set; } = [];
+        // ===============================
+        // RELACIONAMENTOS IMPORTANTES
+        // ===============================
+
+        // PLANOS (planejamento)
+        public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = [];
         public ICollection<MealPlan> MealPlans { get; set; } = [];
+
+        // HISTÓRICOS (execução)
+        public ICollection<WorkoutHistory> WorkoutHistories { get; set; } = [];
+
+        // Acompanhamento
+        public ICollection<Measurement> Measurements { get; set; } = [];
+
+        // exercícios favoritos / frequentes
+        public ICollection<Exercise> FavoriteExercises { get; set; } = [];
     }
 }

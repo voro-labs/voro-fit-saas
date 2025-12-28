@@ -33,7 +33,11 @@ namespace VoroFit.Application.Mappings
             CreateMap<Student, StudentDto>().ReverseMap();
             CreateMap<Measurement, MeasurementDto>().ReverseMap();
             CreateMap<Exercise, ExerciseDto>().ReverseMap();
-            CreateMap<WorkoutExercise, WorkoutExerciseDto>().ReverseMap();
+            CreateMap<WorkoutPlanExercise, WorkoutPlanExerciseDto>().ReverseMap();
+            CreateMap<WorkoutHistoryExercise, WorkoutHistoryExerciseDto>().ReverseMap();
+            CreateMap<WorkoutPlanDay, WorkoutPlanDayDto>().ReverseMap();
+            CreateMap<WorkoutPlan, WorkoutPlanDto>().ReverseMap();
+            CreateMap<WorkoutPlanWeek, WorkoutPlanWeekDto>().ReverseMap();
             CreateMap<WorkoutHistory, WorkoutHistoryDto>().ReverseMap();
             CreateMap<MealPlan, MealPlanDto>().ReverseMap();
             CreateMap<MealPlanDay, MealPlanDayDto>().ReverseMap();

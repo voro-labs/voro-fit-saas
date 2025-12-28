@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,7 +13,6 @@ import {
   Upload,
   User,
   Loader2,
-  UserPlus,
   Phone,
   Mail,
   Calendar,
@@ -21,17 +20,56 @@ import {
   Weight,
   Target,
   FileText,
+  Save,
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
-export default function NewStudentPage() {
+export default function EditStudentPage() {
+  const params = useParams()
   const router = useRouter()
-  const { createStudent, loading, error } = useStudents()
+  const { fetchStudentById, updateStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    birthDate: "",
+    height: "",
+    weight: "",
+    goal: "",
+    notes: "",
+  })
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    if (params.id) {
+      fetchStudentById(params.id as string).then((data) => {
+        if (data) {
+          setFormData({
+            name: data.userExtension?.user.userName || "",
+            email: data.userExtension?.user.email || "",
+            phone: data.userExtension?.user.phoneNumber || "",
+            birthDate: data.userExtension?.user.birthDate
+              ? new Date(data.userExtension.user.birthDate).toISOString().split("T")[0]
+              : "",
+            height: data.height?.toString() || "",
+            weight: data.weight?.toString() || "",
+            goal: data.goal || "",
+            notes: data.notes || "",
+          })
+          if (data.userExtension?.user.avatarUrl) {
+            setAvatarPreview(data.userExtension.user.avatarUrl)
+          }
+        }
+        setLoadingData(false)
+      })
+    }
+  }, [params.id, fetchStudentById])
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -47,16 +85,20 @@ export default function NewStudentPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+    const formDataToSend = new FormData(e.currentTarget)
 
     if (avatarFile) {
-      formData.append("avatar", avatarFile)
+      formDataToSend.append("avatar", avatarFile)
     }
 
-    const result = await createStudent(formData)
+    const result = await updateStudent(params.id as string, formDataToSend)
     if (result) {
-      router.push("/students")
+      router.push(`/students/${params.id}`)
     }
+  }
+
+  if (loadingData) {
+    return <Loading isLoading={true} />
   }
 
   return (
@@ -65,19 +107,19 @@ export default function NewStudentPage() {
         <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
-              <Link href="/students">
+              <Link href={`/students/${params.id}`}>
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Voltar para alunos
+                Voltar para detalhes
               </Link>
             </Button>
 
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                <UserPlus className="h-7 w-7 text-primary" />
+                <User className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-balance">Novo Aluno</h1>
-                <p className="text-muted-foreground">Preencha as informações do novo aluno</p>
+                <h1 className="text-3xl font-bold text-balance">Editar Aluno</h1>
+                <p className="text-muted-foreground">Atualize as informações do aluno</p>
               </div>
             </div>
           </div>
@@ -91,7 +133,7 @@ export default function NewStudentPage() {
           <Card className="border-border/50 shadow-lg">
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl">Informações Pessoais</CardTitle>
-              <CardDescription>Cadastre os dados básicos do aluno</CardDescription>
+              <CardDescription>Edite os dados do aluno</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -110,7 +152,7 @@ export default function NewStudentPage() {
                           <Upload className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium">Clique para fazer upload da foto</p>
+                          <p className="font-medium">Clique para alterar a foto</p>
                           <p className="text-sm text-muted-foreground">PNG, JPG até 5MB</p>
                         </div>
                       </div>
@@ -131,7 +173,15 @@ export default function NewStudentPage() {
                       <User className="h-4 w-4" />
                       Nome Completo *
                     </Label>
-                    <Input id="name" name="name" placeholder="Ex: Carlos Silva" required className="h-12 text-base" />
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="Ex: Carlos Silva"
+                      required
+                      className="h-12 text-base"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -146,6 +196,8 @@ export default function NewStudentPage() {
                         type="email"
                         placeholder="email@exemplo.com"
                         className="h-12 text-base"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -153,7 +205,14 @@ export default function NewStudentPage() {
                         <Phone className="h-4 w-4" />
                         Telefone
                       </Label>
-                      <Input id="phone" name="phone" placeholder="(11) 99999-9999" className="h-12 text-base" />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        placeholder="(11) 99999-9999"
+                        className="h-12 text-base"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
                     </div>
                   </div>
                 </div>
@@ -171,7 +230,14 @@ export default function NewStudentPage() {
                         <Calendar className="h-4 w-4" />
                         Data de Nascimento
                       </Label>
-                      <Input id="birthDate" name="birthDate" type="date" className="h-12" />
+                      <Input
+                        id="birthDate"
+                        name="birthDate"
+                        type="date"
+                        className="h-12"
+                        value={formData.birthDate}
+                        onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -179,7 +245,15 @@ export default function NewStudentPage() {
                         <Ruler className="h-4 w-4" />
                         Altura (cm)
                       </Label>
-                      <Input id="height" name="height" type="number" placeholder="178" className="h-12 text-base" />
+                      <Input
+                        id="height"
+                        name="height"
+                        type="number"
+                        placeholder="178"
+                        className="h-12 text-base"
+                        value={formData.height}
+                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -194,6 +268,8 @@ export default function NewStudentPage() {
                         step="0.1"
                         placeholder="82.5"
                         className="h-12 text-base"
+                        value={formData.weight}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                       />
                     </div>
                   </div>
@@ -216,6 +292,8 @@ export default function NewStudentPage() {
                       name="goal"
                       placeholder="Ex: Hipertrofia, Emagrecimento, Força"
                       className="h-12 text-base"
+                      value={formData.goal}
+                      onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
                     />
                   </div>
 
@@ -230,24 +308,26 @@ export default function NewStudentPage() {
                       placeholder="Informações adicionais sobre o aluno, histórico médico, restrições..."
                       rows={4}
                       className="resize-none text-base"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-3 justify-end pt-6 border-t">
                   <Button type="button" variant="outline" size="lg" asChild>
-                    <Link href="/students">Cancelar</Link>
+                    <Link href={`/students/${params.id}`}>Cancelar</Link>
                   </Button>
                   <Button type="submit" size="lg" disabled={loading} className="min-w-[180px]">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Cadastrando...
+                        Salvando...
                       </>
                     ) : (
                       <>
-                        <UserPlus className="mr-2 h-5 w-5" />
-                        Cadastrar Aluno
+                        <Save className="mr-2 h-5 w-5" />
+                        Salvar Alterações
                       </>
                     )}
                   </Button>

@@ -1,25 +1,56 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Video, Loader2, Dumbbell, FileText, Lightbulb } from "lucide-react"
+import { ArrowLeft, Video, Loader2, Dumbbell, FileText, Lightbulb, Save } from "lucide-react"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useExercises } from "@/hooks/use-exercises.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
-export default function NewExercisePage() {
+export default function EditExercisePage() {
+  const params = useParams()
   const router = useRouter()
-  const { createExercise, loading, error } = useExercises()
+  const { fetchExerciseById, updateExercise, loading, error } = useExercises()
   const [mediaPreview, setMediaPreview] = useState<string>("")
   const [mediaFile, setMediaFile] = useState<File | null>(null)
   const [muscleGroup, setMuscleGroup] = useState("")
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    notes: "",
+    alternatives: "",
+  })
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    if (params.id) {
+      fetchExerciseById(params.id as string).then((data) => {
+        if (data) {
+          setFormData({
+            name: data.name || "",
+            description: data.description || "",
+            notes: data.notes || "",
+            alternatives: data.alternatives || "",
+          })
+          setMuscleGroup(data.muscleGroup || "")
+          if (data.thumbnailUrl) {
+            setMediaPreview(data.thumbnailUrl)
+          } else if (data.videoUrl) {
+            setMediaPreview(data.videoUrl)
+          }
+        }
+        setLoadingData(false)
+      })
+    }
+  }, [params.id, fetchExerciseById])
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -35,18 +66,22 @@ export default function NewExercisePage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+    const formDataToSend = new FormData(e.currentTarget)
 
-    formData.set("muscleGroup", muscleGroup)
+    formDataToSend.set("muscleGroup", muscleGroup)
 
     if (mediaFile) {
-      formData.append("media", mediaFile)
+      formDataToSend.append("media", mediaFile)
     }
 
-    const result = await createExercise(formData)
+    const result = await updateExercise(params.id as string, formDataToSend)
     if (result) {
-      router.push("/exercises")
+      router.push(`/exercises/${params.id}`)
     }
+  }
+
+  if (loadingData) {
+    return <Loading isLoading={true} />
   }
 
   return (
@@ -55,9 +90,9 @@ export default function NewExercisePage() {
         <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
-              <Link href="/exercises">
+              <Link href={`/exercises/${params.id}`}>
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Voltar para biblioteca
+                Voltar para detalhes
               </Link>
             </Button>
 
@@ -66,8 +101,8 @@ export default function NewExercisePage() {
                 <Dumbbell className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-balance">Novo Exercício</h1>
-                <p className="text-muted-foreground">Cadastre um novo exercício personalizado</p>
+                <h1 className="text-3xl font-bold text-balance">Editar Exercício</h1>
+                <p className="text-muted-foreground">Atualize as informações do exercício</p>
               </div>
             </div>
           </div>
@@ -81,7 +116,7 @@ export default function NewExercisePage() {
           <Card className="border-border/50 shadow-lg">
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl">Informações do Exercício</CardTitle>
-              <CardDescription>Preencha os detalhes do exercício</CardDescription>
+              <CardDescription>Edite os detalhes do exercício</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -102,6 +137,8 @@ export default function NewExercisePage() {
                       placeholder="Ex: Supino Inclinado com Halteres"
                       required
                       className="h-12 text-base"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
 
@@ -138,6 +175,8 @@ export default function NewExercisePage() {
                       rows={4}
                       required
                       className="resize-none text-base"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
                 </div>
@@ -151,7 +190,9 @@ export default function NewExercisePage() {
 
                   {mediaPreview && (
                     <div className="rounded-xl border-2 border-border overflow-hidden shadow-md animate-in fade-in zoom-in-95">
-                      {mediaPreview.startsWith("data:image") ? (
+                      {mediaPreview.startsWith("data:image") ||
+                      mediaPreview.endsWith(".jpg") ||
+                      mediaPreview.endsWith(".png") ? (
                         <img
                           src={mediaPreview || "/placeholder.svg"}
                           alt="Preview"
@@ -169,7 +210,7 @@ export default function NewExercisePage() {
                         <Video className="h-7 w-7 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium">Clique para fazer upload de vídeo ou imagem</p>
+                        <p className="font-medium">Clique para alterar vídeo ou imagem</p>
                         <p className="text-sm text-muted-foreground mt-0.5">MP4, MOV, JPG, PNG até 50MB</p>
                       </div>
                     </div>
@@ -200,6 +241,8 @@ export default function NewExercisePage() {
                       placeholder="Dicas de execução, cuidados, postura..."
                       rows={3}
                       className="resize-none text-base"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     />
                   </div>
 
@@ -213,24 +256,26 @@ export default function NewExercisePage() {
                       placeholder="Variações do exercício, alternativas com outros equipamentos..."
                       rows={3}
                       className="resize-none text-base"
+                      value={formData.alternatives}
+                      onChange={(e) => setFormData({ ...formData, alternatives: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-3 justify-end pt-6 border-t">
                   <Button type="button" variant="outline" size="lg" asChild>
-                    <Link href="/exercises">Cancelar</Link>
+                    <Link href={`/exercises/${params.id}`}>Cancelar</Link>
                   </Button>
                   <Button type="submit" size="lg" disabled={loading || !muscleGroup} className="min-w-[180px]">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Cadastrando...
+                        Salvando...
                       </>
                     ) : (
                       <>
-                        <Dumbbell className="mr-2 h-5 w-5" />
-                        Cadastrar Exercício
+                        <Save className="mr-2 h-5 w-5" />
+                        Salvar Alterações
                       </>
                     )}
                   </Button>

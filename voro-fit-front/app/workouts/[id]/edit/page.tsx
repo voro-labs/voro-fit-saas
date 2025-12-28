@@ -2,14 +2,14 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { WorkoutForm } from "@/components/workout-form"
-import { ArrowLeft, Loader2, Dumbbell, User, FileText } from "lucide-react"
+import { ArrowLeft, Loader2, Dumbbell, User, FileText, Save } from "lucide-react"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useStudents } from "@/hooks/use-students.hook"
@@ -17,21 +17,37 @@ import { useWorkouts } from "@/hooks/use-workouts.hook"
 import type { WorkoutExerciseDto } from "@/types/DTOs/workout-exercise.interface"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
-export default function NewWorkoutPage() {
+export default function EditWorkoutPage() {
+  const params = useParams()
   const router = useRouter()
   const { students } = useStudents()
-  const { createWorkout, loading, error } = useWorkouts()
+  const { fetchWorkoutById, updateWorkout, loading, error } = useWorkouts()
   const [selectedStudentId, setSelectedStudentId] = useState("")
   const [workoutName, setWorkoutName] = useState("")
   const [exercises, setExercises] = useState<Partial<WorkoutExerciseDto>[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    if (params.id) {
+      fetchWorkoutById(params.id as string).then((data) => {
+        if (data) {
+          setWorkoutName(data.name || "")
+          setSelectedStudentId(data.studentId || "")
+          setExercises(data.exercises || [])
+        }
+        setLoadingData(false)
+      })
+    }
+  }, [params.id, fetchWorkoutById])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!selectedStudentId || !workoutName) return
 
-    const result = await createWorkout({
+    const result = await updateWorkout(params.id as string, {
       name: workoutName,
       studentId: selectedStudentId,
       status: WorkoutStatusEnum.Active,
@@ -39,8 +55,12 @@ export default function NewWorkoutPage() {
     })
 
     if (result) {
-      router.push("/workouts")
+      router.push(`/workouts/${params.id}`)
     }
+  }
+
+  if (loadingData) {
+    return <Loading isLoading={true} />
   }
 
   return (
@@ -49,9 +69,9 @@ export default function NewWorkoutPage() {
         <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
-              <Link href="/workouts">
+              <Link href={`/workouts/${params.id}`}>
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Voltar para treinos
+                Voltar para detalhes
               </Link>
             </Button>
 
@@ -60,8 +80,8 @@ export default function NewWorkoutPage() {
                 <Dumbbell className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-balance">Montar Treino</h1>
-                <p className="text-muted-foreground">Crie um novo treino personalizado para seu aluno</p>
+                <h1 className="text-3xl font-bold text-balance">Editar Treino</h1>
+                <p className="text-muted-foreground">Atualize o treino do aluno</p>
               </div>
             </div>
           </div>
@@ -75,7 +95,7 @@ export default function NewWorkoutPage() {
           <Card className="border-border/50 shadow-lg">
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl">Informações do Treino</CardTitle>
-              <CardDescription>Selecione o aluno e monte o treino</CardDescription>
+              <CardDescription>Edite o aluno e os exercícios do treino</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -135,7 +155,7 @@ export default function NewWorkoutPage() {
 
                 <div className="flex gap-3 justify-end pt-6 border-t">
                   <Button type="button" variant="outline" size="lg" asChild>
-                    <Link href="/workouts">Cancelar</Link>
+                    <Link href={`/workouts/${params.id}`}>Cancelar</Link>
                   </Button>
                   <Button
                     type="submit"
@@ -150,8 +170,8 @@ export default function NewWorkoutPage() {
                       </>
                     ) : (
                       <>
-                        <Dumbbell className="mr-2 h-5 w-5" />
-                        Salvar Treino
+                        <Save className="mr-2 h-5 w-5" />
+                        Salvar Alterações
                       </>
                     )}
                   </Button>

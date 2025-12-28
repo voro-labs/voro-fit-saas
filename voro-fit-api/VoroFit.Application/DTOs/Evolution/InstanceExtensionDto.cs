@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using VoroFit.Domain.Entities.Evolution;
-using VoroFit.Domain.Enums;
+﻿using VoroFit.Domain.Enums;
 
 namespace VoroFit.Application.DTOs.Evolution
 {

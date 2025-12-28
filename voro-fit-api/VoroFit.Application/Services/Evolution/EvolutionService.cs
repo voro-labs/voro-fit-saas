@@ -1,11 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
 using VoroFit.Application.DTOs.Evolution.API.Request;
 using VoroFit.Application.DTOs.Evolution.API.Response;
 using VoroFit.Application.Services.Interfaces.Evolution;
-using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Shared.Extensions;
 using VoroFit.Shared.Utils;
 

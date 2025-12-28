@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MealBlock } from "@/components/meal-block"
-import { ArrowLeft, Plus, Loader2, UtensilsCrossed, User, Calendar, FileText } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, UtensilsCrossed, User, Calendar, FileText, Save } from "lucide-react"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useStudents } from "@/hooks/use-students.hook"
@@ -17,6 +17,7 @@ import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
 import { MealPlanStatusEnum } from "@/types/Enums/mealPlanStatusEnum.enum"
 import { MealPeriodEnum } from "@/types/Enums/mealPeriodEnum.enum"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 interface Meal {
   id: string
@@ -46,13 +47,49 @@ const periodToEnum: Record<string, MealPeriodEnum> = {
   Ceia: MealPeriodEnum.Ceia,
 }
 
-export default function NewMealPlanPage() {
+const periodFromEnum: Record<MealPeriodEnum, string> = {
+  [MealPeriodEnum.CafeDaManha]: "Café da Manhã",
+  [MealPeriodEnum.LancheDaManha]: "Lanche da Manhã",
+  [MealPeriodEnum.Almoco]: "Almoço",
+  [MealPeriodEnum.LancheDaTarde]: "Lanche da Tarde",
+  [MealPeriodEnum.Jantar]: "Jantar",
+  [MealPeriodEnum.Ceia]: "Ceia",
+}
+
+export default function EditMealPlanPage() {
+  const params = useParams()
   const router = useRouter()
   const { students } = useStudents()
-  const { createMealPlan, loading, error } = useMealPlans()
+  const { fetchMealPlanById, updateMealPlan, loading, error } = useMealPlans()
   const [selectedStudentId, setSelectedStudentId] = useState("")
   const [selectedDay, setSelectedDay] = useState(String(DayOfWeekEnum.Segunda))
   const [meals, setMeals] = useState<Meal[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    if (params.id) {
+      fetchMealPlanById(params.id as string).then((data) => {
+        if (data) {
+          setSelectedStudentId(data.studentId || "")
+          if (data.days && data.days.length > 0) {
+            const firstDay = data.days[0]
+            setSelectedDay(String(firstDay.dayOfWeek))
+            const mealsData: Meal[] =
+              firstDay.meals?.map((meal) => ({
+                id: meal.id || Math.random().toString(36).substr(2, 9),
+                time: meal.time || "",
+                period: periodFromEnum[meal.period] || "",
+                description: meal.description || "",
+                quantity: meal.quantity || "",
+                notes: meal.notes || "",
+              })) || []
+            setMeals(mealsData)
+          }
+        }
+        setLoadingData(false)
+      })
+    }
+  }, [params.id, fetchMealPlanById])
 
   const addMeal = () => {
     const newMeal: Meal = {
@@ -79,16 +116,16 @@ export default function NewMealPlanPage() {
 
     if (!selectedStudentId) return
 
-    const result = await createMealPlan({
+    const result = await updateMealPlan(params.id as string, {
       studentId: selectedStudentId,
       status: MealPlanStatusEnum.Active,
       days: [
         {
           id: "",
-          mealPlanId: "",
+          mealPlanId: params.id as string,
           dayOfWeek: Number(selectedDay) as DayOfWeekEnum,
           meals: meals.map((meal, index) => ({
-            id: "",
+            id: meal.id,
             mealPlanDayId: "",
             period: periodToEnum[meal.period] || MealPeriodEnum.CafeDaManha,
             time: meal.time,
@@ -102,8 +139,12 @@ export default function NewMealPlanPage() {
     })
 
     if (result) {
-      router.push("/nutrition")
+      router.push(`/nutrition/${params.id}`)
     }
+  }
+
+  if (loadingData) {
+    return <Loading isLoading={true} />
   }
 
   return (
@@ -112,9 +153,9 @@ export default function NewMealPlanPage() {
         <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
-              <Link href="/nutrition">
+              <Link href={`/nutrition/${params.id}`}>
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Voltar para planos
+                Voltar para detalhes
               </Link>
             </Button>
 
@@ -123,8 +164,8 @@ export default function NewMealPlanPage() {
                 <UtensilsCrossed className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-balance">Novo Plano Alimentar</h1>
-                <p className="text-muted-foreground">Crie um plano alimentar personalizado</p>
+                <h1 className="text-3xl font-bold text-balance">Editar Plano Alimentar</h1>
+                <p className="text-muted-foreground">Atualize o plano alimentar do aluno</p>
               </div>
             </div>
           </div>
@@ -138,7 +179,7 @@ export default function NewMealPlanPage() {
           <Card className="border-border/50 shadow-lg">
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl">Informações do Plano</CardTitle>
-              <CardDescription>Selecione o aluno e o dia da semana</CardDescription>
+              <CardDescription>Edite o aluno e o dia da semana</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -247,7 +288,7 @@ export default function NewMealPlanPage() {
 
                 <div className="flex gap-3 justify-end pt-6 border-t">
                   <Button type="button" variant="outline" size="lg" asChild>
-                    <Link href="/nutrition">Cancelar</Link>
+                    <Link href={`/nutrition/${params.id}`}>Cancelar</Link>
                   </Button>
                   <Button type="submit" size="lg" disabled={loading || !selectedStudentId} className="min-w-[180px]">
                     {loading ? (
@@ -257,8 +298,8 @@ export default function NewMealPlanPage() {
                       </>
                     ) : (
                       <>
-                        <UtensilsCrossed className="mr-2 h-5 w-5" />
-                        Salvar Plano
+                        <Save className="mr-2 h-5 w-5" />
+                        Salvar Alterações
                       </>
                     )}
                   </Button>

@@ -17,7 +17,7 @@ namespace VoroFit.Infrastructure.Seeds
         {
             // Garante que o banco existe e está migrado
             await context.Database.MigrateAsync();
-            
+
             // SEED: Notifications
             SeedNotifications(context);
 
@@ -25,7 +25,7 @@ namespace VoroFit.Infrastructure.Seeds
 
             // SEED: Roles
             SeedRoles(context);
-            
+
             await context.SaveChangesAsync();
 
             // SEED: Usuário Admin
@@ -48,13 +48,33 @@ namespace VoroFit.Infrastructure.Seeds
 
             await context.SaveChangesAsync();
 
+            // SEED: Workout Plans
+            SeedWorkoutPlans(context);
+
+            await context.SaveChangesAsync();
+
+            // SEED: Workout Plan Weeks
+            SeedWorkoutPlanWeeks(context);
+
+            await context.SaveChangesAsync();
+
+            // SEED: Workout Plan Days
+            SeedWorkoutPlanDays(context);
+
+            await context.SaveChangesAsync();
+
+            // SEED: Workout Plan Exercises
+            SeedWorkoutPlanExercises(context);
+
+            await context.SaveChangesAsync();
+
             // SEED: Workout Histories
             SeedWorkoutHistories(context);
 
             await context.SaveChangesAsync();
 
-            // SEED: Workout Exercises
-            SeedWorkoutExercises(context);
+            // SEED: Workout History Exercises
+            SeedWorkoutHistoryExercises(context);
 
             await context.SaveChangesAsync();
 
@@ -501,134 +521,155 @@ namespace VoroFit.Infrastructure.Seeds
             }
         }
 
-        private static void SeedWorkoutHistories(JasmimDbContext context)
+        private static void SeedWorkoutPlans(JasmimDbContext context)
         {
-            if (!context.WorkoutHistories.Any())
+            if (context.WorkoutPlans.Any()) return;
+
+            var student = context.Students.FirstOrDefault();
+            if (student == null) return;
+
+            var plan = new WorkoutPlan
             {
-                var student = context.Students.FirstOrDefault();
-                if (student == null) return;
+                Id = Guid.NewGuid(),
+                StudentId = student.UserExtensionId,
+                Status = WorkoutPlanStatusEnum.Active,
+                CreatedAt = DateTime.UtcNow
+            };
 
-                var histories = new List<WorkoutHistory>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        StudentId = student.UserExtensionId,
-                        Name = "Treino de Peito e Tríceps",
-
-                        CreatedDate = DateTimeOffset.UtcNow.AddDays(-2),
-                        LastUpdated = DateTimeOffset.UtcNow.AddDays(-2),
-
-                        Status = WorkoutStatusEnum.Active,
-                        Exercises = [] // preenchido depois no seed de WorkoutExercise
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        StudentId = student.UserExtensionId,
-                        Name = "Treino de Costas e Bíceps",
-
-                        CreatedDate = DateTimeOffset.UtcNow.AddDays(-1),
-                        LastUpdated = DateTimeOffset.UtcNow.AddDays(-1),
-
-                        Status = WorkoutStatusEnum.Active,
-                        Exercises = []
-                    }
-                };
-
-                context.WorkoutHistories.AddRange(histories);
-            }
+            context.WorkoutPlans.Add(plan);
         }
 
-        private static void SeedWorkoutExercises(JasmimDbContext context)
+        private static void SeedWorkoutPlanWeeks(JasmimDbContext context)
         {
-            if (!context.WorkoutExercises.Any())
+            if (context.WorkoutPlanWeeks.Any()) return;
+
+            var plan = context.WorkoutPlans.FirstOrDefault();
+            if (plan == null) return;
+
+            var weeks = new List<WorkoutPlanWeek>
+    {
+        new() { WorkoutPlanId = plan.Id, WeekNumber = 1 },
+        new() { WorkoutPlanId = plan.Id, WeekNumber = 2 }
+    };
+
+            context.WorkoutPlanWeeks.AddRange(weeks);
+        }
+
+        private static void SeedWorkoutPlanDays(JasmimDbContext context)
+        {
+            if (context.WorkoutPlanDays.Any()) return;
+
+            var weeks = context.WorkoutPlanWeeks.ToList();
+            if (!weeks.Any()) return;
+
+            var daysOfWeek = new[] { "Segunda", "Quarta", "Sexta" };
+            var days = new List<WorkoutPlanDay>();
+
+            foreach (var week in weeks)
             {
-                var student = context.Users.FirstOrDefault(u => u.UserRoles.Any(ur => ur.RoleId.ToString() == RoleConstant.Student));
-
-                if (student == null) return;
-
-                var histories = context.WorkoutHistories.ToList();
-                var exercises = context.Exercises.ToList();
-
-                if (!histories.Any() || !exercises.Any()) return;
-
-                var chestWorkout = histories.FirstOrDefault(h => h.Name.Contains("Peito"));
-                var backWorkout = histories.FirstOrDefault(h => h.Name.Contains("Costas"));
-
-                if (chestWorkout == null || backWorkout == null) return;
-
-                // pegar exercícios já criados
-                var supino = exercises.FirstOrDefault(e => e.Name == "Supino Reto");
-                var agachamento = exercises.FirstOrDefault(e => e.Name == "Agachamento Livre");
-                var barraFixa = exercises.FirstOrDefault(e => e.Name == "Barra Fixa");
-
-                // se quiser depois colocamos mais exercícios oficiais
-                var workoutExercises = new List<WorkoutExercise>
+                foreach (var day in daysOfWeek)
                 {
-                    // -----------------------------------------------
-                    // TREINO DE PEITO / TRÍCEPS
-                    // -----------------------------------------------
-
-                    new()
+                    days.Add(new WorkoutPlanDay
                     {
-                        Id = Guid.NewGuid(),
-                        WorkoutHistoryId = chestWorkout.Id,
-                        ExerciseId = supino!.Id,
-                        StudentId = student.Id,
-                        Order = 1,
-                        Sets = 3,
-                        Reps = 10,
-                        RestInSeconds = 90,
-                        Weight = 40f
-                    },
-
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        WorkoutHistoryId = chestWorkout.Id,
-                        ExerciseId = agachamento!.Id,
-                        StudentId = student.Id,
-                        Order = 2,
-                        Sets = 4,
-                        Reps = 12,
-                        RestInSeconds = 120,
-                        Weight = 0f // exercício sem carga
-                    },
-
-                    // -----------------------------------------------
-                    // TREINO COSTAS / BÍCEPS
-                    // -----------------------------------------------
-
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        WorkoutHistoryId = backWorkout.Id,
-                        ExerciseId = barraFixa!.Id,
-                        StudentId = student.Id,
-                        Order = 1,
-                        Sets = 3,
-                        Reps = 8,
-                        RestInSeconds = 120,
-                        Weight = null // peso corporal
-                    },
-
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        WorkoutHistoryId = backWorkout.Id,
-                        ExerciseId = agachamento.Id,
-                        StudentId = student.Id,
-                        Order = 2,
-                        Sets = 4,
-                        Reps = 10,
-                        RestInSeconds = 120,
-                        Weight = 0f
-                    }
-                };
-
-                context.WorkoutExercises.AddRange(workoutExercises);
+                        WorkoutPlanWeekId = week.Id,
+                        DayOfWeek = day
+                    });
+                }
             }
+
+            context.WorkoutPlanDays.AddRange(days);
+        }
+
+        private static void SeedWorkoutPlanExercises(JasmimDbContext context)
+        {
+            if (context.WorkoutPlanExercises.Any()) return;
+
+            var day = context.WorkoutPlanDays.FirstOrDefault();
+            if (day == null) return;
+
+            var exercises = context.Exercises.ToList();
+            if (!exercises.Any()) return;
+
+            var supino = exercises.First(e => e.Name == "Supino Reto");
+            var barra = exercises.First(e => e.Name == "Barra Fixa");
+
+            var planExercises = new List<WorkoutPlanExercise>
+    {
+        new()
+        {
+            WorkoutPlanDayId = day.Id,
+            ExerciseId = supino.Id,
+            Order = 1,
+            Sets = 3,
+            Reps = 10,
+            RestInSeconds = 90,
+            Weight = 40
+        },
+        new()
+        {
+            WorkoutPlanDayId = day.Id,
+            ExerciseId = barra.Id,
+            Order = 2,
+            Sets = 3,
+            Reps = 8,
+            RestInSeconds = 120,
+            Weight = null
+        }
+    };
+
+            context.WorkoutPlanExercises.AddRange(planExercises);
+        }
+
+        private static void SeedWorkoutHistories(JasmimDbContext context)
+        {
+            if (context.WorkoutHistories.Any()) return;
+
+            var student = context.Students.FirstOrDefault();
+            var plan = context.WorkoutPlans.FirstOrDefault();
+            var week = context.WorkoutPlanWeeks.FirstOrDefault();
+            var day = context.WorkoutPlanDays.FirstOrDefault();
+
+            if (student == null || plan == null || week == null || day == null) return;
+
+            var history = new WorkoutHistory
+            {
+                Id = Guid.NewGuid(),
+                StudentId = student.UserExtensionId,
+                WorkoutPlanId = plan.Id,
+                WorkoutPlanWeekId = week.Id,
+                WorkoutPlanDayId = day.Id,
+                ExecutionDate = DateTime.UtcNow.AddDays(-1),
+                Status = WorkoutExecutionStatusEnum.Completed
+            };
+
+            context.WorkoutHistories.Add(history);
+        }
+
+        private static void SeedWorkoutHistoryExercises(JasmimDbContext context)
+        {
+            if (context.WorkoutHistoryExercises.Any()) return;
+
+            var history = context.WorkoutHistories.FirstOrDefault();
+            if (history == null) return;
+
+            var planned = context.WorkoutPlanExercises.ToList();
+            if (!planned.Any()) return;
+
+            var historyExercises = planned.Select(p => new WorkoutHistoryExercise
+            {
+                WorkoutHistoryId = history.Id,
+                ExerciseId = p.ExerciseId,
+                Order = p.Order,
+                PlannedSets = p.Sets,
+                PlannedReps = p.Reps,
+                ExecutedSets = p.Sets,
+                ExecutedReps = p.Reps - 1, // exemplo realista
+                PlannedWeight = p.Weight,
+                ExecutedWeight = p.Weight,
+                RestInSeconds = p.RestInSeconds
+            }).ToList();
+
+            context.WorkoutHistoryExercises.AddRange(historyExercises);
         }
 
         private static void SeedMealPlans(JasmimDbContext context)

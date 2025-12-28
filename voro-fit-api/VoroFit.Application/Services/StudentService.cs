@@ -34,7 +34,11 @@ namespace VoroFit.Application.Services
         {
             return await studentRepository.Query()
                 .Include(s => s.UserExtension)
-                .Include(s => s.WorkoutExercises)
+                .Include(s => s.WorkoutHistories)
+                .Include(s => s.FavoriteExercises)
+                .Include(s => s.WorkoutPlans)
+                .Include(s => s.MealPlans)
+                .Include(s => s.Measurements)
                 .ProjectTo<StudentDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
         }

@@ -1,7 +1,4 @@
-﻿using VoroFit.Application.DTOs.Evolution;
-using VoroFit.Application.DTOs.Evolution.API.Request;
-using VoroFit.Application.DTOs.Evolution.API.Response;
-using VoroFit.Domain.Entities.Evolution;
+﻿using VoroFit.Domain.Entities.Evolution;
 
 namespace VoroFit.Application.Services.Interfaces
 {

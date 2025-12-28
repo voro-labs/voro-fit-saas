@@ -6,17 +6,31 @@ namespace VoroFit.Domain.Entities
     {
         public Guid Id { get; set; }
 
-        public string Name { get; set; } = null!;
-
-        // aluno dono do treino
+        // aluno que executou o treino
         public Guid StudentId { get; set; }
         public Student Student { get; set; } = null!;
 
-        public DateTimeOffset CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTimeOffset LastUpdated { get; set; } = DateTime.UtcNow;
+        // vínculo com o planejamento
+        public Guid WorkoutPlanId { get; set; }
+        public WorkoutPlan WorkoutPlan { get; set; } = null!;
 
-        public WorkoutStatusEnum Status { get; set; } = WorkoutStatusEnum.Active;
+        public Guid WorkoutPlanWeekId { get; set; }
+        public WorkoutPlanWeek WorkoutPlanWeek { get; set; } = null!;
 
-        public ICollection<WorkoutExercise> Exercises { get; set; } = [];
+        public Guid WorkoutPlanDayId { get; set; }
+        public WorkoutPlanDay WorkoutPlanDay { get; set; } = null!;
+
+        // informações da execução
+        public DateTimeOffset ExecutionDate { get; set; } = DateTime.UtcNow;
+
+        public WorkoutExecutionStatusEnum Status { get; set; } 
+            = WorkoutExecutionStatusEnum.Completed;
+
+        public string? Notes { get; set; }
+
+        public ICollection<WorkoutHistoryExercise> Exercises { get; set; } = [];
+
+        public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

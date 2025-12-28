@@ -1,15 +1,11 @@
 ﻿namespace VoroFit.Domain.Entities
 {
-    public class WorkoutExercise
+    public class WorkoutPlanExercise
     {
         public Guid Id { get; set; }
 
-        // aluno dono do treino
-        public Guid StudentId { get; set; }
-        public Student Student { get; set; } = null!;
-
-        public Guid WorkoutHistoryId { get; set; }
-        public WorkoutHistory WorkoutHistory { get; set; } = null!;
+        public Guid WorkoutPlanDayId { get; set; }
+        public WorkoutPlanDay WorkoutPlanDay { get; set; } = null!;
 
         public Guid ExerciseId { get; set; }
         public Exercise Exercise { get; set; } = null!;

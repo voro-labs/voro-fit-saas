@@ -21,8 +21,14 @@ namespace VoroFit.Infrastructure.Factories
         public DbSet<MealPlanDay> MealPlanDays { get; set; }
         public DbSet<MealPlan> MealPlans { get; set; }
 
-        public DbSet<WorkoutExercise> WorkoutExercises { get; set; }
+        public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
+        public DbSet<WorkoutPlanWeek> WorkoutPlanWeeks { get; set; }
+        public DbSet<WorkoutPlanDay> WorkoutPlanDays { get; set; }
+        public DbSet<WorkoutPlanExercise> WorkoutPlanExercises { get; set; }
+
         public DbSet<WorkoutHistory> WorkoutHistories { get; set; }
+        public DbSet<WorkoutHistoryExercise> WorkoutHistoryExercises { get; set; }
+
         public DbSet<Exercise> Exercises { get; set; }
 
         public DbSet<Measurement> Measurements { get; set; }
@@ -78,18 +84,6 @@ namespace VoroFit.Infrastructure.Factories
                 .WithMany() // um treinador pode ter vários alunos
                 .HasForeignKey(s => s.TrainerId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // ---------------------------
-            // WORKOUT HISTORY
-            // ---------------------------
-            builder.Entity<WorkoutHistory>()
-                .HasKey(wh => wh.Id);
-
-            builder.Entity<WorkoutHistory>()
-                .HasOne(wh => wh.Student)
-                .WithMany(s => s.WorkoutHistories)
-                .HasForeignKey(wh => wh.StudentId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             // ---------------------------
             // MEASUREMENT
@@ -148,6 +142,118 @@ namespace VoroFit.Infrastructure.Factories
             // ---------------------------
             builder.Entity<Exercise>()
                 .HasKey(e => e.Id);
+
+            // ---------------------------
+            // WORKOUT PLAN
+            // ---------------------------
+            builder.Entity<WorkoutPlan>()
+                .HasKey(wp => wp.Id);
+
+            builder.Entity<WorkoutPlan>()
+                .HasOne(wp => wp.Student)
+                .WithMany(s => s.WorkoutPlans)
+                .HasForeignKey(wp => wp.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ---------------------------
+            // WORKOUT PLAN WEEK
+            // ---------------------------
+            builder.Entity<WorkoutPlanWeek>()
+                .HasKey(wpw => wpw.Id);
+
+            builder.Entity<WorkoutPlanWeek>()
+                .HasOne(wpw => wpw.WorkoutPlan)
+                .WithMany(wp => wp.Weeks)
+                .HasForeignKey(wpw => wpw.WorkoutPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WorkoutPlanWeek>()
+                .Property(wpw => wpw.WeekNumber)
+                .IsRequired();
+
+            // ---------------------------
+            // WORKOUT PLAN DAY
+            // ---------------------------
+            builder.Entity<WorkoutPlanDay>()
+                .HasKey(wpd => wpd.Id);
+
+            builder.Entity<WorkoutPlanDay>()
+                .Property(wpd => wpd.DayOfWeek)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            builder.Entity<WorkoutPlanDay>()
+                .HasOne(wpd => wpd.WorkoutPlanWeek)
+                .WithMany(wpw => wpw.Days)
+                .HasForeignKey(wpd => wpd.WorkoutPlanWeekId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ---------------------------
+            // WORKOUT PLAN EXERCISE
+            // ---------------------------
+            builder.Entity<WorkoutPlanExercise>()
+                .HasKey(wpe => wpe.Id);
+
+            builder.Entity<WorkoutPlanExercise>()
+                .HasOne(wpe => wpe.WorkoutPlanDay)
+                .WithMany(wpd => wpd.Exercises)
+                .HasForeignKey(wpe => wpe.WorkoutPlanDayId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WorkoutPlanExercise>()
+                .HasOne(wpe => wpe.Exercise)
+                .WithMany(e => e.WorkoutPlanExercises)
+                .HasForeignKey(wpe => wpe.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------------------------
+            // WORKOUT HISTORY
+            // ---------------------------
+            builder.Entity<WorkoutHistory>()
+                .HasKey(wh => wh.Id);
+
+            builder.Entity<WorkoutHistory>()
+                .HasOne(wh => wh.Student)
+                .WithMany(s => s.WorkoutHistories)
+                .HasForeignKey(wh => wh.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WorkoutHistory>()
+                .HasOne(wh => wh.WorkoutPlan)
+                .WithMany()
+                .HasForeignKey(wh => wh.WorkoutPlanId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WorkoutHistory>()
+                .HasOne(wh => wh.WorkoutPlanWeek)
+                .WithMany()
+                .HasForeignKey(wh => wh.WorkoutPlanWeekId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WorkoutHistory>()
+                .HasOne(wh => wh.WorkoutPlanDay)
+                .WithMany()
+                .HasForeignKey(wh => wh.WorkoutPlanDayId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------------------------
+            // WORKOUT HISTORY EXERCISE
+            // ---------------------------
+            builder.Entity<WorkoutHistoryExercise>()
+                .HasKey(whe => whe.Id);
+
+            builder.Entity<WorkoutHistoryExercise>()
+                .HasOne(whe => whe.WorkoutHistory)
+                .WithMany(wh => wh.Exercises)
+                .HasForeignKey(whe => whe.WorkoutHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WorkoutHistoryExercise>()
+                .HasOne(whe => whe.Exercise)
+                .WithMany(e => e.WorkoutHistoryExercises)
+                .HasForeignKey(whe => whe.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // ---------------------------
             // IDENTITY CONFIG
