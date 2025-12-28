@@ -1,19 +1,23 @@
-﻿using VoroFit.Application.DTOs.Evolution.API;
-using VoroFit.Application.DTOs.Request;
+﻿using VoroFit.Application.DTOs.Evolution;
+using VoroFit.Application.DTOs.Evolution.API.Request;
+using VoroFit.Application.DTOs.Evolution.API.Response;
 using VoroFit.Domain.Entities.Evolution;
 
 namespace VoroFit.Application.Services.Interfaces.Evolution
 {
     public interface IEvolutionService
     {
-        Task<(Contact senderContact, Group? group, Chat chat)> CreateChatAndGroupOrContactAsync(
-            string instanceName, string normalizedJid, string pushName,
-            string remoteJid, bool isGroup = false, string? participant = "");
+        Task SetInstanceName(string instanceName);
 
-        Task<GroupEventDto?> GetGroupAsync(string groupJId);
-        Task<IEnumerable<GroupEventDto>> GetGroupsAsync();
-        Task<IEnumerable<ContactEventDto>> GetContactsAsync();
-        Task<InstanceEventDto> GetInstanceStatusAsync();
+        Task<IEnumerable<InstanceResponseDto>> GetAllInstancesAsync();
+        Task<InstanceCreateResponseDto> CreateInstanceAsync(InstanceRequestDto dto);
+        Task DeleteInstanceAsync();
+        Task<QrCodeJsonDto> RefreshQrCodeAsync();
+        Task<InstanceCreateResponseDto> GetInstanceStatusAsync();
+
+        Task<GroupResponseDto?> GetGroupAsync(string groupJId);
+        Task<IEnumerable<GroupResponseDto>> GetGroupsAsync();
+        Task<IEnumerable<ContactResponseDto>> GetContactsAsync();
         Task<string> SendMessageAsync(MessageRequestDto request);
         Task<string> SendMediaMessageAsync(MediaRequestDto request);
         Task<string> SendLocationMessageAsync(LocationRequestDto request);

@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VoroFit.Application.DTOs.Evolution.API
+namespace VoroFit.Application.DTOs.Evolution.API.Response
 {
-    public class GroupEventDto
+    public class GroupResponseDto
     {
         [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;

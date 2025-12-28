@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VoroFit.Infrastructure.Factories;
@@ -11,9 +12,11 @@ using VoroFit.Infrastructure.Factories;
 namespace VoroFit.Infrastructure.Migrations
 {
     [DbContext(typeof(JasmimDbContext))]
-    partial class JasmimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251211013456_UpdateInstance")]
+    partial class UpdateInstance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,7 +125,10 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("InstanceExtensionId")
+                    b.Property<Guid?>("InstanceExtensionInstanceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsGroup")
@@ -144,7 +150,9 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("InstanceExtensionId");
+                    b.HasIndex("InstanceExtensionInstanceId");
+
+                    b.HasIndex("InstanceId");
 
                     b.ToTable("Chats");
                 });
@@ -327,12 +335,7 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserExtensionId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("InstanceId");
-
-                    b.HasIndex("UserExtensionId");
 
                     b.ToTable("InstanceExtensions");
                 });
@@ -976,9 +979,13 @@ namespace VoroFit.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("GroupId");
 
-                    b.HasOne("VoroFit.Domain.Entities.Evolution.InstanceExtension", "InstanceExtension")
+                    b.HasOne("VoroFit.Domain.Entities.Evolution.InstanceExtension", null)
                         .WithMany("Chats")
-                        .HasForeignKey("InstanceExtensionId")
+                        .HasForeignKey("InstanceExtensionInstanceId");
+
+                    b.HasOne("VoroFit.Domain.Entities.Evolution.Instance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("InstanceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -986,7 +993,7 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Navigation("Group");
 
-                    b.Navigation("InstanceExtension");
+                    b.Navigation("Instance");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.ContactIdentifier", b =>
@@ -1034,15 +1041,7 @@ namespace VoroFit.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VoroFit.Domain.Entities.UserExtension", "UserExtension")
-                        .WithMany()
-                        .HasForeignKey("UserExtensionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Instance");
-
-                    b.Navigation("UserExtension");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Message", b =>

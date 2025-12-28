@@ -1,2 +1,2 @@
-dotnet ef migrations add Initial --project VoroFit.Infrastructure --startup-project VoroFit.API --output-dir Migrations
-dotnet ef database update Initial --project VoroFit.Infrastructure --startup-project VoroFit.API
+dotnet ef migrations add UpdateInstance --project VoroFit.Infrastructure --startup-project VoroFit.API --output-dir Migrations
+dotnet ef database update --project VoroFit.Infrastructure --startup-project VoroFit.API

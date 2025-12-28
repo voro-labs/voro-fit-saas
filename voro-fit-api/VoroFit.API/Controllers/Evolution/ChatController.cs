@@ -7,8 +7,9 @@ using VoroFit.API.Extensions;
 using VoroFit.API.ViewModels;
 using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Evolution;
+using VoroFit.Application.DTOs.Evolution.API.Request;
 using VoroFit.Application.DTOs.Evolution.Webhook;
-using VoroFit.Application.DTOs.Request;
+using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Enums;
 using VoroFit.Shared.Extensions;
@@ -29,6 +30,7 @@ namespace VoroFit.API.Controllers.Evolution
         IGroupMemberService groupMemberService,
         IMessageReactionService messageReactionService,
         IContactIdentifierService contactIdentifierService,
+        IConversationService conversationService,
         IMapper mapper) : ControllerBase
     {
         private readonly IChatService _chatService = chatService;
@@ -40,6 +42,7 @@ namespace VoroFit.API.Controllers.Evolution
         private readonly IGroupMemberService _groupMemberService = groupMemberService;
         private readonly IMessageReactionService _messageReactionService = messageReactionService;
         private readonly IContactIdentifierService _contactIdentifierService = contactIdentifierService;
+        private readonly IConversationService _conversationService = conversationService;
         private readonly IMapper _mapper = mapper;
 
         // ======================================================
@@ -102,7 +105,7 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                var (senderContact, group, chat) = await _evolutionService.CreateChatAndGroupOrContactAsync(
+                var (senderContact, group, chat) = await _conversationService.CreateChatAndGroupOrContactAsync(
                     $"{request.InstanceName}", $"{request.Number}@s.whatsapp.net",
                     $"{request.DisplayName}", $"{request.Number}@s.whatsapp.net", false, string.Empty);
 
@@ -190,6 +193,7 @@ namespace VoroFit.API.Controllers.Evolution
                     .Query(m => 
                         m.ContactId == contactId &&
                         m.Status != MessageStatusEnum.Deleted)
+                    .Include(m => m.Contact)
                     .Include(m => m.QuotedMessage)
                         .ThenInclude(q => q!.Contact)
                     .Include(m => m.MessageReactions)
@@ -220,7 +224,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 if (chat == null)
                     return NoContent();
@@ -231,12 +236,14 @@ namespace VoroFit.API.Controllers.Evolution
                 if (string.IsNullOrWhiteSpace(contact.Number))
                     return BadRequest("Contato não possui número cadastrado.");
 
-                if (string.IsNullOrWhiteSpace(request.Conversation))
+                if (string.IsNullOrWhiteSpace(request.Text))
                     return BadRequest("Mensagem não pode ser vazia.");
 
-                request.Number = contact.Number;
+                request.Number = $"{contact.Number}@s.whatsapp.net";
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.SendMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
@@ -292,7 +299,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Quoted?.Key.Id, out var guid);
 
@@ -310,15 +318,17 @@ namespace VoroFit.API.Controllers.Evolution
                 if (string.IsNullOrWhiteSpace(contact.Number))
                     return BadRequest("Contato não possui número cadastrado.");
 
-                if (string.IsNullOrWhiteSpace(request.Conversation))
+                if (string.IsNullOrWhiteSpace(request.Text))
                     return BadRequest("Mensagem não pode ser vazia.");
 
-                request.Number = contact.Number;
+                request.Number = $"{contact.Number}@s.whatsapp.net";
 
                 if (request.Quoted != null)
                     request.Quoted.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.SendQuotedMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
@@ -377,7 +387,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 if (chat == null)
                     return NoContent();
@@ -404,6 +415,8 @@ namespace VoroFit.API.Controllers.Evolution
                     return BadRequest("Anexo não pode ser nulo.");
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.SendMediaMessageAsync(mediaRequest);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
@@ -510,7 +523,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Key.Id, out var guid);
 
@@ -540,6 +554,8 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.SendReactionMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
@@ -594,7 +610,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Id, out var guid);
 
@@ -619,6 +636,8 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.DeleteMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
@@ -651,7 +670,8 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId).FirstOrDefaultAsync();
+                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                    .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Id, out var guid);
 
@@ -686,10 +706,12 @@ namespace VoroFit.API.Controllers.Evolution
                 var messageRequest = new MessageRequestDto
                 {
                     Number = contact.Number,
-                    Conversation = conversation
+                    Text = conversation
                 };
 
                 // EvolutionService retorna STRING → ajustado
+                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+
                 var responseString = await _evolutionService.SendMessageAsync(messageRequest);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);

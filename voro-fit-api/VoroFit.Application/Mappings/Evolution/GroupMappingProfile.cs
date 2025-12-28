@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using VoroFit.Application.DTOs.Evolution;
-using VoroFit.Application.DTOs.Evolution.API;
+using VoroFit.Application.DTOs.Evolution.API.Response;
 
 namespace VoroFit.Application.Mappings.Evolution
 {
@@ -9,7 +9,7 @@ namespace VoroFit.Application.Mappings.Evolution
     {
         public GroupMappingProfile()
         {
-            CreateMap<GroupEventDto, GroupDto>()
+            CreateMap<GroupResponseDto, GroupDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
 
             // id → RemoteJid

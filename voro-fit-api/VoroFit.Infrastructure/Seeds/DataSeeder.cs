@@ -190,15 +190,7 @@ namespace VoroFit.Infrastructure.Seeds
                             Role = adminRole
                         }
                     ],
-                    UserExtension = new UserExtension
-                    {
-                        Instances = [
-                            new Instance
-                            {
-                                Name = "voro-evolution"
-                            }
-                        ]
-                    }
+                    UserExtension = new UserExtension()
                 };
 
                 context.Users.Add(admin);
@@ -224,15 +216,7 @@ namespace VoroFit.Infrastructure.Seeds
                             Role = trainerRole
                         }
                     ],
-                    UserExtension = new UserExtension
-                    {
-                        Instances = [
-                            new Instance
-                            {
-                                Name = "voro-evolution"
-                            }
-                        ]
-                    }
+                    UserExtension = new UserExtension()
                 };
 
                 context.Users.Add(trainer);
@@ -258,15 +242,7 @@ namespace VoroFit.Infrastructure.Seeds
                             Role = studentRole
                         }
                     ],
-                    UserExtension = new UserExtension
-                    {
-                        Instances = [
-                            new Instance
-                            {
-                                Name = "voro-evolution"
-                            }
-                        ]
-                    }
+                    UserExtension = new UserExtension()
                 };
 
                 context.Users.Add(student);

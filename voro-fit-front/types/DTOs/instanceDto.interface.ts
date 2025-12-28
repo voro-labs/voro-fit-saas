@@ -1,10 +1,7 @@
-import { ChatDto } from "./chatDto.interface"
+import { InstanceExtensionDto } from "./instanceExtensionDto.interface"
 
 export interface InstanceDto {
   id: string
-  externalId: string
-  updatedAt: Date
-  chats: ChatDto[]
+  name: string
+  instanceExtension: InstanceExtensionDto | null
 }
-
-

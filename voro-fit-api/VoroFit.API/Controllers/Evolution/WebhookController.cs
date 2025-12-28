@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using VoroFit.Application.DTOs.Evolution.Webhook;
+using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Domain.Enums;
@@ -15,7 +16,7 @@ namespace VoroFit.API.Controllers.Evolution
     [AllowAnonymous]
     public class WebhookController(IChatService chatService, IGroupService groupService, IGroupMemberService groupMemberService,
         IContactService contactService, IContactIdentifierService contactIdentifierService, IMessageService messageService,
-        IInstanceService instanceService, IEvolutionService evolutionService) : ControllerBase
+        IInstanceService instanceService, IEvolutionService evolutionService, IConversationService conversationService) : ControllerBase
     {
         private readonly IChatService _chatService = chatService;
         private readonly IGroupService _groupService = groupService;
@@ -25,6 +26,7 @@ namespace VoroFit.API.Controllers.Evolution
         private readonly IGroupMemberService _groupMemberService = groupMemberService;
         private readonly IContactIdentifierService _contactIdentifierService = contactIdentifierService;
         private readonly IEvolutionService _evolutionService = evolutionService;
+        private readonly IConversationService _conversationService = conversationService;
 
         [HttpPost]
         public async Task<IActionResult> Receive([FromBody] JsonElement payload)
@@ -217,7 +219,7 @@ namespace VoroFit.API.Controllers.Evolution
 
             // -------- INSTÂNCIA / CHAT ---------
 
-            var (senderContact, group, chat) = await _evolutionService.CreateChatAndGroupOrContactAsync(
+            var (senderContact, group, chat) = await _conversationService.CreateChatAndGroupOrContactAsync(
                 eventDto.Instance, normalizedJid, pushName, remoteJid, isGroup, key.Participant);
 
             Message? message = await _messageService.Query(item => item.ExternalId == messageKey).FirstOrDefaultAsync();

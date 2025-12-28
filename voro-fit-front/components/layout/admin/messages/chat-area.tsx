@@ -164,9 +164,6 @@ export function ChatArea({
             <p className="font-medium">
               {contact.displayName || contact.number}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {isTyping ? "digitando..." : contact.lastKnownPresence ? "Online" : "Offline"}
-            </p>
           </div>
         </div>
 

@@ -25,6 +25,16 @@ namespace VoroFit.API.Extensions.Configurations
             services.Configure<CookieUtil>(configuration.GetSection("CookieSettings"));
             services.Configure<EvolutionUtil>(configuration.GetSection("EvolutionSettings"));
 
+            services.AddScoped<IDataSeeder, DataSeeder>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IEvolutionService, EvolutionService>();
+            services.AddScoped<IConversationService, ConversationService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IMailKitEmailService, MailKitEmailService>();
+
+            services.AddSignalR();
+
             #region Identity Repositories
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -71,15 +81,6 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<IWorkoutHistoryService, WorkoutHistoryService>();
 
             #endregion
-
-            services.AddScoped<IDataSeeder, DataSeeder>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IEvolutionService, EvolutionService>();
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
-            services.AddScoped<IMailKitEmailService, MailKitEmailService>();
-
-            services.AddSignalR();
 
             return services;
         }

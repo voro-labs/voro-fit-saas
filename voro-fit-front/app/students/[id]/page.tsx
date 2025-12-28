@@ -86,7 +86,7 @@ export default function StudentDetailPage() {
 
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
-      <Loading isLoading={loading}></Loading>
+      <Loading isLoading={!student || loading}></Loading>
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6">

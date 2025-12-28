@@ -61,7 +61,7 @@ namespace VoroFit.Application.Services.Evolution
                 DisplayName = pushName,
                 RemoteJid = remoteJid,
                 ProfilePictureUrl = profilePicture,
-                Number = ExtractNumber(remoteJid)
+                Number = ExtractNumber(remoteJid, remoteJidAlt)
             };
 
             await contactRepository.AddAsync(contact);
@@ -123,9 +123,33 @@ namespace VoroFit.Application.Services.Evolution
             await base.SaveChangesAsync();
         }
 
-        private string ExtractNumber(string jid)
+        public static string ExtractNumber(string? remoteJid, string? remoteJidAlt)
         {
-            return jid.Contains("@") ? jid.Split('@')[0] : jid;
+            if (string.IsNullOrWhiteSpace(remoteJid))
+                return string.Empty;
+
+            if (string.IsNullOrWhiteSpace(remoteJidAlt))
+                return string.Empty;
+
+            if (remoteJid.Contains("whatsapp"))
+            {
+                var beforeAt = remoteJid.Split('@').FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(beforeAt))
+                    return string.Empty;
+
+                return beforeAt.Split('-').FirstOrDefault() ?? string.Empty;
+            }
+
+            if (remoteJidAlt.Contains("whatsapp"))
+            {
+                var beforeAt = remoteJidAlt.Split('@').FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(beforeAt))
+                    return string.Empty;
+
+                return beforeAt.Split('-').FirstOrDefault() ?? string.Empty;
+            }
+
+            return string.Empty;
         }
     }
 }

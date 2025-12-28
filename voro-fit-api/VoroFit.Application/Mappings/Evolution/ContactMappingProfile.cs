@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using VoroFit.Application.DTOs.Evolution;
-using VoroFit.Application.DTOs.Evolution.API;
+using VoroFit.Application.DTOs.Evolution.API.Response;
 
 namespace VoroFit.Application.Mappings
 {
@@ -8,7 +8,7 @@ namespace VoroFit.Application.Mappings
     {
         public ContactMappingProfile()
         {
-            CreateMap<ContactEventDto, ContactDto>()
+            CreateMap<ContactResponseDto, ContactDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
 
             // remoteJid → RemoteJid
@@ -16,7 +16,7 @@ namespace VoroFit.Application.Mappings
 
             // extrair número antes do @ 
             .ForMember(dest => dest.Number,
-                opt => opt.MapFrom(src => ExtractNumber(src.RemoteJid)))
+                opt => opt.MapFrom(src => ExtractNumber(src.RemoteJid, "")))
 
             // pushName → DisplayName
             .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.PushName))
@@ -42,16 +42,33 @@ namespace VoroFit.Application.Mappings
             .ForMember(dest => dest.GroupMemberships, opt => opt.Ignore());
         }
 
-        public static string ExtractNumber(string? remoteJid)
+        public static string ExtractNumber(string? remoteJid, string? remoteJidAlt)
         {
             if (string.IsNullOrWhiteSpace(remoteJid))
                 return string.Empty;
 
-            var beforeAt = remoteJid.Split('@').FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(beforeAt))
+            if (string.IsNullOrWhiteSpace(remoteJidAlt))
                 return string.Empty;
 
-            return beforeAt.Split('-').FirstOrDefault() ?? string.Empty;
+            if (remoteJid.Contains("whatsapp"))
+            {
+                var beforeAt = remoteJid.Split('@').FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(beforeAt))
+                    return string.Empty;
+
+                return beforeAt.Split('-').FirstOrDefault() ?? string.Empty;
+            }
+
+            if (remoteJidAlt.Contains("whatsapp"))
+            {
+                var beforeAt = remoteJidAlt.Split('@').FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(beforeAt))
+                    return string.Empty;
+
+                return beforeAt.Split('-').FirstOrDefault() ?? string.Empty;
+            }
+
+            return string.Empty;
         }
 
         private static DateTimeOffset ParseDate(string date)

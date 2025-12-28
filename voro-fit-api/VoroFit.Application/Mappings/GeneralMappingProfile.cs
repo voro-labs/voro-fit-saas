@@ -28,6 +28,7 @@ namespace VoroFit.Application.Mappings
             CreateMap<MessageReaction, MessageReactionDto>().ReverseMap();
             CreateMap<Message, MessageDto>().ReverseMap();
             
+            CreateMap<InstanceExtension, InstanceExtensionDto>().ReverseMap();
             CreateMap<UserExtension, UserExtensionDto>().ReverseMap();
             CreateMap<Student, StudentDto>().ReverseMap();
             CreateMap<Measurement, MeasurementDto>().ReverseMap();

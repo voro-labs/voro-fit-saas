@@ -6,8 +6,8 @@
         public string RemoteJid { get; set; } = string.Empty;
         public bool IsGroup { get; set; }
 
-        public Guid InstanceId { get; set; } = Guid.NewGuid();
-        public Instance Instance { get; set; } = null!;
+        public Guid InstanceExtensionId { get; set; } = Guid.NewGuid();
+        public InstanceExtension InstanceExtension { get; set; } = null!;
 
         public DateTimeOffset LastMessageAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

@@ -21,7 +21,7 @@ namespace VoroFit.Application.Services.Evolution
             {
                 RemoteJid = remoteJid,
                 IsGroup = isGroup,
-                InstanceId = instance.Id,
+                InstanceExtensionId = instance.Id,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 

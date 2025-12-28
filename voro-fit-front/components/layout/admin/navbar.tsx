@@ -1,5 +1,6 @@
 "use client"
 
+import { useIsMobile } from "@/hooks/use-mobile.hook"
 import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -11,8 +12,11 @@ interface NavbarProps {
 export function Navbar({ isOpen, onMenuClick }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
+    if (!isMobile) return
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     }

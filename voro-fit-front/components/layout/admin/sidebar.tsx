@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   LogOut,
+  Smartphone,
 } from "lucide-react"
 import { toTitleCase } from "@/lib/utils"
 
@@ -21,6 +22,7 @@ const navItems = [
   { title: "Treinos", href: "/workouts", icon: ClipboardList },
   { title: "Nutrição", href: "/nutrition", icon: Apple },
   { title: "Mensagens", href: "/messages", icon: MessageSquare },
+  { title: "Instâncias", href: "/instances", icon: Smartphone }
 ]
 
 interface SidebarProps {

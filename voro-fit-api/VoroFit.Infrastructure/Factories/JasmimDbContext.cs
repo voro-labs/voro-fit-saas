@@ -13,9 +13,9 @@ namespace VoroFit.Infrastructure.Factories
 
         // Expor explicitamente a entidade de junção
         //public DbSet<Exemplo> Exemplo { get; set; }
+        public DbSet<InstanceExtension> InstanceExtensions { get; set; }
         public DbSet<UserExtension> UserExtensions { get; set; }
         public DbSet<Student> Students { get; set; }
-        public DbSet<Instance> Instances { get; set; }
 
         public DbSet<MealPlanMeal> MealPlanMeals { get; set; }
         public DbSet<MealPlanDay> MealPlanDays { get; set; }
@@ -49,6 +49,15 @@ namespace VoroFit.Infrastructure.Factories
                 .HasOne(ue => ue.User)
                 .WithOne(u => u.UserExtension)
                 .HasForeignKey<UserExtension>(ue => ue.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<InstanceExtension>()
+                .HasKey(ue => ue.InstanceId);
+
+            builder.Entity<InstanceExtension>()
+                .HasOne(ue => ue.Instance)
+                .WithOne(u => u.InstanceExtension)
+                .HasForeignKey<InstanceExtension>(ue => ue.InstanceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ---------------------------

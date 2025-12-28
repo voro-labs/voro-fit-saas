@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text;
 using System.Text.Json;
-using VoroFit.Application.DTOs.Evolution.API;
-using VoroFit.Application.DTOs.Request;
+using VoroFit.Application.DTOs.Evolution.API.Request;
+using VoroFit.Application.DTOs.Evolution.API.Response;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Shared.Extensions;
@@ -14,134 +15,97 @@ namespace VoroFit.Application.Services.Evolution
     {
         private readonly HttpClient _httpClient;
         private readonly EvolutionUtil _evolutionUtil;
-        private readonly ILogger<EvolutionService> _logger;
-        private readonly IChatService _chatService;
-        private readonly IGroupService _groupService;
-        private readonly IContactService _contactService;
-        private readonly IContactIdentifierService _contactIdentifierService;
-        private readonly IInstanceService _instanceService;
-        private readonly IGroupMemberService _groupMemberService;
+
+        private string InstanceName = string.Empty;
 
         public EvolutionService(IHttpClientFactory httpClientFactory,
-            IOptions<EvolutionUtil> evolutionUtil, ILogger<EvolutionService> logger,
-            IChatService chatService, IGroupService groupService, 
-            IContactService contactService, IContactIdentifierService contactIdentifierService,
-            IInstanceService instanceService, IGroupMemberService groupMemberService)
+            IOptions<EvolutionUtil> evolutionUtil)
         {
             _evolutionUtil = evolutionUtil.Value;
-            _logger = logger;
-
-            _chatService = chatService;
-            _groupService = groupService;
-            _contactService = contactService;
-            _instanceService = instanceService;
-            _groupMemberService = groupMemberService;
-            _contactIdentifierService = contactIdentifierService;
 
             _httpClient = httpClientFactory.CreateClient(nameof(EvolutionService));
             _httpClient.BaseAddress = new Uri(_evolutionUtil.BaseUrl);
             _httpClient.DefaultRequestHeaders.Add("apikey", _evolutionUtil.Key);
         }
 
-        public async Task<(Contact senderContact, Group? group, Chat chat)> CreateChatAndGroupOrContactAsync(
-            string instanceName, string normalizedJid, string pushName,
-            string remoteJid, bool isGroup = false, string? participant = "")
+        public async Task SetInstanceName(string instanceName)
         {
-            var instance = await _instanceService.GetOrCreateInstance(instanceName);
-
-            // Chat sempre vincula ao JID NORMALIZADO
-            var chat = await _chatService.GetOrCreateChat(normalizedJid, instance, isGroup);
-
-            // -------- CONTATO DO REMETENTE ---------
-
-            ContactIdentifier contactIdentifier;
-            Group? group = null;
-
-            if (isGroup)
-            {
-                // Quem realmente enviou?
-                // participant sempre vem com o JID de quem enviou dentro do grupo
-                var participantJid = participant; // key.Participant;
-
-                if (string.IsNullOrWhiteSpace(participantJid))
-                    participantJid = normalizedJid; // fallback improvável
-
-                // Normalizar participant (usar identificadores caso existam)
-                var partIdentifier = await _contactService.FindByAnyAsync(participantJid);
-                var normalizedParticipantJid = partIdentifier?.RemoteJid ?? participantJid;
-
-                contactIdentifier = await _contactIdentifierService
-                    .GetOrCreateAsync(pushName, normalizedParticipantJid, remoteJid, "");
-
-                await _contactService.UpdateContact(
-                    contactIdentifier.Contact,
-                    pushName,
-                    ""
-                );
-
-                // Criar grupo
-                group = await _groupService.GetOrCreateGroup("Não Informado", normalizedJid);
-
-                // Garantir que o contato é membro do grupo
-                await _groupMemberService.EnsureGroupMembership(group, contactIdentifier.Contact);
-            }
-            else
-            {
-                // Mensagem direta
-                var senderJid = normalizedJid;
-
-                // Normalizar sender
-                var sendIdentifier = await _contactService.FindByAnyAsync(senderJid);
-                var normalizedSenderJid = senderJid;
-
-                contactIdentifier = await _contactIdentifierService
-                    .GetOrCreateAsync(pushName, normalizedSenderJid, remoteJid);
-
-                chat.ContactId = contactIdentifier.Contact.Id;
-            }
-
-            return (contactIdentifier.Contact, group, chat);
+            this.InstanceName = instanceName;
         }
 
-        public async Task<IEnumerable<ContactEventDto>> GetContactsAsync()
+        public async Task<IEnumerable<InstanceResponseDto>> GetAllInstancesAsync()
         {
-            var url = $"/chat/findContacts/{_evolutionUtil.Instance}";
+            var url = $"/instance/fetchInstances";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<InstanceResponseDto>>(responseContent) ?? [];
+        }
+
+        public async Task<InstanceCreateResponseDto> CreateInstanceAsync(InstanceRequestDto request)
+        {
+            var url = $"/instance/create";
+            var payload = request;
+            var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
+            var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
+            response.EnsureSuccessStatusCode();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<InstanceCreateResponseDto>(responseContent) ?? new();
+        }
+        public async Task DeleteInstanceAsync()
+        {
+            var url = $"/instance/delete/{this.InstanceName}";
+            var response = await _httpClient.DeleteAsync(url);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task<QrCodeJsonDto> RefreshQrCodeAsync()
+        {
+            var url = $"/instance/connect/{this.InstanceName}";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<QrCodeJsonDto>(responseContent) ?? new();
+        }
+        public async Task<InstanceCreateResponseDto> GetInstanceStatusAsync()
+        {
+            var url = $"/instance/connectionState/{this.InstanceName}";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<InstanceCreateResponseDto>(responseContent) ?? new();
+        }
+
+        
+
+        public async Task<IEnumerable<ContactResponseDto>> GetContactsAsync()
+        {
+            var url = $"/chat/findContacts/{this.InstanceName}";
             var response = await _httpClient.PostAsync(url, null);
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<ContactEventDto>>(responseContent) ?? [];
+            return JsonSerializer.Deserialize<IEnumerable<ContactResponseDto>>(responseContent) ?? [];
         }
-
-        public async Task<GroupEventDto?> GetGroupAsync(string groupJId)
+        public async Task<GroupResponseDto?> GetGroupAsync(string groupJId)
         {
-            var url = $"/group/findGroupInfos/{_evolutionUtil.Instance}?groupJid={groupJId}";
+            var url = $"/group/findGroupInfos/{this.InstanceName}?groupJid={groupJId}";
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<GroupEventDto>(responseContent) ?? null;
+            return JsonSerializer.Deserialize<GroupResponseDto>(responseContent) ?? null;
         }
 
-        public async Task<IEnumerable<GroupEventDto>> GetGroupsAsync()
+        public async Task<IEnumerable<GroupResponseDto>> GetGroupsAsync()
         {
-            var url = $"/group/fetchAllGroups/{_evolutionUtil.Instance}?getParticipants=false";
+            var url = $"/group/fetchAllGroups/{this.InstanceName}?getParticipants=false";
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<GroupEventDto>>(responseContent) ?? [];
-        }
-
-        public async Task<InstanceEventDto> GetInstanceStatusAsync()
-        {
-            var url = $"/instance/connectionState/{_evolutionUtil.Instance}";
-            var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<InstanceEventDto>(responseContent) ?? new InstanceEventDto();
+            return JsonSerializer.Deserialize<IEnumerable<GroupResponseDto>>(responseContent) ?? [];
         }
 
         public async Task<string> SendMessageAsync(MessageRequestDto request)
         {
-            var url = $"/message/sendText/{_evolutionUtil.Instance}";
+            var url = $"/message/sendText/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -151,7 +115,7 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> SendQuotedMessageAsync(MessageRequestDto request)
         {
-            var url = $"/message/sendText/{_evolutionUtil.Instance}";
+            var url = $"/message/sendText/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -161,7 +125,7 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> SendMediaMessageAsync(MediaRequestDto request)
         {
-            var url = $"/message/sendMedia/{_evolutionUtil.Instance}";
+            var url = $"/message/sendMedia/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -171,7 +135,7 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> SendLocationMessageAsync(LocationRequestDto request)
         {
-            var url = $"/message/sendLocation/{_evolutionUtil.Instance}";
+            var url = $"/message/sendLocation/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -181,7 +145,7 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> SendContactMessageAsync(ContactRequestDto request)
         {
-            var url = $"/message/sendContact/{_evolutionUtil.Instance}";
+            var url = $"/message/sendContact/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -191,7 +155,7 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> SendReactionMessageAsync(ReactionRequestDto request)
         {
-            var url = $"/message/sendReaction/{_evolutionUtil.Instance}";
+            var url = $"/message/sendReaction/{this.InstanceName}";
             var payload = request;
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
             var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
@@ -201,10 +165,20 @@ namespace VoroFit.Application.Services.Evolution
 
         public async Task<string> DeleteMessageAsync(DeleteRequestDto request)
         {
-            var url = $"/chat/deleteMessageForEveryone/{_evolutionUtil.Instance}";
-            var payload = request;
-            var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions().AsDefault());
-            var response = await _httpClient.PostAsync(url, new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"));
+            var url = $"/chat/deleteMessageForEveryone/{this.InstanceName}";
+            var jsonPayload = JsonSerializer.Serialize(
+                request,
+                new JsonSerializerOptions().AsDefault()
+            );
+            var httpRequest = new HttpRequestMessage(HttpMethod.Delete, url)
+            {
+                Content = new StringContent(
+                    jsonPayload,
+                    Encoding.UTF8,
+                    "application/json"
+                )
+            };
+            var response = await _httpClient.SendAsync(httpRequest);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }

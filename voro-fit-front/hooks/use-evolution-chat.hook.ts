@@ -134,7 +134,7 @@ export function useEvolutionChat() {
     setError(null)
 
     try {
-      const body = { conversation: text }
+      const body = { text: text }
 
       const response = await secureApiCall<MessageDto>(`${API_CONFIG.ENDPOINTS.CHAT}/messages/${contactId}/send`, {
         method: "POST",
@@ -268,7 +268,7 @@ export function useEvolutionChat() {
     setError(null)
 
     try {
-      const body = { conversation: text, key: { id: message.id } }
+      const body = { text, quoted: { key: { id: message.id } } }
 
       const response = await secureApiCall<MessageDto>(`${API_CONFIG.ENDPOINTS.CHAT}/messages/${contactId}/send/quoted`, {
         method: "POST",

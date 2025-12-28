@@ -29,9 +29,6 @@ namespace VoroFit.Application.DTOs.Evolution.Webhook
         [JsonPropertyName("messageType")]
         public string MessageType { get; set; } = string.Empty;
 
-        [JsonPropertyName("messageTimestamp")]
-        public long MessageTimestamp { get; set; }
-
         [JsonPropertyName("instanceId")]
         public string InstanceId { get; set; } = string.Empty;
 

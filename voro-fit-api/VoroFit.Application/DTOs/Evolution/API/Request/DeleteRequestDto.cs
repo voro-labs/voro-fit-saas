@@ -1,4 +1,4 @@
-﻿namespace VoroFit.Application.DTOs.Request
+﻿namespace VoroFit.Application.DTOs.Evolution.API.Request
 {
     public class DeleteRequestDto
     {
