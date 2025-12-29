@@ -68,6 +68,7 @@ namespace VoroFit.Application.Mappings
 
             CreateMap<WorkoutPlanDto, WorkoutPlan>()
                 .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(x => x.Weeks, opt => opt.Ignore())
                 .ForAllMembers(o =>
                     o.Condition((src, dest, srcMember) => srcMember != null));
 

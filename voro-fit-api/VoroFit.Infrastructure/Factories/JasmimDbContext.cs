@@ -48,26 +48,6 @@ namespace VoroFit.Infrastructure.Factories
             base.OnModelCreating(builder);
             
             // ---------------------------
-            // SOFT DELETE GLOBAL FILTER
-            // ---------------------------
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
-                {
-                    var method = typeof(DbContext)
-                        .GetMethod(nameof(Set), Type.EmptyTypes)!
-                        .MakeGenericMethod(entityType.ClrType);
-
-                    var parameter = Expression.Parameter(entityType.ClrType, "e");
-                    var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
-                    var condition = Expression.Equal(property, Expression.Constant(false));
-                    var lambda = Expression.Lambda(condition, parameter);
-
-                    builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-                }
-            }
-
-            // ---------------------------
             // USER EXTENSION
             // ---------------------------
             builder.Entity<UserExtension>()
@@ -270,7 +250,26 @@ namespace VoroFit.Infrastructure.Factories
                 .WithMany(e => e.WorkoutHistoryExercises)
                 .HasForeignKey(whe => whe.ExerciseId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            // ---------------------------
+            // SOFT DELETE GLOBAL FILTER
+            // ---------------------------
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
+                {
+                    var method = typeof(DbContext)
+                        .GetMethod(nameof(Set), Type.EmptyTypes)!
+                        .MakeGenericMethod(entityType.ClrType);
 
+                    var parameter = Expression.Parameter(entityType.ClrType, "e");
+                    var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
+                    var condition = Expression.Equal(property, Expression.Constant(false));
+                    var lambda = Expression.Lambda(condition, parameter);
+
+                    builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                }
+            }
 
             // ---------------------------
             // IDENTITY CONFIG

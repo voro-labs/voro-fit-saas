@@ -68,14 +68,12 @@ namespace VoroFit.Application.Services
 
         public async Task<StudentDto> UpdateAsync(Guid id, StudentDto dto)
         {
-            var existingStudent = await base.GetByIdAsync(id);
+            var existingStudent = await base.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Student não encontrado");
             
             mapper.Map(dto, existingStudent);
 
-            if (existingStudent != null)
-            {
-                base.Update(existingStudent);
-            }
+            base.Update(existingStudent);
 
             return mapper.Map<StudentDto>(existingStudent);
         }

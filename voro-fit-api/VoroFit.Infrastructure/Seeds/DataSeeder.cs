@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Text.Json;
 using VoroFit.Domain.Entities;
-using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Domain.Entities.Identity;
 using VoroFit.Domain.Enums;
 using VoroFit.Infrastructure.Factories;

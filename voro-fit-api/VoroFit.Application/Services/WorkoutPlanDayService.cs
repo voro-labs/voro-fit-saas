@@ -46,14 +46,12 @@ namespace VoroFit.Application.Services
 
         public async Task<WorkoutPlanDayDto> UpdateAsync(Guid id, WorkoutPlanDayDto dto)
         {
-            var existingWorkoutPlanDay = await base.GetByIdAsync(id);
+            var existingWorkoutPlanDay = await base.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("WorkoutPlanDay não encontrado");
             
             mapper.Map(dto, existingWorkoutPlanDay);
 
-            if (existingWorkoutPlanDay != null)
-            {
-                base.Update(existingWorkoutPlanDay);
-            }
+            base.Update(existingWorkoutPlanDay);
 
             return mapper.Map<WorkoutPlanDayDto>(existingWorkoutPlanDay);
         }

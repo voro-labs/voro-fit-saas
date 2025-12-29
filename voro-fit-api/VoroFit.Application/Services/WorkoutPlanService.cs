@@ -35,6 +35,7 @@ namespace VoroFit.Application.Services
                 .Include(w => w.Weeks)
                     .ThenInclude(w => w.Days)
                         .ThenInclude(w => w.Exercises)
+                            .ThenInclude(w => w.Exercise)
                 .ToListAsync();
 
             return mapper.Map<IEnumerable<WorkoutPlanDto>>(workoutPlans);
@@ -49,6 +50,7 @@ namespace VoroFit.Application.Services
                 .Include(w => w.Weeks)
                     .ThenInclude(w => w.Days)
                         .ThenInclude(w => w.Exercises)
+                            .ThenInclude(w => w.Exercise)
                 .Where(s => s.Id == id)
                 .FirstOrDefaultAsync();
 
@@ -62,16 +64,14 @@ namespace VoroFit.Application.Services
                 wp => wp.Include(wp => wp.Student),
                 wp => wp.Include(wp => wp.Weeks)
                     .ThenInclude(w => w.Days)
-                    .ThenInclude(d => d.Exercises));
-            
+                    .ThenInclude(d => d.Exercises)) 
+                ?? throw new Exception("WorkoutPlan não encontrado");
+                
             mapper.Map(dto, existingWorkoutPlan);
 
-            if (existingWorkoutPlan != null)
-            {
-                SyncWeeks(existingWorkoutPlan, dto);
+            SyncWeeks(existingWorkoutPlan, dto);
 
-                base.Update(existingWorkoutPlan);
-            }
+            base.Update(existingWorkoutPlan);
 
             return mapper.Map<WorkoutPlanDto>(existingWorkoutPlan);
         }

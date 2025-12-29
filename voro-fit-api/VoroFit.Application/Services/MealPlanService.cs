@@ -56,14 +56,12 @@ namespace VoroFit.Application.Services
 
         public async Task<MealPlanDto> UpdateAsync(Guid id, MealPlanDto dto)
         {
-            var existingMealPlan = await base.GetByIdAsync(id);
-            
+            var existingMealPlan = await base.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("MealPlan não encontrado");
+
             mapper.Map(dto, existingMealPlan);
 
-            if (existingMealPlan != null)
-            {
-                base.Update(existingMealPlan);
-            }
+            base.Update(existingMealPlan);
 
             return mapper.Map<MealPlanDto>(existingMealPlan);
         }
