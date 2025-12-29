@@ -1,2 +1,2 @@
-dotnet ef migrations add UpdatedDayOfWeek --project VoroFit.Infrastructure --startup-project VoroFit.API --output-dir Migrations
+dotnet ef migrations add UpdatedWorkout --project VoroFit.Infrastructure --startup-project VoroFit.API --output-dir Migrations
 dotnet ef database update --project VoroFit.Infrastructure --startup-project VoroFit.API
