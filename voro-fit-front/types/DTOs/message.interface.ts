@@ -1,9 +1,9 @@
 import { MessageStatusEnum } from "../Enums/messageStatusEnum.enum";
 import { MessageTypeEnum } from "../Enums/messageTypeEnum.enum";
-import { ChatDto } from "./chatDto.interface";
-import { ContactDto } from "./contactDto.interface";
-import { GroupDto } from "./groupDto.interface";
-import { MessageReactionDto } from "./messageReactionDto.interface";
+import { ChatDto } from "./chat.interface";
+import { ContactDto } from "./contact.interface";
+import { GroupDto } from "./group.interface";
+import { MessageReactionDto } from "./message-reaction.interface";
 
 export interface MessageDto {
   id?: string;

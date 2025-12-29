@@ -1,4 +1,4 @@
-import { InstanceExtensionDto } from "./instanceExtensionDto.interface"
+import { InstanceExtensionDto } from "./instance-extension.interface"
 
 export interface InstanceDto {
   id: string

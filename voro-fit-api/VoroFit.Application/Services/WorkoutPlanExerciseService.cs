@@ -9,7 +9,7 @@ using VoroFit.Domain.Interfaces.Repositories;
 
 namespace VoroFit.Application.Services
 {
-    public class WorkoutPlanExerciseService(IWorkoutPlanExerciseRepository exerciseRepository, IMapper mapper) : ServiceBase<WorkoutPlanExercise>(exerciseRepository), IWorkoutPlanExerciseService
+    public class WorkoutPlanExerciseService(IWorkoutPlanExerciseRepository workoutPlanExerciseRepository, IMapper mapper) : ServiceBase<WorkoutPlanExercise>(workoutPlanExerciseRepository), IWorkoutPlanExerciseService
     {
         public async Task<WorkoutPlanExerciseDto> CreateAsync(WorkoutPlanExerciseDto dto)
         {
@@ -27,19 +27,21 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<WorkoutPlanExerciseDto>> GetAllAsync()
         {
-            return await exerciseRepository.Query()
+            var workoutPlanExercises = await base.Query()
                 .Include(s => s.Exercise)
                 .Include(s => s.WorkoutPlanDay)
-                .ProjectTo<WorkoutPlanExerciseDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<WorkoutPlanExerciseDto>>(workoutPlanExercises);
         }
 
         public async Task<WorkoutPlanExerciseDto?> GetByIdAsync(Guid id)
         {
-            return await exerciseRepository.Query()
+            var workoutPlanExercise = await base.Query()
                 .Where(s => s.Id == id)
-                .ProjectTo<WorkoutPlanExerciseDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<WorkoutPlanExerciseDto?>(workoutPlanExercise);
         }
 
         public async Task<WorkoutPlanExerciseDto> UpdateAsync(Guid id, WorkoutPlanExerciseDto dto)

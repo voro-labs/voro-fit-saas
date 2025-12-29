@@ -20,8 +20,8 @@ import { useExercises } from "@/hooks/use-exercises.hook"
 import type { WorkoutExerciseDto } from "@/types/DTOs/workout-exercise.interface"
 
 interface WorkoutFormProps {
-  exercises?: Partial<WorkoutExerciseDto>[]
-  onExercisesChange?: (exercises: Partial<WorkoutExerciseDto>[]) => void
+  exercises?: WorkoutExerciseDto[]
+  onExercisesChange?: (exercises: WorkoutExerciseDto[]) => void
 }
 
 export function WorkoutForm({ exercises = [], onExercisesChange }: WorkoutFormProps) {
@@ -29,7 +29,7 @@ export function WorkoutForm({ exercises = [], onExercisesChange }: WorkoutFormPr
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const addExercise = (exercise: (typeof availableExercises)[0]) => {
-    const newExercise: Partial<WorkoutExerciseDto> = {
+    const newExercise: WorkoutExerciseDto = {
       exerciseId: exercise.id,
       exercise: exercise,
       sets: 0,

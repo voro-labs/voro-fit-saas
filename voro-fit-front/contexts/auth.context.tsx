@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { getAuthToken, removeAuthToken, setAuthToken } from "@/lib/api"
-import { AuthDto } from "@/types/DTOs/authDto.interface"
+import { AuthDto } from "@/types/DTOs/auth.interface"
 import { jwtDecode } from "jwt-decode"
 
 

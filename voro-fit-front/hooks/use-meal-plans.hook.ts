@@ -48,7 +48,7 @@ export function useMealPlans() {
     }
   }, [])
 
-  const createMealPlan = useCallback(async (data: Partial<MealPlanDto>): Promise<MealPlanDto | null> => {
+  const createMealPlan = useCallback(async (data: MealPlanDto): Promise<MealPlanDto | null> => {
     setLoading(true)
     setError(null)
 
@@ -73,7 +73,7 @@ export function useMealPlans() {
     }
   }, [])
 
-  const updateMealPlan = useCallback(async (id: string, data: Partial<MealPlanDto>): Promise<MealPlanDto | null> => {
+  const updateMealPlan = useCallback(async (id: string, data: MealPlanDto): Promise<MealPlanDto | null> => {
     setLoading(true)
     setError(null)
 

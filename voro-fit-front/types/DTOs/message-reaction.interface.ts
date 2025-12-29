@@ -1,5 +1,5 @@
-import { ContactDto } from "./contactDto.interface";
-import { MessageDto } from "./messageDto.interface";
+import { ContactDto } from "./contact.interface";
+import { MessageDto } from "./message.interface";
 
 export interface MessageReactionDto {
   id: string;

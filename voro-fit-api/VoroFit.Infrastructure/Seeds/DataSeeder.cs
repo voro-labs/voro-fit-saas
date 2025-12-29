@@ -562,7 +562,7 @@ namespace VoroFit.Infrastructure.Seeds
             var weeks = context.WorkoutPlanWeeks.ToList();
             if (!weeks.Any()) return;
 
-            var daysOfWeek = new[] { "Segunda", "Quarta", "Sexta" };
+            var daysOfWeek = new[] { DayOfWeekEnum.Monday, DayOfWeekEnum.Wednesday, DayOfWeekEnum.Friday };
             var days = new List<WorkoutPlanDay>();
 
             foreach (var week in weeks)

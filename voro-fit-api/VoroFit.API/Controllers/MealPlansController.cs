@@ -7,7 +7,7 @@ using VoroFit.Application.Services.Interfaces;
 
 namespace VoroFit.API.Controllers
 {
-    [Route("api/v{version:version}/[controller]")]
+    [Route("api/v{version:version}/meal-plans")]
     [Tags("MealPlans")]
     [ApiController]
     [Authorize]

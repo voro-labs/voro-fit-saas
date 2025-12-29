@@ -9,7 +9,7 @@ using VoroFit.Domain.Interfaces.Repositories;
 
 namespace VoroFit.Application.Services
 {
-    public class WorkoutPlanService(IWorkoutPlanRepository exerciseRepository, IMapper mapper) : ServiceBase<WorkoutPlan>(exerciseRepository), IWorkoutPlanService
+    public class WorkoutPlanService(IWorkoutPlanRepository workoutPlanRepository, IMapper mapper) : ServiceBase<WorkoutPlan>(workoutPlanRepository), IWorkoutPlanService
     {
         public async Task<WorkoutPlanDto> CreateAsync(WorkoutPlanDto dto)
         {
@@ -27,19 +27,31 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<WorkoutPlanDto>> GetAllAsync()
         {
-            return await exerciseRepository.Query()
+            var workoutPlans = await base.Query()
                 .Include(s => s.Student)
-                .Include(s => s.Weeks)
-                .ProjectTo<WorkoutPlanDto>(mapper.ConfigurationProvider)
+                    .ThenInclude(u => u.UserExtension)
+                        .ThenInclude(u => u.User)
+                .Include(w => w.Weeks)
+                    .ThenInclude(w => w.Days)
+                        .ThenInclude(w => w.Exercises)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<WorkoutPlanDto>>(workoutPlans);
         }
 
         public async Task<WorkoutPlanDto?> GetByIdAsync(Guid id)
         {
-            return await exerciseRepository.Query()
+            var workoutPlan = await base.Query()
+                .Include(s => s.Student)
+                    .ThenInclude(u => u.UserExtension)
+                        .ThenInclude(u => u.User)
+                .Include(w => w.Weeks)
+                    .ThenInclude(w => w.Days)
+                        .ThenInclude(w => w.Exercises)
                 .Where(s => s.Id == id)
-                .ProjectTo<WorkoutPlanDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<WorkoutPlanDto?>(workoutPlan);
         }
 
         public async Task<WorkoutPlanDto> UpdateAsync(Guid id, WorkoutPlanDto dto)

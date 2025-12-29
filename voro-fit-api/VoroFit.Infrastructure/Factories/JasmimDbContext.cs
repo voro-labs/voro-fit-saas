@@ -178,11 +178,6 @@ namespace VoroFit.Infrastructure.Factories
                 .HasKey(wpd => wpd.Id);
 
             builder.Entity<WorkoutPlanDay>()
-                .Property(wpd => wpd.DayOfWeek)
-                .HasMaxLength(20)
-                .IsRequired();
-
-            builder.Entity<WorkoutPlanDay>()
                 .HasOne(wpd => wpd.WorkoutPlanWeek)
                 .WithMany(wpw => wpw.Days)
                 .HasForeignKey(wpd => wpd.WorkoutPlanWeekId)

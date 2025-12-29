@@ -1,7 +1,7 @@
-import { ContactDto } from "./contactDto.interface"
-import { GroupDto } from "./groupDto.interface"
-import { InstanceDto } from "./instanceDto.interface"
-import { MessageDto } from "./messageDto.interface"
+import { ContactDto } from "./contact.interface"
+import { GroupDto } from "./group.interface"
+import { InstanceDto } from "./instance.interface"
+import { MessageDto } from "./message.interface"
 
 export interface ChatDto {
   id: string

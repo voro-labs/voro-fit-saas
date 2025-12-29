@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Search, Plus, CheckCheck } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { ChangeEvent, useEffect, useState } from "react"
-import { ContactDto } from "@/types/DTOs/contactDto.interface"
+import { ContactDto } from "@/types/DTOs/contact.interface"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { flags } from "@/lib/flag-utils"
 

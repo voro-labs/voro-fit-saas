@@ -1,5 +1,5 @@
-import { RoleDto } from "./roleDto.interface";
-import { UserDto } from "./userDto.interface";
+import { RoleDto } from "./role.interface";
+import { UserDto } from "./user.interface";
 
 export interface UserRoleDto {
   userId: string;

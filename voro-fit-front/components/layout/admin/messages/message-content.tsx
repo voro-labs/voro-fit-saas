@@ -4,7 +4,7 @@ import { Download, File, MapPin, Pause, Play, User } from 'lucide-react';
 import Image from "next/image";
 import { useState } from "react";
 import { MessageTypeEnum } from '@/types/Enums/messageTypeEnum.enum';
-import { MessageDto } from '@/types/DTOs/messageDto.interface';
+import { MessageDto } from '@/types/DTOs/message.interface';
 import { Button } from '@/components/ui/button';
 
 interface MessageContentProps {

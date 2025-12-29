@@ -104,9 +104,9 @@ export default function StudentDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={student?.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user.userName}`} />
+                    <AvatarImage src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user?.userName}`} />
                     <AvatarFallback>
-                      {`${student?.userExtension?.user.userName}`
+                      {`${student?.userExtension?.user?.userName}`
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
@@ -115,21 +115,21 @@ export default function StudentDetailPage() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user.userName}`}</h1>
+                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.userName}`}</h1>
                       <Badge className={statusConfig[student?.status ?? 100].color}>{statusConfig[student?.status ?? 100].label}</Badge>
                     </div>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      {student?.userExtension?.user.email && (
+                      {student?.userExtension?.user?.email && (
                         <p className="flex items-center gap-2">
                           <Mail className="h-4 w-4" />
-                          {student?.userExtension?.user.email}
+                          {student?.userExtension?.user?.email}
                         </p>
                       )}
-                      {student?.userExtension?.user.phoneNumber && (
+                      {student?.userExtension?.user?.phoneNumber && (
                         <p className="flex items-center gap-2">
                           <Phone className="h-4 w-4" />
-                          {student?.userExtension?.user.phoneNumber}
+                          {student?.userExtension?.user?.phoneNumber}
                         </p>
                       )}
                     </div>
@@ -236,7 +236,7 @@ export default function StudentDetailPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">Idade</p>
                         <p className="font-medium">
-                          {calculateAge(student?.userExtension?.user.birthDate) ? `${calculateAge(student?.userExtension?.user.birthDate)} anos` : "-"}
+                          {calculateAge(student?.userExtension?.user?.birthDate) ? `${calculateAge(student?.userExtension?.user?.birthDate)} anos` : "-"}
                         </p>
                       </div>
                       <div>
@@ -295,11 +295,11 @@ export default function StudentDetailPage() {
                       {student?.workoutHistories.map((workout) => (
                         <div key={workout.id} className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-1">
-                            <p className="font-medium">{workout.name}</p>
+                            <p className="font-medium">{workout.notes}</p>
                             <p className="text-sm text-muted-foreground">{formatDate(workout.createdAt)}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold">{workout.completionPercentage || 0}%</p>
+                            <p className="font-semibold">{workout.status || 0}%</p>
                             <p className="text-xs text-muted-foreground">Conclusão</p>
                           </div>
                         </div>

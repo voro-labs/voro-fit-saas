@@ -112,16 +112,16 @@ export default function NutritionPage() {
                     {plan.student && (
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={plan.student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${plan.student.userExtension?.user.userName}`} />
+                          <AvatarImage src={plan.student.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${plan.student.userExtension?.user?.userName}`} />
                           <AvatarFallback>
-                            {`${plan.student.userExtension?.user.userName}`
+                            {`${plan.student.userExtension?.user?.userName}`
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{`${plan.student.userExtension?.user.userName}`}</p>
+                          <p className="font-medium text-sm truncate">{`${plan.student.userExtension?.user?.userName}`}</p>
                           <p className="text-xs text-muted-foreground">{getMealsCount(plan.days)} refeições por dia</p>
                         </div>
                       </div>

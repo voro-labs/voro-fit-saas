@@ -9,7 +9,7 @@ using VoroFit.Domain.Interfaces.Repositories;
 
 namespace VoroFit.Application.Services
 {
-    public class WorkoutHistoryExerciseService(IWorkoutHistoryExerciseRepository exerciseRepository, IMapper mapper) : ServiceBase<WorkoutHistoryExercise>(exerciseRepository), IWorkoutHistoryExerciseService
+    public class WorkoutHistoryExerciseService(IWorkoutHistoryExerciseRepository workoutHistoryExerciseRepository, IMapper mapper) : ServiceBase<WorkoutHistoryExercise>(workoutHistoryExerciseRepository), IWorkoutHistoryExerciseService
     {
         public async Task<WorkoutHistoryExerciseDto> CreateAsync(WorkoutHistoryExerciseDto dto)
         {
@@ -27,19 +27,21 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<WorkoutHistoryExerciseDto>> GetAllAsync()
         {
-            return await exerciseRepository.Query()
+            var workoutHistoryExercises = await base.Query()
                 .Include(s => s.Exercise)
                 .Include(s => s.WorkoutHistory)
-                .ProjectTo<WorkoutHistoryExerciseDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<WorkoutHistoryExerciseDto>>(workoutHistoryExercises);
         }
 
         public async Task<WorkoutHistoryExerciseDto?> GetByIdAsync(Guid id)
         {
-            return await exerciseRepository.Query()
+            var workoutHistoryExercise = await base.Query()
                 .Where(s => s.Id == id)
-                .ProjectTo<WorkoutHistoryExerciseDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<WorkoutHistoryExerciseDto?>(workoutHistoryExercise);
         }
 
         public async Task<WorkoutHistoryExerciseDto> UpdateAsync(Guid id, WorkoutHistoryExerciseDto dto)

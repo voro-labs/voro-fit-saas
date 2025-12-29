@@ -27,19 +27,21 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<ExerciseDto>> GetAllAsync()
         {
-            return await exerciseRepository.Query()
+            var exercises = await base.Query()
                 .Include(s => s.WorkoutPlanExercises)
                 .Include(s => s.WorkoutHistoryExercises)
-                .ProjectTo<ExerciseDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<ExerciseDto>>(exercises);
         }
 
         public async Task<ExerciseDto?> GetByIdAsync(Guid id)
         {
-            return await exerciseRepository.Query()
+            var exercise = await base.Query()
                 .Where(s => s.Id == id)
-                .ProjectTo<ExerciseDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<ExerciseDto?>(exercise);
         }
 
         public async Task<ExerciseDto> UpdateAsync(Guid id, ExerciseDto dto)

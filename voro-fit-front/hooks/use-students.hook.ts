@@ -87,7 +87,7 @@ export function useStudents() {
       if (response.hasError) throw new Error(response.message ?? "Erro ao atualizar aluno")
 
       if (response.data) {
-        setStudents((prev) => prev.map((s) => (s.id === id ? response.data! : s)))
+        setStudents((prev) => prev.map((s) => (s.userExtensionId === id ? response.data! : s)))
       }
 
       return response.data ?? null
@@ -110,7 +110,7 @@ export function useStudents() {
 
       if (response.hasError) throw new Error(response.message ?? "Erro ao excluir aluno")
 
-      setStudents((prev) => prev.filter((s) => s.id !== id))
+      setStudents((prev) => prev.filter((s) => s.userExtensionId !== id))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -121,7 +121,7 @@ export function useStudents() {
   }, [])
 
   const addMeasurement = useCallback(
-    async (studentId: string, data: Partial<MeasurementDto>): Promise<MeasurementDto | null> => {
+    async (studentId: string, data: MeasurementDto): Promise<MeasurementDto | null> => {
       setLoading(true)
       setError(null)
 

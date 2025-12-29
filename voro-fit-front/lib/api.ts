@@ -11,13 +11,15 @@ export const API_CONFIG = {
     FORGOT_PASSWORD: "/auth/forgot-password",
     STUDENTS: "/students",
     EXERCISES: "/exercises",
-    WORKOUTS: "/workouts",
-    MEAL_PLANS: "/mealplans",
+    WORKOUTS: "/workouts", // Mantido para compatibilidade (pode ser depreciado)
+    WORKOUT_PLANS: "/workout-plans", // Novo: planejamento de treinos
+    WORKOUT_HISTORIES: "/workout-histories", // Novo: execução de treinos
+    MEAL_PLANS: "/meal-plans",
     MEASUREMENTS: "/measurements",
     CHAT: "/chat",
     MESSAGE: "/message",
     CONTACT: "/contact",
-    INSTANCE: "/instance"
+    INSTANCE: "/instance",
   },
   HEADERS: {
     "Content-Type": "application/json",
@@ -82,7 +84,7 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
         status,
         message: responseText || "Erro inesperado no servidor.",
         data: null,
-        hasError: true
+        hasError: true,
       }
     }
 
@@ -91,7 +93,6 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
     // já temos uma estrutura pronta.
 
     if (!response.ok || json?.hasError) {
-
       // caso sua API não mande mensagem
       if (!json?.message) {
         json!.message = `Erro ${status}: ${response.statusText}`
@@ -109,7 +110,7 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
         status,
         message: json?.message,
         data: null,
-        hasError: true
+        hasError: true,
       }
     }
 
@@ -118,15 +119,14 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
       status,
       data: json?.data ?? null,
       message: json?.message ?? null,
-      hasError: false
+      hasError: false,
     }
-
   } catch (error) {
     return {
       status: 0,
       message: "Erro de conexão com o servidor",
       data: null,
-      hasError: true
+      hasError: true,
     }
   }
 }
@@ -151,7 +151,7 @@ export async function secureApiCall<T>(endpoint: string, options: RequestInit = 
       status: 401,
       message: "Token de autenticação não encontrado. Faça login novamente.",
       data: null,
-      hasError: true
+      hasError: true,
     }
   }
 

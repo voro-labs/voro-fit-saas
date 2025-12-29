@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Phone, Video, MoreVertical, Mic, Paperclip, X, Edit } from 'lucide-react';
 import { cn } from "@/lib/utils";
-import { MessageDto } from "@/types/DTOs/messageDto.interface";
+import { MessageDto } from "@/types/DTOs/message.interface";
 import { MessageStatus } from "./message-status";
 import { MessageReactions } from "./message-reactions";
 import { MessageContent } from "./message-content";
@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ContactDto } from "@/types/DTOs/contactDto.interface";
+import { ContactDto } from "@/types/DTOs/contact.interface";
 import { AttachmentActions } from "./attachment-actions";
 import { PhoneInput } from "@/components/ui/custom/phone-input";
 import { flags } from "@/lib/flag-utils";

@@ -9,7 +9,7 @@ using VoroFit.Domain.Interfaces.Repositories;
 
 namespace VoroFit.Application.Services
 {
-    public class WorkoutPlanDayService(IWorkoutPlanDayRepository exerciseRepository, IMapper mapper) : ServiceBase<WorkoutPlanDay>(exerciseRepository), IWorkoutPlanDayService
+    public class WorkoutPlanDayService(IWorkoutPlanDayRepository workoutPlanDayRepository, IMapper mapper) : ServiceBase<WorkoutPlanDay>(workoutPlanDayRepository), IWorkoutPlanDayService
     {
         public async Task<WorkoutPlanDayDto> CreateAsync(WorkoutPlanDayDto dto)
         {
@@ -27,19 +27,21 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<WorkoutPlanDayDto>> GetAllAsync()
         {
-            return await exerciseRepository.Query()
+            var workoutPlanDays = await base.Query()
                 .Include(s => s.Exercises)
                 .Include(s => s.WorkoutPlanWeek)
-                .ProjectTo<WorkoutPlanDayDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<WorkoutPlanDayDto>>(workoutPlanDays);
         }
 
         public async Task<WorkoutPlanDayDto?> GetByIdAsync(Guid id)
         {
-            return await exerciseRepository.Query()
+            var workoutPlanDay = await base.Query()
                 .Where(s => s.Id == id)
-                .ProjectTo<WorkoutPlanDayDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<WorkoutPlanDayDto?>(workoutPlanDay);
         }
 
         public async Task<WorkoutPlanDayDto> UpdateAsync(Guid id, WorkoutPlanDayDto dto)

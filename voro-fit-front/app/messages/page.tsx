@@ -1,8 +1,16 @@
 "use client"
 
+import type React from "react"
 
+import { useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { MessageBubble } from "@/components/message-bubble"
+import { Search, Send, MoreVertical, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEvolutionChat } from "@/hooks/use-evolution-chat.hook"
 import { useState } from "react"
 import { AuthGuard } from "@/components/auth/auth.guard"
@@ -10,7 +18,7 @@ import { Loading } from "@/components/ui/custom/loading/loading"
 import { ConversationList } from "@/components/layout/admin/messages/conversation-list"
 import { ChatArea } from "@/components/layout/admin/messages/chat-area"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { MessageDto } from "@/types/DTOs/messageDto.interface"
+import { MessageDto } from "@/types/DTOs/message.interface"
 
 export default function MessagesPage() {
   const {

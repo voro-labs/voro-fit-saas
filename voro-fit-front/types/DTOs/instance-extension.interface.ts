@@ -1,6 +1,6 @@
 import { InstanceStatusEnum } from "../Enums/instanceStatusEnum.enum"
-import { InstanceDto } from "./instanceDto.interface"
-import { ChatDto } from "./chatDto.interface"
+import { InstanceDto } from "./instance.interface"
+import { ChatDto } from "./chat.interface"
 
 export interface InstanceExtensionDto {
   instanceId: string

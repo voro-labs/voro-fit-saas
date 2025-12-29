@@ -29,9 +29,9 @@ export default function StudentsPage() {
     const searchLower = search.toLowerCase()
     return students.filter(
       (student) =>
-        student.userExtension?.user.userName.toLowerCase().includes(searchLower) ||
+        student.userExtension?.user?.userName.toLowerCase().includes(searchLower) ||
         student.goal?.toLowerCase().includes(searchLower) ||
-        student.userExtension?.user.email?.toLowerCase().includes(searchLower),
+        student.userExtension?.user?.email?.toLowerCase().includes(searchLower),
     )
   }, [students, search])
 
@@ -109,8 +109,8 @@ export default function StudentsPage() {
                   <StudentCard
                     key={`${student.userExtensionId}`}
                     id={student.userExtensionId}
-                    name={student.userExtension?.user.userName || ""}
-                    age={calculateAge(student.userExtension?.user.birthDate)}
+                    name={student.userExtension?.user?.userName || ""}
+                    age={calculateAge(student.userExtension?.user?.birthDate)}
                     height={student.height}
                     weight={student.weight}
                     status={
@@ -120,7 +120,7 @@ export default function StudentsPage() {
                           ? "inactive"
                           : "pending"
                     }
-                    avatar={student.userExtension?.user.avatarUrl}
+                    avatar={student.userExtension?.user?.avatarUrl}
                     goal={student.goal}
                   />
                 ))}
@@ -146,19 +146,19 @@ export default function StudentsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${student.userExtension?.user.userName}`} />
+                              <AvatarImage src={student.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student.userExtension?.user?.userName}`} />
                               <AvatarFallback>
-                                {`${student.userExtension?.user.userName}`
+                                {`${student.userExtension?.user?.userName}`
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">{`${student.userExtension?.user.userName}`}</span>
+                            <span className="font-medium">{`${student.userExtension?.user?.userName}`}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {calculateAge(student.userExtension?.user.birthDate) ? `${calculateAge(student.userExtension?.user.birthDate)} anos` : "-"}
+                          {calculateAge(student.userExtension?.user?.birthDate) ? `${calculateAge(student.userExtension?.user?.birthDate)} anos` : "-"}
                         </TableCell>
                         <TableCell>{student.height ? `${student.height} cm` : "-"}</TableCell>
                         <TableCell>{student.weight ? `${student.weight} kg` : "-"}</TableCell>

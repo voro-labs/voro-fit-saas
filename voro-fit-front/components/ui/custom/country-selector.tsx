@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CountryDto } from "@/types/DTOs/countryDto.interface"
+import { CountryDto } from "@/types/DTOs/country.interface"
 import { flags } from "@/lib/flag-utils"
 
 interface CountrySelectorProps {

@@ -16,7 +16,7 @@ import {
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { MessageDto } from "@/types/DTOs/messageDto.interface"
+import { MessageDto } from "@/types/DTOs/message.interface"
 
 export default function Messages() {
   const {

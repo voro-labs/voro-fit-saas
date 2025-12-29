@@ -6,26 +6,39 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowLeft, Calendar, Edit, User, Loader2 } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { ArrowLeft, Edit, User, Dumbbell, Calendar } from "lucide-react"
 import Link from "next/link"
-import { useWorkouts } from "@/hooks/use-workouts.hook"
+import { useWorkoutPlans } from "@/hooks/use-workout-plans.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
-import { WorkoutHistoryDto } from "@/types/DTOs/workout-history.interface"
+import type { WorkoutPlanDto } from "@/types/DTOs/workout-plan.interface"
 import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
+import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
 import { Loading } from "@/components/ui/custom/loading/loading"
+
+const daysOfWeek = [
+  { key: DayOfWeekEnum.Segunda, label: "Segunda" },
+  { key: DayOfWeekEnum.Terca, label: "Terça" },
+  { key: DayOfWeekEnum.Quarta, label: "Quarta" },
+  { key: DayOfWeekEnum.Quinta, label: "Quinta" },
+  { key: DayOfWeekEnum.Sexta, label: "Sexta" },
+  { key: DayOfWeekEnum.Sabado, label: "Sábado" },
+  { key: DayOfWeekEnum.Domingo, label: "Domingo" },
+]
 
 export default function WorkoutDetailPage() {
   const params = useParams()
-  const { fetchWorkoutById, loading, error } = useWorkouts()
-  const [workout, setWorkout] = useState<WorkoutHistoryDto | null>(null)
+  const { fetchWorkoutPlanById, loading, error } = useWorkoutPlans()
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlanDto | null>(null)
 
   useEffect(() => {
     if (params.id) {
-      fetchWorkoutById(params.id as string).then((data) => {
-        if (data) setWorkout(data)
+      fetchWorkoutPlanById(params.id as string).then((data) => {
+        if (data) setWorkoutPlan(data)
       })
     }
-  }, [params.id, fetchWorkoutById])
+  }, [params.id, fetchWorkoutPlanById])
 
   const formatDate = (date?: Date) => {
     if (!date) return "-"
@@ -44,7 +57,7 @@ export default function WorkoutDetailPage() {
               </Link>
             </Button>
             <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
-              {error || "Treino não encontrado"}
+              {error || "Plano de treino não encontrado"}
             </div>
           </div>
         </div>
@@ -72,36 +85,42 @@ export default function WorkoutDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h1 className="text-2xl font-bold text-balance">{workout?.name}</h1>
+                    <h1 className="text-2xl font-bold text-balance">Plano de Treino</h1>
                     <Badge
                       className={
-                        workout?.status === WorkoutStatusEnum.Active
+                        workoutPlan?.status === WorkoutStatusEnum.Active
                           ? "bg-accent text-accent-foreground"
                           : "bg-muted text-muted-foreground"
                       }
                     >
-                      {workout?.status === WorkoutStatusEnum.Active
+                      {workoutPlan?.status === WorkoutStatusEnum.Active
                         ? "Ativo"
-                        : workout?.status === WorkoutStatusEnum.Completed
+                        : workoutPlan?.status === WorkoutStatusEnum.Completed
                           ? "Concluído"
                           : "Inativo"}
                     </Badge>
                   </div>
 
-                  {workout?.student && workout?.student.userExtension?.user && (
+                  {workoutPlan?.student && workoutPlan?.student.userExtension?.user && (
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={workout?.student.userExtension?.user.avatarUrl || "/placeholder.svg"} alt={`${workout?.student.userExtension?.user.firstName}`} />
+                        <AvatarImage
+                          src={workoutPlan?.student.userExtension?.user?.avatarUrl || "/placeholder.svg"}
+                          alt={`${workoutPlan?.student.userExtension?.user?.firstName}`}
+                        />
                         <AvatarFallback>
-                          {`${workout?.student.userExtension?.user.firstName}`
+                          {`${workoutPlan?.student.userExtension?.user?.firstName}`
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{`${workout?.student.userExtension?.user.firstName}`}</p>
-                        <p className="text-sm text-muted-foreground">{workout?.exercises?.length || 0} exercícios</p>
+                        <p className="font-medium">{`${workoutPlan?.student.userExtension?.user?.firstName}`}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {workoutPlan?.weeks?.length || 0} {workoutPlan?.weeks?.length === 1 ? "semana" : "semanas"} de
+                          treino
+                        </p>
                       </div>
                     </div>
                   )}
@@ -109,28 +128,28 @@ export default function WorkoutDetailPage() {
                   <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Criado em {formatDate(workout?.createdAt)}
+                      Criado em {formatDate(workoutPlan?.createdAt)}
                     </div>
-                    {workout?.updatedAt && (
+                    {workoutPlan?.updatedAt && (
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        Atualizado {formatDate(workout?.updatedAt)}
+                        Atualizado {formatDate(workoutPlan?.updatedAt)}
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  {workout?.student && (
+                  {workoutPlan?.student && (
                     <Button asChild variant="outline">
-                      <Link href={`/students/${workout?.studentId}`}>
+                      <Link href={`/students/${workoutPlan?.studentId}`}>
                         <User className="mr-2 h-4 w-4" />
                         Ver Aluno
                       </Link>
                     </Button>
                   )}
                   <Button asChild>
-                    <Link href={`/workouts/${workout?.id}/edit`}>
+                    <Link href={`/workouts/${workoutPlan?.id}/edit`}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Link>
@@ -140,74 +159,141 @@ export default function WorkoutDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Exercises List */}
-          <div className="space-y-4 max-w-4xl">
-            {workout?.exercises && workout?.exercises.length > 0 ? (
-              workout?.exercises
-                .sort((a, b) => a.order - b.order)
-                .map((workoutExercise, index) => (
-                  <Card key={workoutExercise.id}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-1">
-                          <CardTitle className="text-base flex items-center gap-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground font-bold">
-                              {index + 1}
-                            </span>
-                            {workoutExercise.exercise?.name || "Exercício"}
-                          </CardTitle>
-                          <Badge variant="secondary">{workoutExercise.exercise?.muscleGroup || "-"}</Badge>
+          {workoutPlan?.weeks && workoutPlan.weeks.length > 0 ? (
+            <Accordion type="single" collapsible defaultValue="week-0" className="space-y-4">
+              {workoutPlan.weeks
+                .sort((a, b) => (a.weekNumber ?? 0) - (b.weekNumber ?? 0))
+                .map((week, weekIndex) => (
+                  <AccordionItem key={week.id} value={`week-${weekIndex}`} className="border rounded-lg bg-card">
+                    <AccordionTrigger className="px-6 hover:no-underline">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white font-bold">
+                          {week.weekNumber}
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="grid grid-cols-4 gap-4">
-                        <div className="rounded-lg border p-3">
-                          <p className="text-xs text-muted-foreground mb-1">Séries</p>
-                          <p className="text-lg font-bold">{workoutExercise.sets}</p>
-                        </div>
-                        <div className="rounded-lg border p-3">
-                          <p className="text-xs text-muted-foreground mb-1">Repetições</p>
-                          <p className="text-lg font-bold">{workoutExercise.reps}</p>
-                        </div>
-                        <div className="rounded-lg border p-3">
-                          <p className="text-xs text-muted-foreground mb-1">Peso</p>
-                          <p className="text-lg font-bold">
-                            {workoutExercise.weight ? `${workoutExercise.weight}kg` : "-"}
-                          </p>
-                        </div>
-                        <div className="rounded-lg border p-3">
-                          <p className="text-xs text-muted-foreground mb-1">Descanso</p>
-                          <p className="text-lg font-bold">
-                            {workoutExercise.restSeconds ? `${workoutExercise.restSeconds}s` : "-"}
+                        <div className="text-left">
+                          <p className="font-semibold">Semana {week.weekNumber}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {week.days?.length || 0} {week.days?.length === 1 ? "dia" : "dias"} de treino
                           </p>
                         </div>
                       </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6">
+                      {week.days && week.days.length > 0 ? (
+                        <Tabs defaultValue={String(week.days[0].dayOfWeek)} className="space-y-4">
+                          <TabsList className="flex-wrap h-auto">
+                            {week.days
+                              .sort((a, b) => (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0))
+                              .map((day) => {
+                                const dayLabel = daysOfWeek.find((d) => d.key === day.dayOfWeek)?.label || "Dia"
+                                return (
+                                  <TabsTrigger key={day.id} value={String(day.dayOfWeek)}>
+                                    {dayLabel}
+                                  </TabsTrigger>
+                                )
+                              })}
+                          </TabsList>
 
-                      {workoutExercise.notes && (
-                        <div className="rounded-lg bg-muted/50 p-3">
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Observações</p>
-                          <p className="text-sm leading-relaxed">{workoutExercise.notes}</p>
-                        </div>
-                      )}
+                          {week.days.map((day) => {
+                            const dayLabel = daysOfWeek.find((d) => d.key === day.dayOfWeek)?.label || "Dia"
+                            return (
+                              <TabsContent key={day.id} value={String(day.dayOfWeek)} className="space-y-4">
+                                {day.exercises && day.exercises.length > 0 ? (
+                                  day.exercises
+                                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                                    .map((exercise, index) => (
+                                      <Card key={exercise.id}>
+                                        <CardHeader className="pb-3">
+                                          <div className="flex items-start justify-between gap-2">
+                                            <div className="space-y-1">
+                                              <CardTitle className="text-base flex items-center gap-2">
+                                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground font-bold">
+                                                  {index + 1}
+                                                </span>
+                                                {exercise.exercise?.name || "Exercício"}
+                                              </CardTitle>
+                                              {exercise.exercise?.muscleGroup && (
+                                                <Badge variant="secondary">{exercise.exercise.muscleGroup}</Badge>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                          <div className="grid grid-cols-4 gap-4">
+                                            <div className="rounded-lg border p-3">
+                                              <p className="text-xs text-muted-foreground mb-1">Séries</p>
+                                              <p className="text-lg font-bold">{exercise.sets}</p>
+                                            </div>
+                                            <div className="rounded-lg border p-3">
+                                              <p className="text-xs text-muted-foreground mb-1">Repetições</p>
+                                              <p className="text-lg font-bold">{exercise.reps}</p>
+                                            </div>
+                                            <div className="rounded-lg border p-3">
+                                              <p className="text-xs text-muted-foreground mb-1">Peso</p>
+                                              <p className="text-lg font-bold">
+                                                {exercise.weight ? `${exercise.weight}kg` : "-"}
+                                              </p>
+                                            </div>
+                                            <div className="rounded-lg border p-3">
+                                              <p className="text-xs text-muted-foreground mb-1">Descanso</p>
+                                              <p className="text-lg font-bold">
+                                                {exercise.restInSeconds ? `${exercise.restInSeconds}s` : "-"}
+                                              </p>
+                                            </div>
+                                          </div>
 
-                      {workoutExercise.alternative && (
-                        <div className="rounded-lg bg-muted/50 p-3">
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Alternativa</p>
-                          <p className="text-sm">{workoutExercise.alternative}</p>
-                        </div>
+                                          {exercise.notes && (
+                                            <div className="rounded-lg bg-muted/50 p-3">
+                                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                                Observações
+                                              </p>
+                                              <p className="text-sm leading-relaxed">{exercise.notes}</p>
+                                            </div>
+                                          )}
+
+                                          {exercise.alternative && (
+                                            <div className="rounded-lg bg-muted/50 p-3">
+                                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                                Alternativa
+                                              </p>
+                                              <p className="text-sm">{exercise.alternative}</p>
+                                            </div>
+                                          )}
+                                        </CardContent>
+                                      </Card>
+                                    ))
+                                ) : (
+                                  <Card className="border-dashed">
+                                    <CardContent className="flex flex-col items-center justify-center py-12">
+                                      <p className="text-muted-foreground">
+                                        Nenhum exercício para {dayLabel.toLowerCase()}
+                                      </p>
+                                    </CardContent>
+                                  </Card>
+                                )}
+                              </TabsContent>
+                            )
+                          })}
+                        </Tabs>
+                      ) : (
+                        <Card className="border-dashed">
+                          <CardContent className="flex flex-col items-center justify-center py-12">
+                            <p className="text-muted-foreground">Nenhum dia configurado para esta semana</p>
+                          </CardContent>
+                        </Card>
                       )}
-                    </CardContent>
-                  </Card>
-                ))
-            ) : (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <p className="text-muted-foreground">Nenhum exercício adicionado a este treino</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+            </Accordion>
+          ) : (
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Dumbbell className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">Nenhuma semana adicionada a este plano</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </AuthGuard>

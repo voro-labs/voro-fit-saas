@@ -203,7 +203,7 @@ export default function EditMealPlanPage() {
                         <SelectContent>
                           {students.map((student) => (
                             <SelectItem key={student.userExtensionId} value={student.userExtensionId}>
-                              {student.userExtension?.user.userName}
+                              {student.userExtension?.user?.userName}
                             </SelectItem>
                           ))}
                         </SelectContent>

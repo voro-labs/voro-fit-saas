@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Reply, Forward, Copy, Trash2, Smile } from 'lucide-react';
-import { MessageDto } from "@/types/DTOs/messageDto.interface";
+import { MessageDto } from "@/types/DTOs/message.interface";
 
 interface MessageActionsProps {
   message: MessageDto;

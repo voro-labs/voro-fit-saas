@@ -27,22 +27,23 @@ namespace VoroFit.Application.Services
 
         public async Task<IEnumerable<MealPlanDto>> GetAllAsync()
         {
-            return await mealPlanRepository.Query()
+            var mealPlans = await base.Query()
                 .Include(s => s.Student)
                 .Include(s => s.Days)
                     .ThenInclude(d => d.Meals)
                 .Include(s => s.Days)
-                    .ThenInclude(d => d.MealPlan)
-                .ProjectTo<MealPlanDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
+
+            return mapper.Map<IEnumerable<MealPlanDto>>(mealPlans);
         }
 
         public async Task<MealPlanDto?> GetByIdAsync(Guid id)
         {
-            return await mealPlanRepository.Query()
+            var mealPlan = await base.Query()
                 .Where(s => s.Id == id)
-                .ProjectTo<MealPlanDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+
+            return mapper.Map<MealPlanDto?>(mealPlan);
         }
 
         public async Task<MealPlanDto> UpdateAsync(Guid id, MealPlanDto dto)

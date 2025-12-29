@@ -56,6 +56,12 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<IMeasurementRepository, MeasurementRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IWorkoutHistoryRepository, WorkoutHistoryRepository>();
+
+            services.AddScoped<IWorkoutHistoryExerciseRepository, WorkoutHistoryExerciseRepository>();
+            services.AddScoped<IWorkoutPlanExerciseRepository, WorkoutPlanExerciseRepository>();
+            services.AddScoped<IWorkoutPlanWeekRepository, WorkoutPlanWeekRepository>();
+            services.AddScoped<IWorkoutPlanDayRepository, WorkoutPlanDayRepository>();
+            services.AddScoped<IWorkoutPlanRepository, WorkoutPlanRepository>();
             #endregion
 
             #region Identity Services
@@ -80,6 +86,11 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IWorkoutHistoryService, WorkoutHistoryService>();
 
+            services.AddScoped<IWorkoutHistoryExerciseService, WorkoutHistoryExerciseService>();
+            services.AddScoped<IWorkoutPlanExerciseService, WorkoutPlanExerciseService>();
+            services.AddScoped<IWorkoutPlanWeekService, WorkoutPlanWeekService>();
+            services.AddScoped<IWorkoutPlanDayService, WorkoutPlanDayService>();
+            services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
             #endregion
 
             return services;

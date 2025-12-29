@@ -2,8 +2,8 @@
 
 import { useAuth } from "@/contexts/auth.context"
 import { API_CONFIG, apiCall } from "@/lib/api"
-import { AuthDto } from "@/types/DTOs/authDto.interface"
-import { SignInDto } from "@/types/DTOs/signInDto.interface"
+import { AuthDto } from "@/types/DTOs/auth.interface"
+import { SignInDto } from "@/types/DTOs/sign-in.interface"
 import { useState } from "react"
 
 export function useSignIn() {

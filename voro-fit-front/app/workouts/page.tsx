@@ -4,14 +4,25 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Plus, Eye, Loader2 } from "lucide-react"
+import { Dumbbell, Plus, Eye, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useWorkouts } from "@/hooks/use-workouts.hook"
+import { useWorkoutPlans } from "@/hooks/use-workout-plans.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { WorkoutStatusEnum } from "@/types/Enums/workoutStatusEnum.enum"
+import { WorkoutPlanWeekDto } from "@/types/DTOs/workout-plan-week.interface"
 
 export default function WorkoutsPage() {
-  const { workouts, loading, error } = useWorkouts()
+  const { workoutPlans, loading, error } = useWorkoutPlans()
+
+  const getWeeksCount = (weeks?: WorkoutPlanWeekDto[]) => {
+    return weeks?.length ?? 0
+  }
+
+  const getDaysCount = (weeks?: { days?: unknown[] }[]) => {
+    if (!weeks || weeks.length === 0) return 0
+    const firstWeek = weeks[0]
+    return firstWeek.days?.length || 0
+  }
 
   const formatDate = (date?: Date) => {
     if (!date) return "-"
@@ -31,13 +42,13 @@ export default function WorkoutsPage() {
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-balance">Treinos</h1>
-              <p className="text-muted-foreground">Gerencie e crie treinos para seus alunos</p>
+              <h1 className="text-3xl font-bold text-balance">Planos de Treino</h1>
+              <p className="text-muted-foreground">Gerencie os treinos dos seus alunos</p>
             </div>
             <Button asChild>
               <Link href="/workouts/new">
                 <Plus className="mr-2 h-4 w-4" />
-                Novo Treino
+                Novo Plano
               </Link>
             </Button>
           </div>
@@ -52,71 +63,76 @@ export default function WorkoutsPage() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : workouts.length === 0 ? (
+          ) : workoutPlans.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-muted-foreground mb-4">Nenhum treino cadastrado</p>
+              <p className="text-muted-foreground mb-4">Nenhum plano de treino cadastrado</p>
               <Button asChild>
                 <Link href="/workouts/new">
                   <Plus className="mr-2 h-4 w-4" />
-                  Criar primeiro treino
+                  Criar primeiro plano
                 </Link>
               </Button>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {workouts.map((workout) => (
-                <Card key={workout.id} className="hover:shadow-md transition-shadow">
+              {workoutPlans.map((plan) => (
+                <Card key={plan.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-base text-balance leading-tight">{workout.name}</CardTitle>
-                      <Badge
-                        className={
-                          workout.status === WorkoutStatusEnum.Active
-                            ? "bg-accent text-accent-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }
-                      >
-                        {workout.status === WorkoutStatusEnum.Active
-                          ? "Ativo"
-                          : workout.status === WorkoutStatusEnum.Completed
-                            ? "Concluído"
-                            : "Inativo"}
-                      </Badge>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                        <Dumbbell className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-base">Plano de Treino</CardTitle>
+                        <Badge
+                          className={
+                            plan.status === WorkoutStatusEnum.Active
+                              ? "bg-accent text-accent-foreground mt-1"
+                              : "bg-muted text-muted-foreground mt-1"
+                          }
+                        >
+                          {plan.status === WorkoutStatusEnum.Active
+                            ? "Ativo"
+                            : plan.status === WorkoutStatusEnum.Completed
+                              ? "Concluído"
+                              : "Inativo"}
+                        </Badge>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {workout.student && (
+                    {plan.student && (
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage
-                            src={workout.student.userExtension?.user.avatarUrl || "/placeholder.svg"}
-                            alt={`${workout.student.userExtension?.user.firstName}`}
+                            src={plan.student.userExtension?.user?.avatarUrl || "/placeholder.svg"}
+                            alt={`${plan.student.userExtension?.user?.firstName}`}
                           />
                           <AvatarFallback>
-                            {`${workout.student.userExtension?.user.firstName}`
+                            {`${plan.student.userExtension?.user?.firstName}`
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{`${workout.student.userExtension?.user.firstName}`}</p>
-                          <p className="text-xs text-muted-foreground">{workout.exercises?.length || 0} exercícios</p>
+                          <p className="font-medium text-sm truncate">{`${plan.student.userExtension?.user?.firstName}`}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {getWeeksCount(plan.weeks)} {getWeeksCount(plan.weeks) === 1 ? "semana" : "semanas"} •{" "}
+                            {getDaysCount(plan.weeks)} dias
+                          </p>
                         </div>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(workout.updatedAt || workout.createdAt)}
-                      </div>
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Atualizado {formatDate(plan.updatedAt || plan.createdAt)}
+                    </p>
 
                     <Button asChild variant="outline" size="sm" className="w-full bg-transparent">
-                      <Link href={`/workouts/${workout.id}`}>
+                      <Link href={`/workouts/${plan.id}`}>
                         <Eye className="h-4 w-4 mr-2" />
-                        Ver Detalhes
+                        Ver Plano
                       </Link>
                     </Button>
                   </CardContent>

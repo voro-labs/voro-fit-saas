@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { API_CONFIG, secureApiCall } from "@/lib/api"
-import { InstanceDto } from "@/types/DTOs/instanceDto.interface"
-import { QrCodeJsonDto } from "@/types/DTOs/qrCodeJsonDto.interface"
+import { InstanceDto } from "@/types/DTOs/instance.interface"
+import { QrCodeJsonDto } from "@/types/DTOs/qr-code-json.interface"
 
 export function useInstances() {
   const [instances, setInstances] = useState<InstanceDto[]>([])

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { API_CONFIG, secureApiCall } from "@/lib/api"
-import { ContactDto } from "@/types/DTOs/contactDto.interface"
-import { MessageDto } from "@/types/DTOs/messageDto.interface"
+import { ContactDto } from "@/types/DTOs/contact.interface"
+import { MessageDto } from "@/types/DTOs/message.interface"
 import { MessageStatusEnum } from "@/types/Enums/messageStatusEnum.enum"
 
 export function useEvolutionChat() {

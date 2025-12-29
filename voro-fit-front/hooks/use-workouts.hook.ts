@@ -48,7 +48,7 @@ export function useWorkouts() {
     }
   }, [])
 
-  const createWorkout = useCallback(async (data: Partial<WorkoutHistoryDto>): Promise<WorkoutHistoryDto | null> => {
+  const createWorkout = useCallback(async (data: WorkoutHistoryDto): Promise<WorkoutHistoryDto | null> => {
     setLoading(true)
     setError(null)
 
@@ -74,7 +74,7 @@ export function useWorkouts() {
   }, [])
 
   const updateWorkout = useCallback(
-    async (id: string, data: Partial<WorkoutHistoryDto>): Promise<WorkoutHistoryDto | null> => {
+    async (id: string, data: WorkoutHistoryDto): Promise<WorkoutHistoryDto | null> => {
       setLoading(true)
       setError(null)
 

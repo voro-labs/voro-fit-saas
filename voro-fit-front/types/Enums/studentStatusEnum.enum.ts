@@ -1,4 +1,3 @@
-
 export enum StudentStatusEnum {
   Unspecified = 0,
   Active = 100,

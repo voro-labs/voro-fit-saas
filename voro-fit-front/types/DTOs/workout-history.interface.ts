@@ -1,15 +1,14 @@
-import type { WorkoutExerciseDto } from "./workout-exercise.interface"
-import type { StudentDto } from "./student.interface"
-import { WorkoutStatusEnum } from "../Enums/workoutStatusEnum.enum"
+import type { WorkoutHistoryExerciseDto } from "./workout-history-exercise.interface"
 
 export interface WorkoutHistoryDto {
   id: string
-  name: string
-  studentId: string
-  student?: StudentDto
-  status: WorkoutStatusEnum
-  completionPercentage?: number
-  exercises?: WorkoutExerciseDto[]
+  workoutPlanId: string
+  workoutPlanWeekId: string
+  workoutPlanDayId: string
+  executionDate: Date
+  status: "Completed" | "Partial" | "Skipped"
+  exercises?: WorkoutHistoryExerciseDto[]
+  notes?: string
   createdAt: Date
   updatedAt?: Date
 }

@@ -1,4 +1,4 @@
-import { RoleDto } from "./Identity/roleDto.interface";
+import { RoleDto } from "./Identity/role.interface";
 
 export interface AuthDto {
   userId?: string;

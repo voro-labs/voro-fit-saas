@@ -51,19 +51,19 @@ export default function EditStudentPage() {
       fetchStudentById(params.id as string).then((data) => {
         if (data) {
           setFormData({
-            name: data.userExtension?.user.userName || "",
-            email: data.userExtension?.user.email || "",
-            phone: data.userExtension?.user.phoneNumber || "",
-            birthDate: data.userExtension?.user.birthDate
-              ? new Date(data.userExtension.user.birthDate).toISOString().split("T")[0]
+            name: data.userExtension?.user?.userName || "",
+            email: data.userExtension?.user?.email || "",
+            phone: data.userExtension?.user?.phoneNumber || "",
+            birthDate: data.userExtension?.user?.birthDate
+              ? new Date(data.userExtension.user?.birthDate).toISOString().split("T")[0]
               : "",
             height: data.height?.toString() || "",
             weight: data.weight?.toString() || "",
             goal: data.goal || "",
             notes: data.notes || "",
           })
-          if (data.userExtension?.user.avatarUrl) {
-            setAvatarPreview(data.userExtension.user.avatarUrl)
+          if (data.userExtension?.user?.avatarUrl) {
+            setAvatarPreview(data.userExtension.user?.avatarUrl)
           }
         }
         setLoadingData(false)

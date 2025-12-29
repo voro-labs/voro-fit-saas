@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, AlertCircle } from "lucide-react"
 import { useAuth } from "@/contexts/auth.context"
 import { useSignIn } from "@/hooks/use-sign-in.hook"
-import { SignInDto } from "@/types/DTOs/signInDto.interface"
+import { SignInDto } from "@/types/DTOs/sign-in.interface"
 import { LoadingSimple } from "@/components/ui/custom/loading/loading-simple"
 import { Input } from "@/components/ui/input"
 
@@ -22,7 +22,7 @@ export default function SignInPage() {
   })
 
   const [showPassword, setShowPassword] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<Partial<SignInDto>>({})
+  const [fieldErrors, setFieldErrors] = useState<SignInDto>({})
 
   // Redirecionar se já estiver logado
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function SignInPage() {
   }, [user, router])
 
   const validateForm = (): boolean => {
-    const errors: Partial<SignInDto> = {}
+    const errors: SignInDto = {}
 
     if (!formData.email) {
       errors.email = "email é obrigatório"
