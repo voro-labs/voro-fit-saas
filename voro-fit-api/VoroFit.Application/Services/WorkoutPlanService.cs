@@ -6,6 +6,7 @@ using VoroFit.Application.Services.Base;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Domain.Entities;
 using VoroFit.Domain.Interfaces.Repositories;
+using VoroFit.Shared.Helpers;
 
 namespace VoroFit.Application.Services
 {
@@ -56,16 +57,111 @@ namespace VoroFit.Application.Services
 
         public async Task<WorkoutPlanDto> UpdateAsync(Guid id, WorkoutPlanDto dto)
         {
-            var updateWorkoutPlanDto = mapper.Map<WorkoutPlan>(dto);
-
-            var existingWorkoutPlan = base.GetByIdAsync(id);
+            var existingWorkoutPlan = await base.GetByIdAsync(wp => 
+                wp.Id == id,
+                wp => wp.Include(wp => wp.Student),
+                wp => wp.Include(wp => wp.Weeks)
+                    .ThenInclude(w => w.Days)
+                    .ThenInclude(d => d.Exercises));
+            
+            mapper.Map(dto, existingWorkoutPlan);
 
             if (existingWorkoutPlan != null)
             {
-                base.Update(updateWorkoutPlanDto);
+                SyncWeeks(existingWorkoutPlan, dto);
+
+                base.Update(existingWorkoutPlan);
             }
 
-            return mapper.Map<WorkoutPlanDto>(updateWorkoutPlanDto);
+            return mapper.Map<WorkoutPlanDto>(existingWorkoutPlan);
         }
+
+        private static void SyncWeeks(WorkoutPlan plan, WorkoutPlanDto dto)
+        {
+            CollectionSyncHelper.Sync(
+                plan.Weeks,
+                dto.Weeks ?? [],
+                db => db.Id,
+                d => d.Id ?? Guid.Empty,
+                d => new WorkoutPlanWeek
+                {
+                    Id = Guid.NewGuid(),
+                    WeekNumber = d.WeekNumber ?? 0,
+                    CreatedAt = DateTimeOffset.UtcNow
+                },
+                (db, d) =>
+                {
+                    db.WeekNumber = d.WeekNumber ?? 0;
+                    db.UpdatedAt = DateTimeOffset.UtcNow;
+                    SyncDays(db, d);
+                },
+                db =>
+                {
+                    db.IsDeleted = true;
+                    db.DeletedAt = DateTimeOffset.UtcNow;
+                }
+            );
+        }
+
+        private static void SyncDays(WorkoutPlanWeek week, WorkoutPlanWeekDto dto)
+        {
+            CollectionSyncHelper.Sync(
+                week.Days,
+                dto.Days ?? [],
+                db => db.Id,
+                d => d.Id ?? Guid.Empty,
+                d => new WorkoutPlanDay
+                {
+                    Id = Guid.NewGuid(),
+                    DayOfWeek = d.DayOfWeek ?? Domain.Enums.DayOfWeekEnum.Monday,
+                    CreatedAt = DateTimeOffset.UtcNow
+                },
+                (db, d) =>
+                {
+                    db.DayOfWeek = d.DayOfWeek ?? Domain.Enums.DayOfWeekEnum.Monday;
+                    db.UpdatedAt = DateTimeOffset.UtcNow;
+                    SyncExercises(db, d);
+                },
+                db =>
+                {
+                    db.IsDeleted = true;
+                    db.DeletedAt = DateTimeOffset.UtcNow;
+                }
+            );
+        }
+
+        private static void SyncExercises(WorkoutPlanDay day, WorkoutPlanDayDto dto)
+        {
+            CollectionSyncHelper.Sync(
+                day.Exercises,
+                dto.Exercises ?? [],
+                db => db.Id,
+                d => d.Id ?? Guid.Empty,
+                d => new WorkoutPlanExercise
+                {
+                    Id = Guid.NewGuid(),
+                    ExerciseId = d.ExerciseId ?? Guid.Empty,
+                    Order = d.Order ?? 0,
+                    Sets = d.Sets ?? 0,
+                    Reps = d.Reps ?? 0,
+                    RestInSeconds = d.RestInSeconds ?? 0,
+                    Weight = d.Weight
+                },
+                (db, d) =>
+                {
+                    db.Order = d.Order ?? 0;
+                    db.Sets = d.Sets ?? 0;
+                    db.Reps = d.Reps ?? 0;
+                    db.RestInSeconds = d.RestInSeconds ?? 0;
+                    db.Weight = d.Weight;
+                },
+                db =>
+                {
+                    db.IsDeleted = true;
+                    db.DeletedAt = DateTimeOffset.UtcNow;
+                }
+            );
+        }
+
     }
 }

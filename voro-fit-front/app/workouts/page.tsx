@@ -93,7 +93,7 @@ export default function WorkoutsPage() {
                         >
                           {plan.status === WorkoutStatusEnum.Active
                             ? "Ativo"
-                            : plan.status === WorkoutStatusEnum.Completed
+                            : plan.status === WorkoutStatusEnum.Finished
                               ? "Concluído"
                               : "Inativo"}
                         </Badge>

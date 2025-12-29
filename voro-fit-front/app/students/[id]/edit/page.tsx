@@ -51,7 +51,7 @@ export default function EditStudentPage() {
       fetchStudentById(params.id as string).then((data) => {
         if (data) {
           setFormData({
-            name: data.userExtension?.user?.userName || "",
+            name: data.userExtension?.user?.firstName || "",
             email: data.userExtension?.user?.email || "",
             phone: data.userExtension?.user?.phoneNumber || "",
             birthDate: data.userExtension?.user?.birthDate

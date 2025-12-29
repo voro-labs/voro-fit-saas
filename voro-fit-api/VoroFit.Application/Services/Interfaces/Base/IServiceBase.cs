@@ -6,7 +6,9 @@ namespace VoroFit.Application.Services.Interfaces.Base
     {
         Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true);
         Task<T?> GetByIdAsync(params object[] keyValues);
+        Task<T?> GetByIdAsync(Expression<Func<T, bool>> predicate, params Func<IQueryable<T>, IQueryable<T>>[] includes);
         IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null, bool asNoTracking = true);
+        IQueryable<T> Include(params Expression<Func<T, object>>[] includes);
 
         Task AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);

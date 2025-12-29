@@ -48,6 +48,18 @@ namespace VoroFit.Application.Services
         public async Task<StudentDto?> GetByIdAsync(Guid id)
         {
             var student = await base.Query()
+                .Include(s => s.UserExtension)
+                    .ThenInclude(s => s.User)
+                .Include(s => s.WorkoutHistories)
+                    .ThenInclude(wh => wh.WorkoutPlan)
+                .Include(s => s.WorkoutHistories)
+                    .ThenInclude(wh => wh.WorkoutPlanDay)
+                .Include(s => s.WorkoutHistories)
+                    .ThenInclude(wh => wh.WorkoutPlanWeek)
+                .Include(s => s.FavoriteExercises)
+                .Include(s => s.WorkoutPlans)
+                .Include(s => s.MealPlans)
+                .Include(s => s.Measurements)
                 .Where(s => s.UserExtensionId == id)
                 .FirstOrDefaultAsync();
 
@@ -56,16 +68,16 @@ namespace VoroFit.Application.Services
 
         public async Task<StudentDto> UpdateAsync(Guid id, StudentDto dto)
         {
-            var updateStudentDto = mapper.Map<Student>(dto);
-
-            var existingStudent = base.GetByIdAsync(id);
+            var existingStudent = await base.GetByIdAsync(id);
+            
+            mapper.Map(dto, existingStudent);
 
             if (existingStudent != null)
             {
-                base.Update(updateStudentDto);
+                base.Update(existingStudent);
             }
 
-            return mapper.Map<StudentDto>(updateStudentDto);
+            return mapper.Map<StudentDto>(existingStudent);
         }
     }
 }

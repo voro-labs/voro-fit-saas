@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using VoroFit.Domain.Interfaces.Entities;
 
 namespace VoroFit.Domain.Entities.Identity
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, ISoftDeletable
     {
 
         [StringLength(100)]
@@ -19,9 +20,11 @@ namespace VoroFit.Domain.Entities.Identity
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public bool IsActive { get; set; }
-
         public UserExtension? UserExtension { get; set; }
         public ICollection<UserRole> UserRoles { get; set; } = [];
+
+        public bool IsActive { get; set; } = true;
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

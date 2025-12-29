@@ -1,6 +1,8 @@
-﻿namespace VoroFit.Domain.Entities
+﻿using VoroFit.Domain.Interfaces.Entities;
+
+namespace VoroFit.Domain.Entities
 {
-    public class WorkoutHistoryExercise
+    public class WorkoutHistoryExercise : ISoftDeletable
     {
         public Guid Id { get; set; }
 
@@ -24,5 +26,8 @@
         public int RestInSeconds { get; set; }
 
         public string? Notes { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

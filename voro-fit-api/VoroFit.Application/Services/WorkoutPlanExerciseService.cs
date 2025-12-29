@@ -46,16 +46,16 @@ namespace VoroFit.Application.Services
 
         public async Task<WorkoutPlanExerciseDto> UpdateAsync(Guid id, WorkoutPlanExerciseDto dto)
         {
-            var updateWorkoutPlanExerciseDto = mapper.Map<WorkoutPlanExercise>(dto);
-
-            var existingWorkoutPlanExercise = base.GetByIdAsync(id);
+            var existingWorkoutPlanExercise = await base.GetByIdAsync(id);
+            
+            mapper.Map(dto, existingWorkoutPlanExercise);
 
             if (existingWorkoutPlanExercise != null)
             {
-                base.Update(updateWorkoutPlanExerciseDto);
+                base.Update(existingWorkoutPlanExercise);
             }
 
-            return mapper.Map<WorkoutPlanExerciseDto>(updateWorkoutPlanExerciseDto);
+            return mapper.Map<WorkoutPlanExerciseDto>(existingWorkoutPlanExercise);
         }
     }
 }

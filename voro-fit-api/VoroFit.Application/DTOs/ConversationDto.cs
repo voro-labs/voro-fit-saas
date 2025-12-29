@@ -2,11 +2,11 @@
 {
     public class ConversationDto
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; } = string.Empty;
 
-        public string Number { get; set; } = string.Empty;
+        public string? Number { get; set; } = string.Empty;
 
         public DateTimeOffset? LastMessageAt { get; set; }
 

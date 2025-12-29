@@ -40,7 +40,7 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
     }
 
     const newDay: WorkoutPlanDayDto = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       workoutPlanWeekId: week.id || "",
       dayOfWeek: availableDay.value,
       exercises: [],
@@ -63,7 +63,7 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)} className="h-8 w-8">
+            <Button type="button" variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)} className="h-8 w-8">
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
             <CardTitle className="text-lg flex items-center gap-2">

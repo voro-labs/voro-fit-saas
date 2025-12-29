@@ -1,8 +1,9 @@
 ﻿using VoroFit.Domain.Enums;
+using VoroFit.Domain.Interfaces.Entities;
 
 namespace VoroFit.Domain.Entities
 {
-    public class MealPlan
+    public class MealPlan : ISoftDeletable
     {
         public Guid Id { get; set; }
         public MealPlanStatusEnum Status { get; set; }
@@ -16,6 +17,9 @@ namespace VoroFit.Domain.Entities
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTimeOffset? UpdatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 
 }

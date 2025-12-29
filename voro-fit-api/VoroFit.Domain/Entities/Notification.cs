@@ -1,6 +1,8 @@
-﻿namespace VoroFit.Domain.Entities
+﻿using VoroFit.Domain.Interfaces.Entities;
+
+namespace VoroFit.Domain.Entities
 {
-    public class Notification
+    public class Notification : ISoftDeletable
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = default!;
@@ -10,6 +12,9 @@
         public string? Bcc { get; set; }
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTimeOffset? UpdatedAt { get; set; }
+
         public bool IsActive { get; set; } = true;
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

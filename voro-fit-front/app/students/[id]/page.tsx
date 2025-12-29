@@ -26,6 +26,7 @@ import { AuthGuard } from "@/components/auth/auth.guard"
 import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
 import { StudentDto } from "@/types/DTOs/student.interface"
 import { Loading } from "@/components/ui/custom/loading/loading"
+import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
 
 export default function StudentDetailPage() {
   const params = useParams()
@@ -45,6 +46,33 @@ export default function StudentDetailPage() {
     [StudentStatusEnum.Active]: { label: "Ativo", color: "bg-accent text-accent-foreground" },
     [StudentStatusEnum.Inactive]: { label: "Inativo", color: "bg-muted text-muted-foreground" },
     [StudentStatusEnum.Pending]: { label: "Pendente", color: "bg-destructive/10 text-destructive" },
+  }
+
+  const weekLabels: Record<number, string> = {
+    [1]: "Semana 1",
+    [2]: "Semana 2",
+    [3]: "Semana 3",
+    [4]: "Semana 4",
+  }
+
+  const getWeek = (weekNumber: number | undefined) => {
+    if (!weekNumber) return "Desconhecida"
+    return [weekLabels[weekNumber]]
+  }
+
+  const dayLabels: Record<DayOfWeekEnum, string> = {
+    [DayOfWeekEnum.Segunda]: "Segunda",
+    [DayOfWeekEnum.Terca]: "Terça",
+    [DayOfWeekEnum.Quarta]: "Quarta",
+    [DayOfWeekEnum.Quinta]: "Quinta",
+    [DayOfWeekEnum.Sexta]: "Sexta",
+    [DayOfWeekEnum.Sabado]: "Sábado",
+    [DayOfWeekEnum.Domingo]: "Domingo",
+  }
+
+  const getDayOfWeek = (day: DayOfWeekEnum | undefined) => {
+    if (!day) return ["Desconhecido"]
+    return [dayLabels[day]]
   }
 
   const calculateAge = (birthDate?: Date) => {
@@ -104,9 +132,9 @@ export default function StudentDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user?.userName}`} />
+                    <AvatarImage src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user?.firstName}`} />
                     <AvatarFallback>
-                      {`${student?.userExtension?.user?.userName}`
+                      {`${student?.userExtension?.user?.firstName}`
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
@@ -115,7 +143,7 @@ export default function StudentDetailPage() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.userName}`}</h1>
+                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.firstName}`}</h1>
                       <Badge className={statusConfig[student?.status ?? 100].color}>{statusConfig[student?.status ?? 100].label}</Badge>
                     </div>
 
@@ -295,7 +323,7 @@ export default function StudentDetailPage() {
                       {student?.workoutHistories.map((workout) => (
                         <div key={workout.id} className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-1">
-                            <p className="font-medium">{workout.notes}</p>
+                            <p className="font-medium">{getWeek(workout.workoutPlanWeek?.weekNumber)} · {getDayOfWeek(workout.workoutPlanDay?.dayOfWeek)}</p>
                             <p className="text-sm text-muted-foreground">{formatDate(workout.createdAt)}</p>
                           </div>
                           <div className="text-right">

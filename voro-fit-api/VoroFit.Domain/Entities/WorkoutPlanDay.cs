@@ -1,8 +1,9 @@
 ﻿using VoroFit.Domain.Enums;
+using VoroFit.Domain.Interfaces.Entities;
 
 namespace VoroFit.Domain.Entities
 {
-    public class WorkoutPlanDay
+    public class WorkoutPlanDay : ISoftDeletable
     {
         public Guid Id { get; set; }
 
@@ -14,5 +15,9 @@ namespace VoroFit.Domain.Entities
         public ICollection<WorkoutPlanExercise> Exercises { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

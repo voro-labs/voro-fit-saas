@@ -112,17 +112,17 @@ export default function MealPlanDetailPage() {
                       <Avatar className="h-12 w-12">
                         <AvatarImage
                           src={mealPlan?.student.userExtension?.user?.avatarUrl || "/placeholder.svg"}
-                          alt={`${mealPlan?.student.userExtension?.user?.userName}`}
+                          alt={`${mealPlan?.student.userExtension?.user?.firstName}`}
                         />
                         <AvatarFallback>
-                          {`${mealPlan?.student.userExtension?.user?.userName}`
+                          {`${mealPlan?.student.userExtension?.user?.firstName}`
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{`${mealPlan?.student.userExtension?.user?.userName}`}</p>
+                        <p className="font-medium">{`${mealPlan?.student.userExtension?.user?.firstName}`}</p>
                         <p className="text-sm text-muted-foreground">Plano semanal completo</p>
                       </div>
                     </div>

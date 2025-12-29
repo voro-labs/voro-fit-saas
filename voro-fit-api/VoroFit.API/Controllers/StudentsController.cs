@@ -70,6 +70,8 @@ namespace VoroFit.API.Controllers
             {
                 var created = await _studentService.CreateAsync(model);
 
+                await _studentService.SaveChangesAsync();
+
                 return ResponseViewModel<StudentDto>
                     .SuccessWithMessage("Aluno criado com sucesso.", created)
                     .ToActionResult();
@@ -93,6 +95,8 @@ namespace VoroFit.API.Controllers
             {
                 var updated = await _studentService.UpdateAsync(id, model);
 
+                await _studentService.SaveChangesAsync();
+
                 return ResponseViewModel<StudentDto>
                     .SuccessWithMessage("Aluno atualizado com sucesso.", updated)
                     .ToActionResult();
@@ -114,6 +118,8 @@ namespace VoroFit.API.Controllers
             try
             {
                 await _studentService.DeleteAsync(id);
+
+                await _studentService.SaveChangesAsync();
 
                 return ResponseViewModel<string>
                     .SuccessWithMessage("Aluno excluído com sucesso.", null)

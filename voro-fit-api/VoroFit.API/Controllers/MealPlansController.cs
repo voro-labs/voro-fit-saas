@@ -70,6 +70,8 @@ namespace VoroFit.API.Controllers
             {
                 var result = await _mealPlanService.CreateAsync(dto);
 
+                await _mealPlanService.SaveChangesAsync();
+
                 return ResponseViewModel<MealPlanDto>
                     .SuccessWithMessage("Meal plan created successfully.", result)
                     .ToActionResult();
@@ -89,6 +91,8 @@ namespace VoroFit.API.Controllers
             try
             {
                 var result = await _mealPlanService.UpdateAsync(id, dto);
+
+                await _mealPlanService.SaveChangesAsync();
 
                 if (result is null)
                 {
@@ -116,6 +120,8 @@ namespace VoroFit.API.Controllers
             try
             {
                 await _mealPlanService.DeleteAsync(id);
+
+                await _mealPlanService.SaveChangesAsync();
 
                 return ResponseViewModel<object>
                     .SuccessWithMessage("Meal plan deleted successfully.", true)

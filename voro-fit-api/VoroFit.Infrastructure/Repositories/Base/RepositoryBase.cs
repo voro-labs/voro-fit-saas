@@ -46,6 +46,19 @@ namespace VoroFit.Infrastructure.Repositories.Base
             return await _dbSet.FindAsync(keyValues);
         }
 
+        public async Task<T?> GetByIdAsync(
+            Expression<Func<T, bool>> predicate,
+            params Func<IQueryable<T>, IQueryable<T>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+                query = include(query);
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
+
         public IQueryable<T> Include(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;

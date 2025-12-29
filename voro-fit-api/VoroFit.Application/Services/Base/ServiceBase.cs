@@ -14,8 +14,14 @@ namespace VoroFit.Application.Services.Base
         public Task<T?> GetByIdAsync(params object[] keyValues)
             => _repository.GetByIdAsync(keyValues);
 
+        public Task<T?> GetByIdAsync(Expression<Func<T, bool>> predicate, params Func<IQueryable<T>, IQueryable<T>>[] includes)
+            => _repository.GetByIdAsync(predicate, includes);
+
         public IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null, bool asNoTracking = true)
             => _repository.Query(predicate, asNoTracking);
+
+        public IQueryable<T> Include(params Expression<Func<T, object>>[] includes)
+            => _repository.Include(includes);
 
         public Task AddAsync(T entity)
             => _repository.AddAsync(entity);

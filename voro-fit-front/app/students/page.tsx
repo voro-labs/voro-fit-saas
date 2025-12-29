@@ -29,7 +29,7 @@ export default function StudentsPage() {
     const searchLower = search.toLowerCase()
     return students.filter(
       (student) =>
-        student.userExtension?.user?.userName.toLowerCase().includes(searchLower) ||
+        student.userExtension?.user?.firstName.toLowerCase().includes(searchLower) ||
         student.goal?.toLowerCase().includes(searchLower) ||
         student.userExtension?.user?.email?.toLowerCase().includes(searchLower),
     )
@@ -109,7 +109,7 @@ export default function StudentsPage() {
                   <StudentCard
                     key={`${student.userExtensionId}`}
                     id={student.userExtensionId}
-                    name={student.userExtension?.user?.userName || ""}
+                    name={student.userExtension?.user?.firstName || ""}
                     age={calculateAge(student.userExtension?.user?.birthDate)}
                     height={student.height}
                     weight={student.weight}
@@ -146,15 +146,15 @@ export default function StudentsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage src={student.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student.userExtension?.user?.userName}`} />
+                              <AvatarImage src={student.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student.userExtension?.user?.firstName}`} />
                               <AvatarFallback>
-                                {`${student.userExtension?.user?.userName}`
+                                {`${student.userExtension?.user?.firstName}`
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">{`${student.userExtension?.user?.userName}`}</span>
+                            <span className="font-medium">{`${student.userExtension?.user?.firstName}`}</span>
                           </div>
                         </TableCell>
                         <TableCell>

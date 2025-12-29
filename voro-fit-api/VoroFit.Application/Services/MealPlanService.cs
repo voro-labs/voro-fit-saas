@@ -29,6 +29,8 @@ namespace VoroFit.Application.Services
         {
             var mealPlans = await base.Query()
                 .Include(s => s.Student)
+                    .ThenInclude(s => s.UserExtension)
+                        .ThenInclude(s => s.User)
                 .Include(s => s.Days)
                     .ThenInclude(d => d.Meals)
                 .Include(s => s.Days)
@@ -40,6 +42,12 @@ namespace VoroFit.Application.Services
         public async Task<MealPlanDto?> GetByIdAsync(Guid id)
         {
             var mealPlan = await base.Query()
+                .Include(s => s.Student)
+                    .ThenInclude(s => s.UserExtension)
+                        .ThenInclude(s => s.User)
+                .Include(s => s.Days)
+                    .ThenInclude(d => d.Meals)
+                .Include(s => s.Days)
                 .Where(s => s.Id == id)
                 .FirstOrDefaultAsync();
 
@@ -48,16 +56,16 @@ namespace VoroFit.Application.Services
 
         public async Task<MealPlanDto> UpdateAsync(Guid id, MealPlanDto dto)
         {
-            var updateMealPlanDto = mapper.Map<MealPlan>(dto);
-
-            var existingMealPlan = base.GetByIdAsync(id);
+            var existingMealPlan = await base.GetByIdAsync(id);
+            
+            mapper.Map(dto, existingMealPlan);
 
             if (existingMealPlan != null)
             {
-                base.Update(updateMealPlanDto);
+                base.Update(existingMealPlan);
             }
 
-            return mapper.Map<MealPlanDto>(updateMealPlanDto);
+            return mapper.Map<MealPlanDto>(existingMealPlan);
         }
     }
 }

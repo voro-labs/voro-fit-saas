@@ -76,7 +76,7 @@ export default function EditMealPlanPage() {
             setSelectedDay(String(firstDay.dayOfWeek))
             const mealsData: Meal[] =
               firstDay.meals?.map((meal) => ({
-                id: meal.id || Math.random().toString(36).substr(2, 9),
+                id: meal.id || crypto.randomUUID(),
                 time: meal.time || "",
                 period: periodFromEnum[meal.period] || "",
                 description: meal.description || "",
@@ -93,7 +93,7 @@ export default function EditMealPlanPage() {
 
   const addMeal = () => {
     const newMeal: Meal = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       time: "",
       period: "",
       description: "",
@@ -202,8 +202,8 @@ export default function EditMealPlanPage() {
                         </SelectTrigger>
                         <SelectContent>
                           {students.map((student) => (
-                            <SelectItem key={student.userExtensionId} value={student.userExtensionId}>
-                              {student.userExtension?.user?.userName}
+                            <SelectItem key={student.userExtensionId} value={student.userExtensionId!}>
+                              {student.userExtension?.user?.firstName}
                             </SelectItem>
                           ))}
                         </SelectContent>
