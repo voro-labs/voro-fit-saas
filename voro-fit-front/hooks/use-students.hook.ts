@@ -49,14 +49,14 @@ export function useStudents() {
     }
   }, [])
 
-  const createStudent = useCallback(async (data: FormData): Promise<StudentDto | null> => {
+  const createStudent = useCallback(async (data: StudentDto): Promise<StudentDto | null> => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await secureApiCall<StudentDto>(API_CONFIG.ENDPOINTS.STUDENTS, {
         method: "POST",
-        body: data,
+        body: JSON.stringify(data),
       })
 
       if (response.hasError) throw new Error(response.message ?? "Erro ao criar aluno")
@@ -74,14 +74,14 @@ export function useStudents() {
     }
   }, [])
 
-  const updateStudent = useCallback(async (id: string, data: FormData): Promise<StudentDto | null> => {
+  const updateStudent = useCallback(async (id: string, data: StudentDto): Promise<StudentDto | null> => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await secureApiCall<StudentDto>(`${API_CONFIG.ENDPOINTS.STUDENTS}/${id}`, {
         method: "PUT",
-        body: data,
+        body: JSON.stringify(data),
       })
 
       if (response.hasError) throw new Error(response.message ?? "Erro ao atualizar aluno")

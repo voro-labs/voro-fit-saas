@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, Clock } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TimePicker } from "@/components/ui/custom/time-picker"
 
 interface Meal {
   id: string
@@ -58,7 +59,12 @@ export function MealBlock({ meal, onRemove, onChange }: MealBlockProps) {
 
           <div className="space-y-2">
             <Label>Horário</Label>
-            <Input type="time" value={meal.time} onChange={(e) => onChange("time", e.target.value)} />
+            <TimePicker
+              value={meal.time} 
+              onChange={(value) => onChange("time", value)} 
+              placeholder="hh:mm"
+              className="h-12 text-base"
+            />
           </div>
         </div>
 

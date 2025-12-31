@@ -31,7 +31,7 @@ namespace VoroFit.Application.Services.Evolution
             return base.AddRangeAsync(instances);
         }
 
-        public async Task<Instance> GetOrCreateInstance(InstanceRequestDto instanceRequestDto)
+        public async Task<Instance> GetOrCreateInstance(InstanceRequestDto instanceRequestDto, string? phoneNumber = null)
         {
             var name = instanceRequestDto.InstanceName.ToLower();
 
@@ -54,6 +54,7 @@ namespace VoroFit.Application.Services.Evolution
                 Name = $"{response.Instance?.InstanceName}",
                 InstanceExtension = new() 
                 {
+                    PhoneNumber = $"{phoneNumber}",
                     Hash = $"{response.Hash}",
                     Status = InstanceStatusEnum.Unspecified,
                     Base64 = $"{response.Qrcode?.Base64}",

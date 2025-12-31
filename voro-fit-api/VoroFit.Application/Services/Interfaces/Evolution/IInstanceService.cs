@@ -10,7 +10,7 @@ namespace VoroFit.Application.Services.Interfaces.Evolution
     {
         Task AddAsync(InstanceDto instanceDto);
         Task AddRangeAsync(IEnumerable<InstanceDto> instanceDtos);
-        Task<Instance> GetOrCreateInstance(InstanceRequestDto instanceRequestDto);
+        Task<Instance> GetOrCreateInstance(InstanceRequestDto instanceRequestDto, string? phoneNumber = null);
         Task<Instance> UpdateStatus(Guid id, InstanceStatusEnum status);
     }
 }

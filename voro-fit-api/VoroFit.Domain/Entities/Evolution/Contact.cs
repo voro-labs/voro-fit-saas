@@ -21,6 +21,7 @@
         public string? LastKnownPresence { get; set; }
         public DateTimeOffset LastPresenceAt { get; set; } = DateTimeOffset.UtcNow;
 
+        public ICollection<Chat> Chats { get; set; } = [];
         public ICollection<ContactIdentifier> Identifiers { get; set; } = [];
 
         public ICollection<Message> Messages { get; set; } = [];

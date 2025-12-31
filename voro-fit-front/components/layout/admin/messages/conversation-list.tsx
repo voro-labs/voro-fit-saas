@@ -4,13 +4,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, CheckCheck } from 'lucide-react'
+import { Search, Plus, CheckCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ChangeEvent, useEffect, useState } from "react"
-import { ContactDto } from "@/types/DTOs/contact.interface"
+import { type ChangeEvent, useEffect, useState } from "react"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
+import { ContactDto } from "@/types/DTOs/contact.interface"
 import { flags } from "@/lib/flag-utils"
 
 interface ConversationListProps {
@@ -32,8 +40,8 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
     if (!search) {
       setFiltered(contacts)
     } else {
-      const result = contacts.filter(conv =>
-        (conv.displayName || conv.number).toLowerCase().includes(search.toLowerCase())
+      const result = contacts.filter((conv) =>
+        (conv.displayName || conv.number).toLowerCase().includes(search.toLowerCase()),
       )
       setFiltered(result)
     }
@@ -44,7 +52,7 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
   }
 
   function handleAddContact() {
-    onAddContact(contactName, `${flags[countryCode].dialCodeOnlyNumber}${phoneNumber}`);    
+    onAddContact(contactName, `${flags[countryCode].dialCodeOnlyNumber}${phoneNumber}`)
     setContactName("")
     setPhoneNumber("")
     setOpen(false)
@@ -57,14 +65,9 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar conversas..."
-              className="pl-9"
-              value={search}
-              onChange={inputChange}
-            />
+            <Input placeholder="Buscar conversas..." className="pl-9" value={search} onChange={inputChange} />
           </div>
-          
+
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="icon" variant="default">
@@ -74,9 +77,7 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Adicionar novo contato</DialogTitle>
-                <DialogDescription>
-                  Preencha os dados do novo contato para iniciar uma conversa.
-                </DialogDescription>
+                <DialogDescription>Preencha os dados do novo contato para iniciar uma conversa.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
@@ -96,7 +97,8 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
                     countryCode={countryCode}
                     autoComplete="off"
                     value={phoneNumber}
-                    onChange={(value) => setPhoneNumber(value)}></PhoneInput>
+                    onChange={(value) => setPhoneNumber(value)}
+                  ></PhoneInput>
                 </div>
               </div>
               <DialogFooter>
@@ -122,8 +124,11 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
           >
             <div className="relative">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={conversation.profilePictureUrl || "/placeholder.svg"} alt={(conversation.displayName || conversation.number)} />
-                <AvatarFallback>{(`${conversation.displayName || conversation.number}`).charAt(0)}</AvatarFallback>
+                <AvatarImage
+                  src={conversation.profilePictureUrl || "/placeholder.svg"}
+                  alt={conversation.displayName || conversation.number}
+                />
+                <AvatarFallback>{`${conversation.displayName || conversation.number}`.charAt(0)}</AvatarFallback>
               </Avatar>
               {conversation.lastKnownPresence && (
                 <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-card" />
@@ -132,16 +137,16 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
 
             <div className="flex-1 min-w-0 text-left">
               <div className="flex items-baseline justify-between gap-2 mb-1">
-                <p className="font-medium truncate">{(conversation.displayName || conversation.number)}</p>
+                <p className="font-medium truncate">{conversation.displayName || conversation.number}</p>
                 <span className="text-xs text-muted-foreground shrink-0">
-                  {conversation.lastMessageAt != null ? new Date(conversation.lastMessageAt).toLocaleDateString("pt-BR", { timeZone: "UTC" }) : null}
+                  {conversation.lastMessageAt != null
+                    ? new Date(conversation.lastMessageAt).toLocaleDateString("pt-BR", { timeZone: "UTC" })
+                    : null}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
-                  {conversation.lastMessageFromMe && (
-                    <CheckCheck className="h-3.5 w-3.5 shrink-0" />
-                  )}
+                  {conversation.lastMessageFromMe && <CheckCheck className="h-3.5 w-3.5 shrink-0" />}
                   <span className="truncate">{conversation.lastMessage}</span>
                 </p>
                 {(conversation.unread || 0) > 0 && (

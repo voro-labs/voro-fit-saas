@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VoroFit.API.Extensions;
 using VoroFit.API.ViewModels;
 using VoroFit.Application.DTOs;
+using VoroFit.Application.DTOs.Identity;
 using VoroFit.Application.Services.Interfaces;
+using VoroFit.Application.Services.Interfaces.Identity;
+using VoroFit.Shared.Constants;
+using VoroFit.Shared.Helpers;
 
 namespace VoroFit.API.Controllers
 {
@@ -11,9 +16,8 @@ namespace VoroFit.API.Controllers
     [Tags("Students")]
     [ApiController]
     [Authorize]
-    public class StudentsController(IStudentService studentService) : ControllerBase
+    public class StudentsController(IStudentService studentService, IUserService userService) : ControllerBase
     {
-        private readonly IStudentService _studentService = studentService;
 
         // ---------------------------------------------
         // GET /students
@@ -23,7 +27,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var result = await _studentService.GetAllAsync();
+                var result = await studentService.GetAllAsync();
 
                 return ResponseViewModel<IEnumerable<StudentDto>>
                     .Success(result)
@@ -45,7 +49,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var student = await _studentService.GetByIdAsync(id);
+                var student = await studentService.GetByIdAsync(id);
 
                 return ResponseViewModel<StudentDto>
                     .Success(student)
@@ -63,17 +67,33 @@ namespace VoroFit.API.Controllers
         // POST /students (com FormData)
         // ---------------------------------------------
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateStudent([FromForm] StudentDto model)
+        public async Task<IActionResult> CreateStudent([FromBody] StudentDto model)
         {
             try
             {
-                var created = await _studentService.CreateAsync(model);
+                var userDto = new UserDto
+                {
+                    Email = $"{model.UserExtension?.User?.Email}",
+                    FirstName = model.UserExtension?.User?.FirstName ?? string.Empty,
+                    LastName = model.UserExtension?.User?.LastName ?? string.Empty,
+                    AvatarUrl = model.UserExtension?.User?.AvatarUrl ?? string.Empty,
+                    CountryCode = model.UserExtension?.User?.CountryCode ?? string.Empty,
+                    PhoneNumber = model.UserExtension?.User?.PhoneNumber ?? string.Empty
+                };
 
-                await _studentService.SaveChangesAsync();
+                var user = await userService
+                    .CreateAsync(userDto, RandomTextHelper.GenerateRandomText, [RoleConstant.Student]) 
+                        ?? throw new KeyNotFoundException("User não encontrado.");
+
+                model.UserExtensionId = user.Id;
+                model.UserExtension = null;
+
+                var updated = await studentService.UpdateAsync(user.Id, model);
+
+                await studentService.SaveChangesAsync();
 
                 return ResponseViewModel<StudentDto>
-                    .SuccessWithMessage("Aluno criado com sucesso.", created)
+                    .SuccessWithMessage("Aluno criado com sucesso.", updated)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -88,14 +108,28 @@ namespace VoroFit.API.Controllers
         // PUT /students/{id}
         // ---------------------------------------------
         [HttpPut("{id:guid}")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UpdateStudent(Guid id, [FromForm] StudentDto model)
+        public async Task<IActionResult> UpdateStudent(Guid id, [FromBody] StudentDto model)
         {
             try
             {
-                var updated = await _studentService.UpdateAsync(id, model);
+                var userDto = new UserDto
+                {
+                    Email = $"{model.UserExtension?.User?.Email}",
+                    FirstName = model.UserExtension?.User?.FirstName ?? string.Empty,
+                    LastName = model.UserExtension?.User?.LastName ?? string.Empty,
+                    AvatarUrl = model.UserExtension?.User?.AvatarUrl ?? string.Empty,
+                    CountryCode = model.UserExtension?.User?.CountryCode ?? string.Empty,
+                    PhoneNumber = model.UserExtension?.User?.PhoneNumber ?? string.Empty
+                };
 
-                await _studentService.SaveChangesAsync();
+                var user = await userService.UpdateAsync(id, userDto);
+
+                model.UserExtensionId = user.Id;
+                model.UserExtension = null;
+
+                var updated = await studentService.UpdateAsync(id, model);
+
+                await studentService.SaveChangesAsync();
 
                 return ResponseViewModel<StudentDto>
                     .SuccessWithMessage("Aluno atualizado com sucesso.", updated)
@@ -117,9 +151,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                await _studentService.DeleteAsync(id);
+                await studentService.DeleteAsync(id);
 
-                await _studentService.SaveChangesAsync();
+                await studentService.SaveChangesAsync();
 
                 return ResponseViewModel<string>
                     .SuccessWithMessage("Aluno excluído com sucesso.", null)
@@ -141,7 +175,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var measurement = await _studentService.AddMeasurementAsync(id, model);
+                var measurement = await studentService.AddMeasurementAsync(id, model);
 
                 return ResponseViewModel<MeasurementDto>
                     .Success(measurement)

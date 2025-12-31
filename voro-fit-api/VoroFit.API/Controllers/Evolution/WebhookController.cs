@@ -14,19 +14,10 @@ namespace VoroFit.API.Controllers.Evolution
     [Tags("Evolution")]
     [ApiController]
     [AllowAnonymous]
-    public class WebhookController(IChatService chatService, IGroupService groupService, IGroupMemberService groupMemberService,
-        IContactService contactService, IContactIdentifierService contactIdentifierService, IMessageService messageService,
-        IInstanceService instanceService, IEvolutionService evolutionService, IConversationService conversationService) : ControllerBase
+    public class WebhookController(IChatService chatService, IGroupService groupService,
+        IContactService contactService, IContactIdentifierService contactIdentifierService,
+        IMessageService messageService, IConversationService conversationService) : ControllerBase
     {
-        private readonly IChatService _chatService = chatService;
-        private readonly IGroupService _groupService = groupService;
-        private readonly IContactService _contactService = contactService;
-        private readonly IMessageService _messageService = messageService;
-        private readonly IInstanceService _instanceService = instanceService;
-        private readonly IGroupMemberService _groupMemberService = groupMemberService;
-        private readonly IContactIdentifierService _contactIdentifierService = contactIdentifierService;
-        private readonly IEvolutionService _evolutionService = evolutionService;
-        private readonly IConversationService _conversationService = conversationService;
 
         [HttpPost]
         public async Task<IActionResult> Receive([FromBody] JsonElement payload)
@@ -134,7 +125,7 @@ namespace VoroFit.API.Controllers.Evolution
 
             if (!string.IsNullOrWhiteSpace(remoteJidAlt))
             {
-                identifier = await _contactIdentifierService
+                identifier = await contactIdentifierService
                     .GetOrCreateAsync(pushName, remoteJid, remoteJidAlt);
 
                 remoteJid = identifier.Contact.RemoteJid;
@@ -219,10 +210,10 @@ namespace VoroFit.API.Controllers.Evolution
 
             // -------- INSTÂNCIA / CHAT ---------
 
-            var (senderContact, group, chat) = await _conversationService.CreateChatAndGroupOrContactAsync(
+            var (senderContact, group, chat) = await conversationService.CreateChatAndGroupOrContactAsync(
                 eventDto.Instance, normalizedJid, pushName, remoteJid, isGroup, key.Participant);
 
-            Message? message = await _messageService.Query(item => item.ExternalId == messageKey).FirstOrDefaultAsync();
+            Message? message = await messageService.Query(item => item.ExternalId == messageKey).FirstOrDefaultAsync();
 
             if (messageType == MessageTypeEnum.Reaction)
             {
@@ -243,8 +234,8 @@ namespace VoroFit.API.Controllers.Evolution
 
                 message.MessageReactions.Add(reaction);
 
-                _messageService.Update(message);
-                await _messageService.SaveChangesAsync();
+                messageService.Update(message);
+                await messageService.SaveChangesAsync();
             }
             else
             {
@@ -276,7 +267,7 @@ namespace VoroFit.API.Controllers.Evolution
                         Thumbnail = thumbnail
                     };
 
-                    await _messageService.AddAsync(message);
+                    await messageService.AddAsync(message);
                 }
                 else
                 {
@@ -293,12 +284,12 @@ namespace VoroFit.API.Controllers.Evolution
                     message.DurationSeconds = durationSeconds;
                     message.Thumbnail = thumbnail;
 
-                    _messageService.Update(message);
+                    messageService.Update(message);
                 }
 
                 if (data.ContextInfo?.QuotedMessage != null)
                 {
-                    var quotedMessage = await _messageService
+                    var quotedMessage = await messageService
                         .Query(m => m.ExternalId == data.ContextInfo.StanzaId).FirstOrDefaultAsync();
 
                     if (quotedMessage != null)
@@ -307,7 +298,7 @@ namespace VoroFit.API.Controllers.Evolution
                     }
                 }
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
             }
 
             if (senderContact != null && senderContact.Id != Guid.Empty)
@@ -318,7 +309,7 @@ namespace VoroFit.API.Controllers.Evolution
 
                 senderContact.LastMessageAt = DateTimeOffset.UtcNow;
 
-                _contactService.Update(senderContact);
+                contactService.Update(senderContact);
             }
 
             if (group != null)
@@ -329,13 +320,13 @@ namespace VoroFit.API.Controllers.Evolution
 
                 group.LastMessageAt = DateTimeOffset.UtcNow;
                 
-                _groupService.Update(group);
+                groupService.Update(group);
             }
             
-            _chatService.Update(chat);
+            chatService.Update(chat);
 
-            await _contactService.SaveChangesAsync();
-            await _chatService.SaveChangesAsync();
+            await contactService.SaveChangesAsync();
+            await chatService.SaveChangesAsync();
 
             return Ok(new { success = true });
         }
@@ -344,7 +335,7 @@ namespace VoroFit.API.Controllers.Evolution
         {
             var data = eventDto.Data;
 
-            var message = await _messageService.Query(m => m.ExternalId == data.KeyId).FirstOrDefaultAsync();
+            var message = await messageService.Query(m => m.ExternalId == data.KeyId).FirstOrDefaultAsync();
 
             if (message == null)
                 return NotFound(new { success = false, message = "Mensagem não encontrada." });
@@ -362,9 +353,9 @@ namespace VoroFit.API.Controllers.Evolution
 
             message.Status = messageStatus;
 
-            _messageService.Update(message);
+            messageService.Update(message);
 
-            await _messageService.SaveChangesAsync();
+            await messageService.SaveChangesAsync();
             return Ok(new { success = true });
         }
 
@@ -377,16 +368,16 @@ namespace VoroFit.API.Controllers.Evolution
             if (!remoteJid.EndsWith("@s.whatsapp.net"))
                 return NoContent();
 
-            var contactIdentifier = await _contactIdentifierService
+            var contactIdentifier = await contactIdentifierService
                     .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
 
-            await _contactService.UpdateContact(
+            await contactService.UpdateContact(
                 contactIdentifier.Contact,
                 data.PushName,
                 data.ProfilePicUrl
             );
 
-            await _contactService.SaveChangesAsync();
+            await contactService.SaveChangesAsync();
         
             return Ok(new { success = true });
         }
@@ -401,16 +392,16 @@ namespace VoroFit.API.Controllers.Evolution
                 if (!remoteJid.EndsWith("@s.whatsapp.net"))
                     return NoContent();
 
-                var contactIdentifier = await _contactIdentifierService
+                var contactIdentifier = await contactIdentifierService
                     .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
 
-                await _contactService.UpdateContact(
+                await contactService.UpdateContact(
                     contactIdentifier.Contact,
                     data.PushName,
                     data.ProfilePicUrl
                 );
 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
             }
 
             return Ok(new { success = true });
@@ -425,7 +416,7 @@ namespace VoroFit.API.Controllers.Evolution
                 var remoteJid = presence.Key;
                 var presenceInfo = presence.Value.LastKnownPresence;
 
-                var contactIdentifier = await _contactIdentifierService
+                var contactIdentifier = await contactIdentifierService
                     .GetOrCreateAsync("", remoteJid, remoteJid, "");
 
                 var contact = contactIdentifier.Contact;
@@ -433,7 +424,7 @@ namespace VoroFit.API.Controllers.Evolution
                 contact.LastKnownPresence = presenceInfo;
                 contact.LastPresenceAt = DateTimeOffset.UtcNow;
 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
             }
 
             return Ok(new { success = true });
@@ -442,7 +433,7 @@ namespace VoroFit.API.Controllers.Evolution
 
         //private async Task<IActionResult> ChatUpdate(ChatUpdateEventDto eventDto)
         //{
-        //    var instance = await _instanceService.GetOrCreateInstance(eventDto.Instance);
+        //    var instance = await instanceService.GetOrCreateInstance(eventDto.Instance);
 
         //    foreach (var data in eventDto.Data)
         //    {
@@ -452,24 +443,24 @@ namespace VoroFit.API.Controllers.Evolution
         //        if (!isContact && !isGroup)
         //            continue;
 
-        //        var chat = await _chatService.GetOrCreateChat(remoteJid, instance, isGroup);
+        //        var chat = await chatService.GetOrCreateChat(remoteJid, instance, isGroup);
         //        chat.UpdatedAt = DateTimeOffset.UtcNow;
 
         //        if (isContact)
         //        {
         //            // Garante contato e vincula ao chat
-        //            var contact = await _contactService.GetOrCreateContact(remoteJid, "");
+        //            var contact = await contactService.GetOrCreateContact(remoteJid, "");
         //            chat.ContactId = contact.Id;
         //        }
         //        else if (isGroup)
         //        {
         //            // Garante grupo e vincula ao chat
-        //            var group = await _groupService.GetOrCreateGroup(remoteJid);
+        //            var group = await groupService.GetOrCreateGroup(remoteJid);
         //            chat.GroupId = group.Id;
         //        }
         //    }
 
-        //    await _chatService.SaveChangesAsync();
+        //    await chatService.SaveChangesAsync();
         //    return Ok(new { success = true });
         //}
 
@@ -482,7 +473,7 @@ namespace VoroFit.API.Controllers.Evolution
 
         //private async Task<Message?> FindMessageByExternalId(string externalId)
         //{
-        //    return await _messageService
+        //    return await messageService
         //        .Query(m => m.ExternalId == externalId)
         //        .FirstOrDefaultAsync();
         //}

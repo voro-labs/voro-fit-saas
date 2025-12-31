@@ -6,7 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Plus, QrCode, Smartphone, Trash2, RefreshCw, CheckCircle, XCircle, Clock, X, MessageSquare } from "lucide-react"
+import {
+  Plus,
+  QrCode,
+  Smartphone,
+  Trash2,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  Clock,
+  X,
+  MessageSquare,
+} from "lucide-react"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import {
   Dialog,
@@ -31,16 +42,22 @@ import {
 import Image from "next/image"
 import { useInstances } from "@/hooks/use-instance.hook"
 import { InstanceStatusEnum } from "@/types/Enums/instanceStatusEnum.enum"
+import { useRouter } from "next/navigation"
+import { PhoneInput } from "@/components/ui/custom/phone-input"
+import { applyMask, phoneMasks } from "@/lib/mask-utils"
 
 export default function InstancesPage() {
-  const { instances, loading, error, loadInstances, createInstance, deleteInstance, getStatus, refreshQrCode } = useInstances()
+  const { instances, loading, error, loadInstances, createInstance, deleteInstance, getStatus, refreshQrCode } =
+    useInstances()
+  const router = useRouter()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [qrDialogOpen, setQrDialogOpen] = useState(false)
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null)
   const [newInstanceName, setNewInstanceName] = useState("")
+  const [newInstancePhoneNumber, setNewInstancePhoneNumber] = useState("")
   const statusIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const selectedInstance = instances.find(i => i.id === selectedInstanceId) || null
+  const selectedInstance = instances.find((i) => i.id === selectedInstanceId) || null
 
   useEffect(() => {
     loadInstances()
@@ -49,7 +66,7 @@ export default function InstancesPage() {
   useEffect(() => {
     if (!qrDialogOpen || !selectedInstanceId) return
 
-    const instance = instances.find(i => i.id === selectedInstanceId)
+    const instance = instances.find((i) => i.id === selectedInstanceId)
     if (!instance) return
 
     if (!instance.instanceExtension?.base64) {
@@ -63,7 +80,7 @@ export default function InstancesPage() {
     }
 
     statusIntervalRef.current = setInterval(() => {
-      getStatus(instance.name).then(updatedInstance => {
+      getStatus(instance.name).then((updatedInstance) => {
         if (updatedInstance?.instanceExtension?.status === InstanceStatusEnum.Connected) {
           setQrDialogOpen(false)
           if (statusIntervalRef.current) {
@@ -83,10 +100,7 @@ export default function InstancesPage() {
   }, [qrDialogOpen, selectedInstanceId])
 
   useEffect(() => {
-    if (
-      selectedInstance?.instanceExtension?.status === InstanceStatusEnum.Connected &&
-      statusIntervalRef.current
-    ) {
+    if (selectedInstance?.instanceExtension?.status === InstanceStatusEnum.Connected && statusIntervalRef.current) {
       clearInterval(statusIntervalRef.current)
       statusIntervalRef.current = null
     }
@@ -151,16 +165,23 @@ export default function InstancesPage() {
                   <Label htmlFor="name">Nome da Instância</Label>
                   <Input
                     id="name"
+                    autoComplete="off"
                     placeholder="Ex: WhatsApp Principal"
                     value={newInstanceName}
                     onChange={(e) => setNewInstanceName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        var instance = createInstance(newInstanceName);
-                        if (instance !== null)
-                          setCreateDialogOpen(false);
-                      }
-                    }}
+                    className="h-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Número do WhatsApp</Label>
+                  <PhoneInput
+                    id="phone"
+                    autoComplete="tel"
+                    value={newInstancePhoneNumber}
+                    onChange={(value) => setNewInstancePhoneNumber(value)}
+                    countryCode="BR"
+                    placeholder="(11) 9999-9999"
+                    className="h-12"
                   />
                 </div>
               </div>
@@ -168,11 +189,13 @@ export default function InstancesPage() {
                 <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={() => {
-                  var instance = createInstance(newInstanceName);
-                  if (instance !== null)
-                    setCreateDialogOpen(false);
-                }} disabled={!newInstanceName.trim() || loading}>
+                <Button
+                  onClick={() => {
+                    var instance = createInstance(newInstanceName, newInstancePhoneNumber)
+                    if (instance !== null) setCreateDialogOpen(false)
+                  }}
+                  disabled={!newInstanceName.trim() || loading}
+                >
                   {loading ? "Criando..." : "Criar Instância"}
                 </Button>
               </DialogFooter>
@@ -205,7 +228,7 @@ export default function InstancesPage() {
                     <div>
                       <CardTitle>{instance.name}</CardTitle>
                       <CardDescription className="mt-1">
-                        {instance.instanceExtension?.phoneNumber || "Número não encontrado"}
+                        {applyMask(`${instance.instanceExtension?.phoneNumber}`, phoneMasks["BR"].mask) || "Número não encontrado"}
                       </CardDescription>
                     </div>
                     {getStatusBadge(instance.instanceExtension?.status || InstanceStatusEnum.Disconnected)}
@@ -215,44 +238,43 @@ export default function InstancesPage() {
                   <div className="flex flex-col gap-2 text-sm">
                     <div>
                       <span className="text-muted-foreground">Chave: </span>
-                      <span className="font-mono text-xs">{instance.id}</span>
+                      <span className="text-xs">{instance.id}</span>
                     </div>
                     {instance.instanceExtension?.connectedAt && (
                       <div>
                         <span className="text-muted-foreground">Conectado em: </span>
-                        <span className="text-xs">{new Date(instance.instanceExtension?.connectedAt || "").toLocaleString("pt-BR")}</span>
+                        <span className="text-xs">
+                          {new Date(instance.instanceExtension?.connectedAt || "").toLocaleString("pt-BR")}
+                        </span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex gap-2">
                     {instance.instanceExtension?.status == InstanceStatusEnum.Connected ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 bg-transparent"
-                          onClick={() => {
-                            
-                          }}
-                        >
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          Ir para mensagens
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 bg-transparent"
-                          onClick={() => {
-                            setSelectedInstanceId(instance.id)
-                            setQrDialogOpen(true)
-                          }}
-                        >
-                          <QrCode className="mr-2 h-4 w-4" />
-                          Ver QR Code
-                        </Button>
-                      )}
-                    
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                        onClick={() => router.push(`/messages/${instance.id}`)}
+                      >
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Ir para mensagens
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                        onClick={() => {
+                          setSelectedInstanceId(instance.id)
+                          setQrDialogOpen(true)
+                        }}
+                      >
+                        <QrCode className="mr-2 h-4 w-4" />
+                        Ver QR Code
+                      </Button>
+                    )}
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

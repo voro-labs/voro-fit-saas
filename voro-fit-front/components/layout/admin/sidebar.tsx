@@ -21,7 +21,6 @@ const navItems = [
   { title: "Exercícios", href: "/exercises", icon: Dumbbell },
   { title: "Treinos", href: "/workouts", icon: ClipboardList },
   { title: "Nutrição", href: "/nutrition", icon: Apple },
-  { title: "Mensagens", href: "/messages", icon: MessageSquare },
   { title: "Instâncias", href: "/instances", icon: Smartphone }
 ]
 

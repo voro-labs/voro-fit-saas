@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using VoroFit.Application.DTOs;
+﻿using VoroFit.Application.DTOs;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Domain.Entities.Identity;
 using VoroFit.Shared.Structs;
@@ -11,144 +10,72 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using VoroFit.Application.Services.Interfaces.Evolution;
+using VoroFit.Domain.Entities;
+using VoroFit.Shared.Constants;
+using VoroFit.Application.Services.Interfaces.Identity;
+using VoroFit.Application.DTOs.Identity;
+using AutoMapper;
 
 namespace VoroFit.Application.Services
 {
-    public class AuthService(IMapper mapper, IOptions<CookieUtil> cookieUtil,
-        SignInManager<User> signInManager, UserManager<User> userManager,
-        IConfiguration configuration, INotificationService notificationService,
-        IContactService contactService, IGroupService groupService) : IAuthService
+    public class AuthService(IOptions<CookieUtil> cookieUtil, IConfiguration configuration,
+        IMapper mapper, INotificationService notificationService, IUserService userService) : IAuthService
     {
         private readonly INotificationService _notificationService = notificationService;
-        private readonly IContactService _contactService = contactService;
-        private readonly IGroupService _groupService = groupService;
-        private readonly SignInManager<User> _signInManager = signInManager;
-        private readonly UserManager<User> _userManager = userManager;
         private readonly CookieUtil _cookieUtil = cookieUtil.Value;
-        private readonly IMapper _mapper = mapper;
+        private readonly IUserService _userService = userService;
 
         public async Task<AuthDto> SignInAsync(SignInDto signInDto)
         {
-            var user = await _userManager.FindByEmailAsync(signInDto.Email);
-
-            if (user == null)
-                throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, signInDto.Password, false);
-
-            if (!result.Succeeded)
-                throw new UnauthorizedAccessException("Usuário ou senha inválidos.");
-
-            //await _contactService.SyncContactsAsync();
-
-            //await _groupService.SyncGroupsAsync();
-
-            var rolesNames = await _userManager.GetRolesAsync(user);
+            var (user, rolesNames) = await _userService.GetByEmailAndPassword(signInDto.Email, signInDto.Password);
 
             return await GenerateAuthDto(user, rolesNames);
         }
 
-        public async Task<IEnumerable<IdentityError>> SignUpAsync(SignUpDto signUpDto, ICollection<string> roles)
+        public async Task<User> SignUpAsync(SignUpDto signUpDto, ICollection<string> roles)
         {
-            var user = new User
-            {
-                UserName = signUpDto.Email,
-                Email = signUpDto.Email,
-                UserExtension = new()
-            };
+            var userDto = mapper.Map<UserDto>(signUpDto);
+            
+            var user = await _userService.CreateAsync(userDto, signUpDto.Password, roles);
 
-            return await SignUpAsync(user, signUpDto.Password, roles);
-        }
-
-        public async Task<IEnumerable<IdentityError>> SignUpAsync(User user, string password, ICollection<string> roles)
-        {
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (!result.Succeeded)
-                return result.Errors;
-
-            foreach (var role in roles)
-            {
-                if (!await _userManager.IsInRoleAsync(user, role.ToString()))
-                {
-                    await _userManager.AddToRoleAsync(user, role.ToString());
-                }
-            }
-
-            var userName = !string.IsNullOrEmpty(user.FirstName) ? $"{user.FirstName} {user.LastName}" : $"{user.UserName}";
+            var userName = string.IsNullOrEmpty(user.UserName) ? $"{user.FirstName}.{user.LastName}".ToLower() : $"{user.UserName}";
 
             await _notificationService.SendWelcomeAsync($"{user.Email}", userName);
 
-            return [];
+            return user;
         }
 
-        public async Task<IEnumerable<IdentityError>> ConfirmEmailAsync(string email)
+        public async Task ConfirmEmailAsync(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return [new IdentityError { Description = "Usuário não encontrado." }]; ;
+            var (user, token) = await _userService.GenerateConfirmEmailAsync(email);
 
-            if (user.EmailConfirmed)
-                return [];
+            var userName = string.IsNullOrEmpty(user.UserName) ? $"{user.FirstName}.{user.LastName}".ToLower() : $"{user.UserName}";
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-
-            return result.Succeeded ? [] : [new IdentityError { Description = "Usuário não encontrado." }];
+            await _notificationService.SendConfirmEmailAsync($"{user.Email}", userName, Uri.EscapeDataString(token));
         }
 
-        public async Task<IEnumerable<IdentityError>> ConfirmEmailAsync(AuthDto authViewModel, string email)
+        public async Task<bool> ConfirmEmailAsync(AuthDto authViewModel, string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return [new IdentityError { Description = "Usuário não encontrado." }];
+            var confirmed = await _userService.ConfirmEmailAsync(authViewModel, email);
 
-            var result = await _userManager.ConfirmEmailAsync(user, authViewModel.Token);
-            return result.Succeeded ? [] : result.Errors;
+            return confirmed;
         }
 
-        public async Task<IEnumerable<IdentityError>> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
+        public async Task ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
         {
-            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
-            if (user == null)
-                return [new IdentityError { Description = "Usuário não encontrado." }];
+            var (user, token) = await _userService.GenerateForgotPasswordAsync(forgotPasswordDto);
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            // Aqui você pode enviar o token por email, SMS etc.
             var userName = !string.IsNullOrEmpty(user.FirstName) ? $"{user.FirstName} {user.LastName}" : $"{user.UserName}";
 
             await _notificationService.SendResetLinkAsync($"{user.Email}", userName, Uri.EscapeDataString(token));
-
-            return [];
         }
 
-        public async Task<IEnumerable<IdentityError>> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
-            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
-            if (user == null)
-                return [new IdentityError { Description = "Usuário não encontrado." }];
+            var reseted = await _userService.ResetPasswordAsync(resetPasswordDto);
 
-            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
-            return result.Succeeded ? [] : result.Errors;
+            return reseted;
         } 
-
-        public string GenerateRandomPassword()
-        {
-            // Você pode criar regras mais complexas aqui
-            return Guid.NewGuid().ToString("N")[..8] + "@1Aa";
-        }
-
-        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
-        {
-            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        }
-
-        public async Task<string> GeneratePasswordResetTokenAsync(User user)
-        {
-            return await _userManager.GeneratePasswordResetTokenAsync(user);
-        }
 
         private static async Task<List<Claim>> GenerateClaims(User user, IList<string>? rolesNames)
         {

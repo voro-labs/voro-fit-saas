@@ -6,7 +6,6 @@ namespace VoroFit.Domain.Entities.Identity
 {
     public class User : IdentityUser<Guid>, ISoftDeletable
     {
-
         [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
 
@@ -15,6 +14,8 @@ namespace VoroFit.Domain.Entities.Identity
 
         [StringLength(3)]
         public string? CountryCode { get; set; }
+
+        public string? AvatarUrl { get; set; }
 
         public DateTimeOffset? BirthDate { get; set; }
 

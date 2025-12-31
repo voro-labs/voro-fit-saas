@@ -5,8 +5,8 @@ using VoroFit.Application.Services.Base;
 
 namespace VoroFit.Application.Services.Identity
 {
-    public class UserRoleService(IUserRoleRepository roleRepository) : ServiceBase<UserRole>(roleRepository), IUserRoleService
+    public class UserRoleService(IUserRoleRepository userRoleRepository) : ServiceBase<UserRole>(userRoleRepository), IUserRoleService
     {
-        private readonly IUserRoleRepository _roleRepository = roleRepository;
+        
     }
 }

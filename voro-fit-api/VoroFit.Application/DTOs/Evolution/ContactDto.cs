@@ -12,7 +12,6 @@ namespace VoroFit.Application.DTOs.Evolution
         public string? DisplayName { get; set; }
         public string? ProfilePictureUrl { get; set; }
         
-        public string? InstanceName { get; set; }
         public IFormFile? ProfilePicture { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

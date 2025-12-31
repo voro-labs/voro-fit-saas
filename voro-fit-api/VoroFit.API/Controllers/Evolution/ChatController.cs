@@ -16,45 +16,32 @@ using VoroFit.Shared.Extensions;
 
 namespace VoroFit.API.Controllers.Evolution
 {
-    [Route("api/v{version:version}/[controller]")]
+    [Route("api/v{version:version}/[controller]/{instanceId}")]
     [Tags("Evolution")]
     [ApiController]
     [Authorize]
     public class ChatController(
         IChatService chatService,
-        IGroupService groupService,
         IMessageService messageService,
         IContactService contactService,
         IEvolutionService evolutionService,
-        IInstanceService instanceService,
-        IGroupMemberService groupMemberService,
         IMessageReactionService messageReactionService,
-        IContactIdentifierService contactIdentifierService,
         IConversationService conversationService,
+        IInstanceService instanceService,
         IMapper mapper) : ControllerBase
     {
-        private readonly IChatService _chatService = chatService;
-        private readonly IGroupService _groupService = groupService;
-        private readonly IContactService _contactService = contactService;
-        private readonly IMessageService _messageService = messageService;
-        private readonly IEvolutionService _evolutionService = evolutionService;
-        private readonly IInstanceService _instanceService = instanceService;
-        private readonly IGroupMemberService _groupMemberService = groupMemberService;
-        private readonly IMessageReactionService _messageReactionService = messageReactionService;
-        private readonly IContactIdentifierService _contactIdentifierService = contactIdentifierService;
-        private readonly IConversationService _conversationService = conversationService;
-        private readonly IMapper _mapper = mapper;
 
-        // ======================================================
+        // ======l================================================
         // GET → Conversas unificadas (contatos + grupos)
         // ======================================================
         [HttpGet("contacts")]
-        public async Task<IActionResult> GetContacts()
+        public async Task<IActionResult> GetContacts([FromRoute] Guid instanceId)
         {
             try
             {
                 // contatos (privado)
-                var contacts = await _contactService.Query(c => !c.GroupMemberships.Any())
+                var contacts = await contactService.Query(c => !c.GroupMemberships.Any())
+                    .Where(item => item.Chats != null && item.Chats.Any(chat => chat.InstanceExtensionId == instanceId))
                     .Include(item => item.Messages)
                     .OrderByDescending(c => c.LastMessageAt)
                     .ToListAsync();
@@ -66,7 +53,7 @@ namespace VoroFit.API.Controllers.Evolution
                 //            .FirstOrDefault()
 
                 //// grupos (conversas de grupo)
-                //var groups = await _groupService.Query()
+                //var groups = await groupService.Query()
                 //    .OrderByDescending(c => c.LastMessageAt)
                 //    .Select(c => new ConversationDto
                 //    {
@@ -83,7 +70,7 @@ namespace VoroFit.API.Controllers.Evolution
 
                 //var result = contacts.Concat(groups).ToList();
 
-                var contactsDtos = _mapper.Map<IEnumerable<ContactDto>>(contacts);
+                var contactsDtos = mapper.Map<IEnumerable<ContactDto>>(contacts);
 
                 return ResponseViewModel<IEnumerable<ContactDto>>
                     .Success(contactsDtos)
@@ -101,32 +88,41 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Enviar mensagem
         // ======================================================
         [HttpPost("contacts/save")]
-        public async Task<IActionResult> ContactSave([FromBody] ContactDto request)
+        public async Task<IActionResult> ContactSave([FromRoute] Guid instanceId, [FromBody] ContactDto request)
         {
             try
             {
-                var (senderContact, group, chat) = await _conversationService.CreateChatAndGroupOrContactAsync(
-                    $"{request.InstanceName}", $"{request.Number}@s.whatsapp.net",
-                    $"{request.DisplayName}", $"{request.Number}@s.whatsapp.net", false, string.Empty);
+              var instance = await instanceService.Query(i => i.Id == instanceId)
+                  .Include(i => i.InstanceExtension)
+                  .FirstOrDefaultAsync();
 
-                if (senderContact != null)
-                    _contactService.Update(senderContact);
+              if (instance == null)
+                  return ResponseViewModel<ContactDto>
+                      .Fail("Instância não encontrada")
+                      .ToActionResult();
 
-                _chatService.Update(chat);
+              var (senderContact, group, chat) = await conversationService.CreateChatAndGroupOrContactAsync(
+                  $"{instance.Name}", $"{request.Number}@s.whatsapp.net",
+                  $"{request.DisplayName}", $"{request.Number}@s.whatsapp.net", false, string.Empty);
 
-                await _contactService.SaveChangesAsync();
-                await _chatService.SaveChangesAsync();
+              if (senderContact != null)
+                  contactService.Update(senderContact);
 
-                if (senderContact == null)
-                    return ResponseViewModel<ContactDto>
-                        .Fail("Contato não foi cadastrado")
-                        .ToActionResult();
+              chatService.Update(chat);
 
-                var contactDto = _mapper.Map<ContactDto>(senderContact);
+              await contactService.SaveChangesAsync();
+              await chatService.SaveChangesAsync();
 
-                return ResponseViewModel<ContactDto>
-                    .Success(contactDto)
-                    .ToActionResult();
+              if (senderContact == null)
+                  return ResponseViewModel<ContactDto>
+                      .Fail("Contato não foi cadastrado")
+                      .ToActionResult();
+
+              var contactDto = mapper.Map<ContactDto>(senderContact);
+
+              return ResponseViewModel<ContactDto>
+                  .Success(contactDto)
+                  .ToActionResult();
             }
             catch (Exception ex)
             {
@@ -137,11 +133,14 @@ namespace VoroFit.API.Controllers.Evolution
         }
 
         [HttpPut("contacts/{contactId:guid}/update")]
-        public async Task<IActionResult> ContactUpdate(Guid contactId, [FromForm] ContactDto request)
+        public async Task<IActionResult> ContactUpdate([FromRoute] Guid instanceId, Guid contactId, [FromForm] ContactDto request)
         {
             try
             {
-                var senderContact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var senderContact = await contactService.Query(c => 
+                  c.Id == contactId && c.Chats != null &&
+                  c.Chats.Any(chat => chat.InstanceExtensionId == instanceId))
+                .FirstOrDefaultAsync();
 
                 if (senderContact == null)
                     return ResponseViewModel<ContactDto>
@@ -163,11 +162,11 @@ namespace VoroFit.API.Controllers.Evolution
                 }
                     
 
-                await _contactService.UpdateContact(senderContact, request.DisplayName, profilePicture);
+                await contactService.UpdateContact(senderContact, request.DisplayName, profilePicture);
 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
 
-                var contactDto = _mapper.Map<ContactDto>(senderContact);
+                var contactDto = mapper.Map<ContactDto>(senderContact);
 
                 return ResponseViewModel<ContactDto>
                     .Success(contactDto)
@@ -185,12 +184,13 @@ namespace VoroFit.API.Controllers.Evolution
         // GET → Mensagens de um contato
         // ======================================================
         [HttpGet("messages/{contactId:guid}")]
-        public async Task<IActionResult> GetMessages(Guid contactId)
+        public async Task<IActionResult> GetMessages([FromRoute] Guid instanceId, Guid contactId)
         {
             try
             {
-                var messages = await _messageService
+                var messages = await messageService
                     .Query(m => 
+                        m.Chat.InstanceExtensionId == instanceId &&
                         m.ContactId == contactId &&
                         m.Status != MessageStatusEnum.Deleted)
                     .Include(m => m.Contact)
@@ -200,7 +200,7 @@ namespace VoroFit.API.Controllers.Evolution
                     .OrderBy(m => m.SentAt)
                     .ToListAsync();
 
-                var messagesDtos = _mapper.Map<IEnumerable<MessageDto>>(messages);
+                var messagesDtos = mapper.Map<IEnumerable<MessageDto>>(messages);
 
                 return ResponseViewModel<IEnumerable<MessageDto>>
                     .Success(messagesDtos)
@@ -218,13 +218,13 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Enviar mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/send")]
-        public async Task<IActionResult> SendMessage(Guid contactId, [FromBody] MessageRequestDto request)
+        public async Task<IActionResult> SendMessage([FromRoute] Guid instanceId, Guid contactId, [FromBody] MessageRequestDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 if (chat == null)
@@ -242,9 +242,9 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Number = $"{contact.Number}@s.whatsapp.net";
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.SendMessageAsync(request);
+                var responseString = await evolutionService.SendMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
@@ -263,7 +263,7 @@ namespace VoroFit.API.Controllers.Evolution
                     Type = MessageTypeEnum.Text
                 };
 
-                await _messageService.AddAsync(messageDto);
+                await messageService.AddAsync(messageDto);
 
                 contact.LastMessage = messageDto.Content;
 
@@ -271,11 +271,11 @@ namespace VoroFit.API.Controllers.Evolution
 
                 contact.LastMessageAt = DateTimeOffset.UtcNow;
                 
-                _contactService.Update(contact);
+                contactService.Update(contact);
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
                 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
 
                 return ResponseViewModel<MessageDto>
                     .Success(messageDto)
@@ -293,18 +293,18 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Enviar resposta para mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/send/quoted")]
-        public async Task<IActionResult> SendQuoted(Guid contactId, [FromBody] MessageRequestDto request)
+        public async Task<IActionResult> SendQuoted([FromRoute] Guid instanceId, Guid contactId, [FromBody] MessageRequestDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Quoted?.Key.Id, out var guid);
 
-                var message = await _messageService.Query(m => m.Id == guid && m.ContactId == contactId).FirstOrDefaultAsync();
+                var message = await messageService.Query(m => m.Id == guid && m.ContactId == contactId).FirstOrDefaultAsync();
 
                 if (chat == null)
                     return NoContent();
@@ -327,9 +327,9 @@ namespace VoroFit.API.Controllers.Evolution
                     request.Quoted.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.SendQuotedMessageAsync(request);
+                var responseString = await evolutionService.SendQuotedMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
@@ -349,7 +349,7 @@ namespace VoroFit.API.Controllers.Evolution
                     QuotedMessageId = message.Id
                 };
 
-                await _messageService.AddAsync(messageDto);
+                await messageService.AddAsync(messageDto);
 
                 contact.LastMessage = messageDto.Content;
 
@@ -357,13 +357,13 @@ namespace VoroFit.API.Controllers.Evolution
 
                 contact.LastMessageAt = DateTimeOffset.UtcNow;
                 
-                _contactService.Update(contact);
+                contactService.Update(contact);
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
                 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
 
-                messageDto.QuotedMessage = _mapper.Map<MessageDto>(message);
+                messageDto.QuotedMessage = mapper.Map<MessageDto>(message);
 
                 return ResponseViewModel<MessageDto>
                     .Success(messageDto)
@@ -381,13 +381,13 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Enviar resposta para mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/send/attachment")]
-        public async Task<IActionResult> SendAttachment(Guid contactId, [FromForm] MediaDto request)
+        public async Task<IActionResult> SendAttachment([FromRoute] Guid instanceId, Guid contactId, [FromForm] MediaDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 if (chat == null)
@@ -415,9 +415,9 @@ namespace VoroFit.API.Controllers.Evolution
                     return BadRequest("Anexo não pode ser nulo.");
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.SendMediaMessageAsync(mediaRequest);
+                var responseString = await evolutionService.SendMediaMessageAsync(mediaRequest);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
@@ -487,7 +487,7 @@ namespace VoroFit.API.Controllers.Evolution
                     Thumbnail = thumbnail
                 };
 
-                await _messageService.AddAsync(messageDto);
+                await messageService.AddAsync(messageDto);
 
                 contact.LastMessage = "Enviou um arquivo";
 
@@ -495,11 +495,11 @@ namespace VoroFit.API.Controllers.Evolution
 
                 contact.LastMessageAt = DateTimeOffset.UtcNow;
                 
-                _contactService.Update(contact);
+                contactService.Update(contact);
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
                 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
 
                 return ResponseViewModel<MessageDto>
                     .Success(messageDto)
@@ -517,18 +517,18 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Enviar reação para mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/send/reaction")]
-        public async Task<IActionResult> SendReaction(Guid contactId, [FromBody] ReactionRequestDto request)
+        public async Task<IActionResult> SendReaction([FromRoute] Guid instanceId, Guid contactId, [FromBody] ReactionRequestDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Key.Id, out var guid);
 
-                var message = await _messageService.Query(m => m.Id == guid && m.ContactId == contactId)
+                var message = await messageService.Query(m => m.Id == guid && m.ContactId == contactId)
                     .Include(m => m.MessageReactions)
                     .FirstOrDefaultAsync();
 
@@ -554,15 +554,15 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.SendReactionMessageAsync(request);
+                var responseString = await evolutionService.SendReactionMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
-                _messageReactionService.DeleteRange(message.MessageReactions.Where(item => item.IsFromMe));
+                messageReactionService.DeleteRange(message.MessageReactions.Where(item => item.IsFromMe));
 
-                await _messageReactionService.SaveChangesAsync();
+                await messageReactionService.SaveChangesAsync();
 
                 var messageReaction = new MessageReactionDto()
                 {
@@ -574,7 +574,7 @@ namespace VoroFit.API.Controllers.Evolution
                     IsFromMe = request.Key.FromMe
                 };
 
-                await _messageReactionService.AddAsync(messageReaction);
+                await messageReactionService.AddAsync(messageReaction);
 
                 contact.LastMessage = $"Você reagiu com {request.Reaction}";
 
@@ -582,11 +582,11 @@ namespace VoroFit.API.Controllers.Evolution
 
                 contact.LastMessageAt = DateTimeOffset.UtcNow;
 
-                _contactService.Update(contact);
+                contactService.Update(contact);
 
-                await _messageReactionService.SaveChangesAsync();
+                await messageReactionService.SaveChangesAsync();
 
-                await _contactService.SaveChangesAsync();
+                await contactService.SaveChangesAsync();
 
                 return ResponseViewModel<object>
                     .Success(null)
@@ -604,18 +604,18 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Deleta a mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/delete")]
-        public async Task<IActionResult> DeleteMessage(Guid contactId, [FromBody] DeleteRequestDto request)
+        public async Task<IActionResult> DeleteMessage([FromRoute] Guid instanceId, Guid contactId, [FromBody] DeleteRequestDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Id, out var guid);
 
-                var message = await _messageService.Query(m => m.Id == guid && m.ContactId == contactId).FirstOrDefaultAsync();
+                var message = await messageService.Query(m => m.Id == guid && m.ContactId == contactId).FirstOrDefaultAsync();
 
                 if (chat == null)
                     return NoContent();
@@ -636,17 +636,17 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.DeleteMessageAsync(request);
+                var responseString = await evolutionService.DeleteMessageAsync(request);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
                 message.Status = MessageStatusEnum.Deleted;
 
-                _messageService.Update(message);
+                messageService.Update(message);
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
                 
                 return ResponseViewModel<object>
                     .Success(null)
@@ -664,18 +664,18 @@ namespace VoroFit.API.Controllers.Evolution
         // POST → Encaminha a mensagem
         // ======================================================
         [HttpPost("messages/{contactId:guid}/forward")]
-        public async Task<IActionResult> ForwardMessage(Guid contactId, [FromBody] ForwardRequestDto request)
+        public async Task<IActionResult> ForwardMessage([FromRoute] Guid instanceId, Guid contactId, [FromBody] ForwardRequestDto request)
         {
             try
             {
-                var contact = await _contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
+                var contact = await contactService.Query(c => c.Id == contactId).FirstOrDefaultAsync();
 
-                var chat = await _chatService.Query(chat => chat.ContactId == contactId)
+                var chat = await chatService.Query(chat => chat.InstanceExtensionId == instanceId && chat.ContactId == contactId)
                     .Include(c => c.InstanceExtension).ThenInclude(ie => ie.Instance).FirstOrDefaultAsync();
 
                 _ = Guid.TryParse(request.Id, out var guid);
 
-                var message = await _messageService.Query(m => m.Id == guid).FirstOrDefaultAsync();
+                var message = await messageService.Query(m => m.Id == guid).FirstOrDefaultAsync();
 
                 if (chat == null)
                     return NoContent();
@@ -710,17 +710,17 @@ namespace VoroFit.API.Controllers.Evolution
                 };
 
                 // EvolutionService retorna STRING → ajustado
-                await _evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
-                var responseString = await _evolutionService.SendMessageAsync(messageRequest);
+                var responseString = await evolutionService.SendMessageAsync(messageRequest);
 
                 var response = JsonSerializer.Deserialize<MessageUpsertDataDto>(responseString);
 
                 message.Status = MessageStatusEnum.Deleted;
 
-                _messageService.Update(message);
+                messageService.Update(message);
 
-                await _messageService.SaveChangesAsync();
+                await messageService.SaveChangesAsync();
                 
                 return ResponseViewModel<object>
                     .Success(null)

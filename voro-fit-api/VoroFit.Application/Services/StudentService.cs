@@ -4,8 +4,9 @@ using VoroFit.Domain.Interfaces.Repositories;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.DTOs;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using VoroFit.Shared.Constants;
+using VoroFit.Application.Services.Identity;
 
 namespace VoroFit.Application.Services
 {
@@ -14,15 +15,6 @@ namespace VoroFit.Application.Services
         public Task<MeasurementDto> AddMeasurementAsync(Guid studentId, MeasurementDto dto)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<StudentDto> CreateAsync(StudentDto dto)
-        {
-            var createStudentDto = mapper.Map<Student>(dto);
-
-            var student = base.AddAsync(createStudentDto);
-
-            return mapper.Map<StudentDto>(student);
         }
 
         public Task DeleteAsync(Guid id)

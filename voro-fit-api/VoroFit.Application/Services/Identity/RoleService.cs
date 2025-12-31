@@ -8,9 +8,7 @@ namespace VoroFit.Application.Services.Identity
 {
     public class RoleService(IRoleRepository roleRepository) : ServiceBase<Role>(roleRepository), IRoleService
     {
-        private readonly IRoleRepository _roleRepository = roleRepository;
-
         public async Task<Role?> GetByNameAsync(string roleName)
-            => await _roleRepository.Query(r => r.Name == roleName).FirstOrDefaultAsync();
+            => await roleRepository.Query(r => r.Name == roleName).FirstOrDefaultAsync();
     }
 }

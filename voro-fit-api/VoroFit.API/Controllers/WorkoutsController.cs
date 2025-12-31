@@ -13,8 +13,6 @@ namespace VoroFit.API.Controllers
     [Authorize]
     public class WorkoutsController(IWorkoutHistoryService workoutService) : ControllerBase
     {
-        private readonly IWorkoutHistoryService _workoutService = workoutService;
-
         // ----------------------------------------------------
         // GET /workouts
         // ----------------------------------------------------
@@ -23,7 +21,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var workouts = await _workoutService.GetAllAsync();
+                var workouts = await workoutService.GetAllAsync();
 
                 return ResponseViewModel<IEnumerable<WorkoutHistoryDto>>
                     .Success(workouts)
@@ -45,7 +43,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var workout = await _workoutService.GetByIdAsync(id);
+                var workout = await workoutService.GetByIdAsync(id);
 
                 return ResponseViewModel<WorkoutHistoryDto>
                     .Success(workout)
@@ -67,9 +65,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var created = await _workoutService.CreateAsync(model);
+                var created = await workoutService.CreateAsync(model);
 
-                await _workoutService.SaveChangesAsync();
+                await workoutService.SaveChangesAsync();
 
                 return ResponseViewModel<WorkoutHistoryDto>
                     .SuccessWithMessage("Treino criado com sucesso.", created)
@@ -91,9 +89,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var updated = await _workoutService.UpdateAsync(id, model);
+                var updated = await workoutService.UpdateAsync(id, model);
 
-                await _workoutService.SaveChangesAsync();
+                await workoutService.SaveChangesAsync();
 
                 return ResponseViewModel<WorkoutHistoryDto>
                     .SuccessWithMessage("Treino atualizado com sucesso.", updated)
@@ -115,9 +113,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                await _workoutService.DeleteAsync(id);
+                await workoutService.DeleteAsync(id);
 
-                await _workoutService.SaveChangesAsync();
+                await workoutService.SaveChangesAsync();
 
                 return ResponseViewModel<string>
                     .SuccessWithMessage("Treino excluído com sucesso.", null)

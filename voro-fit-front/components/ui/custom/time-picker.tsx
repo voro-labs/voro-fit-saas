@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Clock, ChevronUp, ChevronDown } from "lucide-react"
 import { Input } from "../input"
+import { cn } from "@/lib/utils"
 
 interface TimePickerProps {
   value: string // Time string in HH:mm format
@@ -15,6 +16,7 @@ interface TimePickerProps {
   timeStep?: number // minutes step (default: 15)
   minTime?: string // HH:mm format
   maxTime?: string // HH:mm format
+  className?: string
 }
 
 export function TimePicker({
@@ -27,6 +29,7 @@ export function TimePicker({
   timeStep = 15,
   minTime,
   maxTime,
+  className,
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [displayValue, setDisplayValue] = useState("")
@@ -279,7 +282,10 @@ export function TimePicker({
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           onFocus={() => setIsOpen(true)}
-          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={cn(
+            "w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            className,
+          )}
           placeholder={placeholder}
           disabled={disabled}
           autoComplete="off"

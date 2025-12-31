@@ -143,7 +143,7 @@ export default function StudentDetailPage() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.firstName}`}</h1>
+                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.firstName} ${student?.userExtension?.user?.lastName}`}</h1>
                       <Badge className={statusConfig[student?.status ?? 100].color}>{statusConfig[student?.status ?? 100].label}</Badge>
                     </div>
 

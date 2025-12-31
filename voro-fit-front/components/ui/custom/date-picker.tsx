@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "../input"
+import { cn } from "@/lib/utils"
 
 interface DatePickerProps {
   value: string // ISO date string
@@ -15,6 +16,7 @@ interface DatePickerProps {
   disabled?: boolean
   minDate?: string
   maxDate?: string
+  className?: string
 }
 
 export function DatePicker({
@@ -26,6 +28,7 @@ export function DatePicker({
   disabled,
   minDate,
   maxDate,
+  className,
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [displayValue, setDisplayValue] = useState("")
@@ -235,7 +238,10 @@ export function DatePicker({
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           onFocus={() => setIsOpen(true)}
-          className="w-full px-3 py-2 pr-10 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+          className={cn(
+            "w-full px-3 py-2 pr-10 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring",
+            className,
+          )}
           placeholder={placeholder}
           disabled={disabled}
           autoComplete="off"
@@ -271,7 +277,9 @@ export function DatePicker({
                   </SelectTrigger>
                   <SelectContent>
                     {months.map((month, index) => (
-                      <SelectItem key={index} value={`${index}`}>{month}</SelectItem>
+                      <SelectItem key={index} value={`${index}`}>
+                        {month}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -281,8 +289,10 @@ export function DatePicker({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {years.map(year => (
-                      <SelectItem key={year} value={`${year}`}>{year}</SelectItem>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={`${year}`}>
+                        {year}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

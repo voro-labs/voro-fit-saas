@@ -42,7 +42,7 @@ namespace VoroFit.Application.Services
                 throw new InvalidOperationException("Template de e-mail de reset de senha não encontrado.");
 
             // Gera o link de reset (ajuste conforme sua URL base)
-            var resetLink = $"https://vorolabs.app/admin/reset-password?email={email}&token={token}";
+            var resetLink = $"https://fit.vorolabs.app/admin/reset-password?email={email}&token={token}";
 
             // Substitui placeholders no corpo e no assunto
             var subject = template.Subject
@@ -51,6 +51,29 @@ namespace VoroFit.Application.Services
             var body = template.Body
                 .Replace("{UserName}", userName)
                 .Replace("{ResetLink}", resetLink);
+
+            // Envia o e-mail usando o serviço de e-mail real
+            await _emailService.SendAsync(email, subject, body, template.Cc, template.Bcc);
+        }
+
+        public async Task SendConfirmEmailAsync(string email, string userName, string token)
+        {
+            var template = await _notificationRepository
+                .Query(n => n.Name == NotificationEnum.ConfirmEmail.AsText() && n.IsActive).FirstOrDefaultAsync();
+
+            if (template == null)
+                throw new InvalidOperationException("Template de e-mail de confirmação de e-mail não encontrado.");
+
+            // Gera o link de confirmação (ajuste conforme sua URL base)
+            var confirmLink = $"https://fit.vorolabs.app/admin/confirm-email?email={email}&token={token}";
+
+            // Substitui placeholders no corpo e no assunto
+            var subject = template.Subject
+                .Replace("{UserName}", userName);
+
+            var body = template.Body
+                .Replace("{UserName}", userName)
+                .Replace("{ConfirmLink}", confirmLink);
 
             // Envia o e-mail usando o serviço de e-mail real
             await _emailService.SendAsync(email, subject, body, template.Cc, template.Bcc);

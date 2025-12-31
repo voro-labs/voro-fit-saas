@@ -155,6 +155,38 @@ namespace VoroFit.Infrastructure.Seeds
                             </div>",
                         CreatedAt = DateTime.UtcNow,
                         IsActive = true
+                    },
+
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = NotificationEnum.ConfirmEmail.AsText(),
+                        Subject = "Confirmação de E-mail - {UserName}",
+                        Body = @"
+                            <div style='font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 30px;'>
+                                <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);'>
+                                    <h2 style='color: #333333; text-align: center;'>Confirmação de E-mail</h2>
+                                    <p style='color: #555555; font-size: 16px;'>Olá <strong>{UserName}</strong>,</p>
+                                    <p style='color: #555555; font-size: 16px;'>
+                                        Recebemos uma solicitação para confirmar seu e-mail. Para continuar, clique no botão abaixo:
+                                    </p>
+                                    <div style='text-align: center; margin: 25px 0;'>
+                                        <a href='{ConfirmLink}' style='background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;'>
+                                            Confirmar E-mail
+                                        </a>
+                                    </div>
+                                    <p style='color: #777777; font-size: 14px;'>
+                                        Se você não solicitou essa alteração, basta ignorar este e-mail.
+                                    </p>
+                                    <br/>
+                                    <p style='font-size: 15px; color: #888888; text-align: center;'>
+                                        Atenciosamente,<br/>
+                                        <strong>Equipe Suporte</strong>
+                                    </p>
+                                </div>
+                            </div>",
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
                     }
                 };
 

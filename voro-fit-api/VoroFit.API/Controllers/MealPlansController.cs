@@ -13,15 +13,13 @@ namespace VoroFit.API.Controllers
     [Authorize]
     public class MealPlansController(IMealPlanService mealPlanService) : ControllerBase
     {
-        private readonly IMealPlanService _mealPlanService = mealPlanService;
-
         // GET /api/v1/mealplans
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _mealPlanService.GetAllAsync();
+                var result = await mealPlanService.GetAllAsync();
 
                 return ResponseViewModel<IEnumerable<MealPlanDto>>
                     .SuccessWithMessage("Meal plans loaded successfully.", result)
@@ -41,7 +39,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var result = await _mealPlanService.GetByIdAsync(id);
+                var result = await mealPlanService.GetByIdAsync(id);
 
                 if (result is null)
                 {
@@ -68,9 +66,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var result = await _mealPlanService.CreateAsync(dto);
+                var result = await mealPlanService.CreateAsync(dto);
 
-                await _mealPlanService.SaveChangesAsync();
+                await mealPlanService.SaveChangesAsync();
 
                 return ResponseViewModel<MealPlanDto>
                     .SuccessWithMessage("Meal plan created successfully.", result)
@@ -90,9 +88,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var result = await _mealPlanService.UpdateAsync(id, dto);
+                var result = await mealPlanService.UpdateAsync(id, dto);
 
-                await _mealPlanService.SaveChangesAsync();
+                await mealPlanService.SaveChangesAsync();
 
                 if (result is null)
                 {
@@ -119,9 +117,9 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                await _mealPlanService.DeleteAsync(id);
+                await mealPlanService.DeleteAsync(id);
 
-                await _mealPlanService.SaveChangesAsync();
+                await mealPlanService.SaveChangesAsync();
 
                 return ResponseViewModel<object>
                     .SuccessWithMessage("Meal plan deleted successfully.", true)

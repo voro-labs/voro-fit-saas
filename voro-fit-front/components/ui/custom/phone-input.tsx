@@ -1,11 +1,11 @@
 "use client"
 
-
 import { applyMask, phoneMasks, removeMask } from "@/lib/mask-utils"
 import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Input } from "../input"
+import { cn } from "@/lib/utils"
 
 interface PhoneInputProps {
   id: string
@@ -16,9 +16,20 @@ interface PhoneInputProps {
   countryCode: string
   placeholder?: string
   disabled?: boolean
+  className?: string
 }
 
-export function PhoneInput({ id, value, autoComplete, onChange, onBlur, countryCode, placeholder, disabled }: PhoneInputProps) {
+export function PhoneInput({
+  id,
+  value,
+  autoComplete,
+  onChange,
+  onBlur,
+  countryCode,
+  placeholder,
+  disabled,
+  className,
+}: PhoneInputProps) {
   const [maskedValue, setMaskedValue] = useState("")
 
   useEffect(() => {
@@ -59,7 +70,7 @@ export function PhoneInput({ id, value, autoComplete, onChange, onBlur, countryC
       autoComplete={autoComplete}
       onChange={handleInputChange}
       onBlur={onBlur}
-      className="w-full px-3 py-2"
+      className={cn("w-full px-3 py-2", className)}
       placeholder={currentPlaceholder}
       disabled={disabled}
     />

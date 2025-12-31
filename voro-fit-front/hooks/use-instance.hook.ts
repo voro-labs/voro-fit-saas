@@ -33,13 +33,13 @@ export function useInstances() {
   }, [])
 
   const createInstance = useCallback(
-    async (instanceName: string): Promise<InstanceDto | null> => {
+    async (instanceName: string, number: string): Promise<InstanceDto | null> => {
       setLoading(true)
       setError(null)
 
       try {
         const response = await secureApiCall<InstanceDto>(
-          API_CONFIG.ENDPOINTS.INSTANCE,
+          `${API_CONFIG.ENDPOINTS.INSTANCE}/${number}`,
           {
             method: "POST",
             body: JSON.stringify({ instanceName }),

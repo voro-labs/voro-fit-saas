@@ -27,6 +27,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { Loading } from "@/components/ui/custom/loading/loading"
+import { DatePicker } from "@/components/ui/custom/date-picker"
+import { PhoneInput } from "@/components/ui/custom/phone-input"
+import { StudentDto } from "@/types/DTOs/student.interface"
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+}
 
 export default function EditStudentPage() {
   const params = useParams()
@@ -34,10 +46,13 @@ export default function EditStudentPage() {
   const { fetchStudentById, updateStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
+    countryCode: "+55",
     birthDate: "",
     height: "",
     weight: "",
@@ -51,11 +66,13 @@ export default function EditStudentPage() {
       fetchStudentById(params.id as string).then((data) => {
         if (data) {
           setFormData({
-            name: data.userExtension?.user?.firstName || "",
+            firstName: data.userExtension?.user?.firstName || "",
+            lastName: data.userExtension?.user?.lastName || "",
             email: data.userExtension?.user?.email || "",
-            phone: data.userExtension?.user?.phoneNumber || "",
+            phoneNumber: data.userExtension?.user?.phoneNumber || "",
+            countryCode: data.userExtension?.user?.countryCode || "+55",
             birthDate: data.userExtension?.user?.birthDate
-              ? new Date(data.userExtension.user?.birthDate).toISOString().split("T")[0]
+              ? new Date(data.userExtension.user.birthDate).toISOString().split("T")[0]
               : "",
             height: data.height?.toString() || "",
             weight: data.weight?.toString() || "",
@@ -63,7 +80,7 @@ export default function EditStudentPage() {
             notes: data.notes || "",
           })
           if (data.userExtension?.user?.avatarUrl) {
-            setAvatarPreview(data.userExtension.user?.avatarUrl)
+            setAvatarPreview(data.userExtension.user.avatarUrl)
           }
         }
         setLoadingData(false)
@@ -85,13 +102,31 @@ export default function EditStudentPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formDataToSend = new FormData(e.currentTarget)
 
+    let avatarBase64: string | undefined
     if (avatarFile) {
-      formDataToSend.append("avatar", avatarFile)
+      avatarBase64 = await fileToBase64(avatarFile)
     }
 
-    const result = await updateStudent(params.id as string, formDataToSend)
+    const studentData: StudentDto = {
+      userExtension: {
+        user: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          countryCode: formData.countryCode,
+          birthDate: formData.birthDate ? new Date(formData.birthDate) : undefined,
+          avatarUrl: avatarBase64 || avatarPreview || undefined
+        }
+      },
+      height: formData.height ? Number(formData.height) : undefined,
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      goal: formData.goal || undefined,
+      notes: formData.notes || undefined
+    }
+
+    const result = await updateStudent(params.id as string, studentData)
     if (result) {
       router.push(`/students/${params.id}`)
     }
@@ -168,20 +203,36 @@ export default function EditStudentPage() {
                     <span>Dados Pessoais</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-base flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Nome Completo *
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="Ex: Carlos Silva"
-                      required
-                      className="h-12 text-base"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-base flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Nome *
+                      </Label>
+                      <Input
+                        id="firstName"
+                        placeholder="Ex: Carlos"
+                        required
+                        className="h-12 text-base"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-base flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Sobrenome *
+                      </Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Ex: Silva"
+                        required
+                        className="h-12 text-base"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -192,7 +243,6 @@ export default function EditStudentPage() {
                       </Label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
                         placeholder="email@exemplo.com"
                         className="h-12 text-base"
@@ -205,13 +255,14 @@ export default function EditStudentPage() {
                         <Phone className="h-4 w-4" />
                         Telefone
                       </Label>
-                      <Input
+                      <PhoneInput
                         id="phone"
-                        name="phone"
-                        placeholder="(11) 99999-9999"
-                        className="h-12 text-base"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        value={formData.phoneNumber}
+                        autoComplete="tel"
+                        onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
+                        countryCode="BR"
+                        placeholder="(11) 9999-9999"
+                        className="h-12"
                       />
                     </div>
                   </div>
@@ -230,13 +281,12 @@ export default function EditStudentPage() {
                         <Calendar className="h-4 w-4" />
                         Data de Nascimento
                       </Label>
-                      <Input
+                      <DatePicker
                         id="birthDate"
-                        name="birthDate"
-                        type="date"
-                        className="h-12"
                         value={formData.birthDate}
-                        onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                        onChange={(value) => setFormData({ ...formData, birthDate: value })}
+                        placeholder="dd/mm/aaaa"
+                        className="h-12"
                       />
                     </div>
 
@@ -247,7 +297,6 @@ export default function EditStudentPage() {
                       </Label>
                       <Input
                         id="height"
-                        name="height"
                         type="number"
                         placeholder="178"
                         className="h-12 text-base"
@@ -263,7 +312,6 @@ export default function EditStudentPage() {
                       </Label>
                       <Input
                         id="weight"
-                        name="weight"
                         type="number"
                         step="0.1"
                         placeholder="82.5"
@@ -289,7 +337,6 @@ export default function EditStudentPage() {
                     </Label>
                     <Input
                       id="goal"
-                      name="goal"
                       placeholder="Ex: Hipertrofia, Emagrecimento, Força"
                       className="h-12 text-base"
                       value={formData.goal}
@@ -304,7 +351,6 @@ export default function EditStudentPage() {
                     </Label>
                     <Textarea
                       id="notes"
-                      name="notes"
                       placeholder="Informações adicionais sobre o aluno, histórico médico, restrições..."
                       rows={4}
                       className="resize-none text-base"

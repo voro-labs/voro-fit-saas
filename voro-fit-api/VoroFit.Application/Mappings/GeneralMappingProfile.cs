@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Evolution;
+using VoroFit.Application.DTOs.Identity;
 using VoroFit.Domain.Entities;
 using VoroFit.Domain.Entities.Evolution;
+using VoroFit.Domain.Entities.Identity;
 
 namespace VoroFit.Application.Mappings
 {
@@ -29,7 +31,16 @@ namespace VoroFit.Application.Mappings
             CreateMap<Message, MessageDto>().ReverseMap();
             
             CreateMap<InstanceExtension, InstanceExtensionDto>().ReverseMap();
-            CreateMap<UserExtension, UserExtensionDto>().ReverseMap();
+            
+            // =========================
+            // USER EXTENSION
+            // =========================
+            CreateMap<UserExtension, UserExtensionDto>();
+
+            CreateMap<UserExtensionDto, UserExtension>()
+                .ForMember(d => d.UserId, o => o.Ignore())
+                .ForAllMembers(o =>
+                    o.Condition((src, dest, srcMember) => srcMember != null));
 
             // =========================
             // STUDENT

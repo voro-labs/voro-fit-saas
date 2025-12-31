@@ -25,6 +25,9 @@ namespace VoroFit.Domain.Entities
         [StringLength(200)]
         public string Goal { get; set; } = string.Empty;
 
+        [StringLength(200)]
+        public string Notes { get; set; } = string.Empty;
+
         // ===============================
         // RELACIONAMENTOS IMPORTANTES
         // ===============================

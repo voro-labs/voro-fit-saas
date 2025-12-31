@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { useState, useRef, useEffect } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, Phone, Video, MoreVertical, Mic, Paperclip, X, Edit } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { MessageDto } from "@/types/DTOs/message.interface";
-import { MessageStatus } from "./message-status";
-import { MessageReactions } from "./message-reactions";
-import { MessageContent } from "./message-content";
-import { TypingIndicator } from "./typing-indicator";
-import { MessageActions } from "./message-actions";
+import { useState, useRef, useEffect } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Send, Phone, Video, MoreVertical, Mic, X, Edit } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { MessageDto } from "@/types/DTOs/message.interface"
+import { MessageStatus } from "./message-status"
+import { MessageReactions } from "./message-reactions"
+import { MessageContent } from "./message-content"
+import { TypingIndicator } from "./typing-indicator"
+import { MessageActions } from "./message-actions"
 import {
   Dialog,
   DialogContent,
@@ -21,24 +21,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { ContactDto } from "@/types/DTOs/contact.interface";
-import { AttachmentActions } from "./attachment-actions";
-import { PhoneInput } from "@/components/ui/custom/phone-input";
-import { flags } from "@/lib/flag-utils";
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { ContactDto } from "@/types/DTOs/contact.interface"
+import { AttachmentActions } from "./attachment-actions"
+import { PhoneInput } from "@/components/ui/custom/phone-input"
+import { flags } from "@/lib/flag-utils"
 
 interface ChatAreaProps {
-  contact?: ContactDto;
-  messages: MessageDto[];
-  onSendMessage: (text: string, quotedMessage?: MessageDto) => void;
-  onSendAttachment: (file: File) => void;
-  onReact?: (message: MessageDto, emoji: string) => void;
-  onReply?: (message: MessageDto) => void;
-  onForward?: (message: MessageDto) => void;
-  onDelete?: (message: MessageDto) => void;
-  isTyping?: boolean;
-  onEditContact?: (contactId: string, contactName: string, phoneNumber: string, profilePicture: File | null) => void;
+  contact?: ContactDto
+  messages: MessageDto[]
+  onSendMessage: (text: string, quotedMessage?: MessageDto) => void
+  onSendAttachment: (file: File) => void
+  onReact?: (message: MessageDto, emoji: string) => void
+  onReply?: (message: MessageDto) => void
+  onForward?: (message: MessageDto) => void
+  onDelete?: (message: MessageDto) => void
+  isTyping?: boolean
+  onEditContact?: (contactId: string, contactName: string, phoneNumber: string, profilePicture: File | null) => void
 }
 
 export function ChatArea({
@@ -53,61 +53,61 @@ export function ChatArea({
   isTyping = false,
   onEditContact,
 }: ChatAreaProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [inputValue, setInputValue] = useState("");
-  const [quotedMessage, setQuotedMessage] = useState<MessageDto | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editedName, setEditedName] = useState("");
-  const [editedNumber, setEditedNumber] = useState("");
-  const [editedPhoto, setEditedPhoto] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = useState("")
+  const [quotedMessage, setQuotedMessage] = useState<MessageDto | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editedName, setEditedName] = useState("")
+  const [editedNumber, setEditedNumber] = useState("")
+  const [editedPhoto, setEditedPhoto] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string>("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [countryCode, setCountryCode] = useState("BR")
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     if (isEditDialogOpen && contact) {
-      setEditedName(contact.displayName || "");
-      setEditedNumber(contact.number?.slice(2) ?? "");
-      setPreviewUrl(contact.profilePictureUrl || "");
-      setEditedPhoto(null);
+      setEditedName(contact.displayName || "")
+      setEditedNumber(contact.number?.slice(2) ?? "")
+      setPreviewUrl(contact.profilePictureUrl || "")
+      setEditedPhoto(null)
     }
-  }, [isEditDialogOpen, contact, messages]);
+  }, [isEditDialogOpen, contact, messages])
 
   function triggerFilePicker(accept: string) {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = accept;
-      fileInputRef.current.click();
+      fileInputRef.current.accept = accept
+      fileInputRef.current.click()
     }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      e.target.value = "";
-      onSendAttachment(file!);
+      e.target.value = ""
+      onSendAttachment(file!)
     }
   }
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      setEditedPhoto(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      setEditedPhoto(file)
+      const url = URL.createObjectURL(file)
+      setPreviewUrl(url)
     }
-  };
+  }
 
   const handleSaveContact = () => {
-    if (!contact) return;
-    onEditContact?.(`${contact.id}`, editedName, `${flags[countryCode].dialCodeOnlyNumber}${editedNumber}`, editedPhoto);
-    setIsEditDialogOpen(false);
-  };
+    if (!contact) return
+    onEditContact?.(`${contact.id}`, editedName, `${flags[countryCode].dialCodeOnlyNumber}${editedNumber}`, editedPhoto)
+    setIsEditDialogOpen(false)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
+    e.preventDefault()
+    if (!inputValue.trim()) return
 
     if (quotedMessage?.id) {
       onSendMessage(inputValue, quotedMessage)
@@ -115,30 +115,28 @@ export function ChatArea({
       onSendMessage(inputValue)
     }
 
-    setInputValue("");
-    setQuotedMessage(null);
-  };
+    setInputValue("")
+    setQuotedMessage(null)
+  }
 
   const handleReply = (message: MessageDto) => {
-    inputRef.current?.focus();
-    setQuotedMessage(message);
-    onReply?.(message);
-  };
+    inputRef.current?.focus()
+    setQuotedMessage(message)
+    onReply?.(message)
+  }
 
   const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content);
-  };
+    navigator.clipboard.writeText(content)
+  }
 
   if (!contact) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground">
-            Selecione uma conversa para começar
-          </p>
+          <p className="text-lg text-muted-foreground">Selecione uma conversa para começar</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -152,18 +150,14 @@ export function ChatArea({
                 src={contact.profilePictureUrl || "/placeholder.svg"}
                 alt={contact.displayName || contact.number}
               />
-              <AvatarFallback>
-                {(contact.displayName || contact.number).charAt(0)}
-              </AvatarFallback>
+              <AvatarFallback>{(contact.displayName || contact.number).charAt(0)}</AvatarFallback>
             </Avatar>
             {contact.lastKnownPresence && (
               <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-card" />
             )}
           </div>
           <div>
-            <p className="font-medium">
-              {contact.displayName || contact.number}
-            </p>
+            <p className="font-medium">{contact.displayName || contact.number}</p>
           </div>
         </div>
 
@@ -186,13 +180,7 @@ export function ChatArea({
       {/* Messages */}
       <div className="voro-scroll-y">
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={cn(
-              "flex gap-2 group",
-              message.isFromMe ? "justify-end" : "justify-start"
-            )}
-          >
+          <div key={message.id} className={cn("flex gap-2 group", message.isFromMe ? "justify-end" : "justify-start")}>
             {message.isFromMe && (
               <MessageActions
                 message={message}
@@ -208,9 +196,7 @@ export function ChatArea({
               <div
                 className={cn(
                   "rounded-2xl px-4 py-2",
-                  message.isFromMe
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border"
+                  message.isFromMe ? "bg-primary text-primary-foreground" : "bg-card border border-border",
                 )}
               >
                 {!message.isFromMe && message.group && (
@@ -223,12 +209,7 @@ export function ChatArea({
 
                 <div className="flex items-center justify-end gap-1 mt-1">
                   <p
-                    className={cn(
-                      "text-xs",
-                      message.isFromMe
-                        ? "text-primary-foreground/70"
-                        : "text-muted-foreground"
-                    )}
+                    className={cn("text-xs", message.isFromMe ? "text-primary-foreground/70" : "text-muted-foreground")}
                   >
                     {new Date(message.sentAt).toLocaleTimeString("pt-BR", {
                       hour: "2-digit",
@@ -238,20 +219,13 @@ export function ChatArea({
                   {message.isFromMe && (
                     <MessageStatus
                       status={message.status}
-                      className={cn(
-                        message.isFromMe
-                          ? "text-primary-foreground/70"
-                          : "text-muted-foreground"
-                      )}
+                      className={cn(message.isFromMe ? "text-primary-foreground/70" : "text-muted-foreground")}
                     />
                   )}
                 </div>
               </div>
 
-              <MessageReactions
-                reactions={message.messageReactions}
-                isFromMe={message.isFromMe}
-              />
+              <MessageReactions reactions={message.messageReactions} isFromMe={message.isFromMe} />
             </div>
 
             {!message.isFromMe && (
@@ -279,18 +253,12 @@ export function ChatArea({
             <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-primary mb-1">
-                  Respondendo a {quotedMessage.isFromMe ? "você mesmo" : quotedMessage.contact?.displayName || "contato"}
+                  Respondendo a{" "}
+                  {quotedMessage.isFromMe ? "você mesmo" : quotedMessage.contact?.displayName || "contato"}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {quotedMessage.content}
-                </p>
+                <p className="text-xs text-muted-foreground truncate">{quotedMessage.content}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 shrink-0"
-                onClick={() => setQuotedMessage(null)}
-              >
+              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => setQuotedMessage(null)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -298,13 +266,7 @@ export function ChatArea({
         )}
 
         <form onSubmit={handleSubmit} className="flex items-center gap-2 p-4">
-
-          <Input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
+          <Input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
 
           <AttachmentActions
             onSendImage={() => triggerFilePicker("image/*")}
@@ -339,34 +301,16 @@ export function ChatArea({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Editar Contato</DialogTitle>
-            <DialogDescription>
-              Atualize as informações do contato aqui.
-            </DialogDescription>
+            <DialogDescription>Atualize as informações do contato aqui.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col items-center gap-4">
               <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src={previewUrl || "/placeholder.svg"}
-                  alt="Preview"
-                />
-                <AvatarFallback>
-                  {editedName.charAt(0) || editedNumber.charAt(0)}
-                </AvatarFallback>
+                <AvatarImage src={previewUrl || "/placeholder.svg"} alt="Preview" />
+                <AvatarFallback>{editedName.charAt(0) || editedNumber.charAt(0)}</AvatarFallback>
               </Avatar>
-              <Input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
+              <Input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+              <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                 Escolher Foto
               </Button>
             </div>
@@ -386,15 +330,12 @@ export function ChatArea({
                 countryCode={countryCode}
                 autoComplete="off"
                 value={editedNumber}
-                onChange={(value) => setEditedNumber(value)}></PhoneInput>
+                onChange={(value) => setEditedNumber(value)}
+              ></PhoneInput>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancelar
             </Button>
             <Button type="button" onClick={handleSaveContact}>
@@ -404,5 +345,5 @@ export function ChatArea({
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

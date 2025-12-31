@@ -8,12 +8,14 @@ import type { UserExtensionDto } from "./user-extension.interface"
 export interface StudentDto {
   userExtensionId?: string
   userExtension?: UserExtensionDto
+  trainerId?: string
+  trainer?: UserExtensionDto
   height?: number
   weight?: number
   goal?: string
   notes?: string
   status?: StudentStatusEnum
-  createdAt: Date
+  createdAt?: Date
   updatedAt?: Date
   measurements?: MeasurementDto[]
   workoutPlans?: WorkoutPlanDto[]

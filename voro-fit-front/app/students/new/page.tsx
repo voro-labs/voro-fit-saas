@@ -26,12 +26,40 @@ import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { DatePicker } from "@/components/ui/custom/date-picker"
+import { PhoneInput } from "@/components/ui/custom/phone-input"
+import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
+import { useAuth } from "@/contexts/auth.context"
+import { StudentDto } from "@/types/DTOs/student.interface"
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+}
 
 export default function NewStudentPage() {
   const router = useRouter()
+  const { user: Trainer } = useAuth()
   const { createStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    countryCode: "+55",
+    birthDate: "",
+    height: "",
+    weight: "",
+    goal: "",
+    notes: "",
+  })
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -47,13 +75,33 @@ export default function NewStudentPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
 
+    let avatarBase64: string | undefined
     if (avatarFile) {
-      formData.append("avatar", avatarFile)
+      avatarBase64 = await fileToBase64(avatarFile)
     }
 
-    const result = await createStudent(formData)
+    const studentData: StudentDto = {
+      userExtension: {
+        user: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          countryCode: formData.countryCode,
+          birthDate: formData.birthDate ? new Date(formData.birthDate) : undefined,
+          avatarUrl: avatarBase64
+        }
+      },
+      trainerId: `${Trainer?.userId}`,
+      height: formData.height ? Number(formData.height) : undefined,
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      goal: formData.goal || undefined,
+      notes: formData.notes || undefined,
+      status: StudentStatusEnum.Active,
+    }
+
+    const result = await createStudent(studentData)
     if (result) {
       router.push("/students")
     }
@@ -126,12 +174,36 @@ export default function NewStudentPage() {
                     <span>Dados Pessoais</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-base flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Nome Completo *
-                    </Label>
-                    <Input id="name" name="name" placeholder="Ex: Carlos Silva" required className="h-12 text-base" />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-base flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Nome *
+                      </Label>
+                      <Input
+                        id="firstName"
+                        placeholder="Ex: Carlos"
+                        required
+                        className="h-12 text-base"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-base flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Sobrenome *
+                      </Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Ex: Silva"
+                        required
+                        className="h-12 text-base"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -142,10 +214,11 @@ export default function NewStudentPage() {
                       </Label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
                         placeholder="email@exemplo.com"
                         className="h-12 text-base"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -153,7 +226,15 @@ export default function NewStudentPage() {
                         <Phone className="h-4 w-4" />
                         Telefone
                       </Label>
-                      <Input id="phone" name="phone" placeholder="(11) 99999-9999" className="h-12 text-base" />
+                      <PhoneInput
+                        id="phone"
+                        value={formData.phoneNumber}
+                        autoComplete="tel"
+                        onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
+                        countryCode="BR"
+                        placeholder="(11) 9999-9999"
+                        className="h-12"
+                      />
                     </div>
                   </div>
                 </div>
@@ -171,7 +252,13 @@ export default function NewStudentPage() {
                         <Calendar className="h-4 w-4" />
                         Data de Nascimento
                       </Label>
-                      <Input id="birthDate" name="birthDate" type="date" className="h-12" />
+                      <DatePicker
+                        id="birthDate"
+                        value={formData.birthDate}
+                        onChange={(value) => setFormData({ ...formData, birthDate: value })}
+                        placeholder="dd/mm/aaaa"
+                        className="h-12"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -179,7 +266,14 @@ export default function NewStudentPage() {
                         <Ruler className="h-4 w-4" />
                         Altura (cm)
                       </Label>
-                      <Input id="height" name="height" type="number" placeholder="178" className="h-12 text-base" />
+                      <Input
+                        id="height"
+                        type="number"
+                        placeholder="178"
+                        className="h-12 text-base"
+                        value={formData.height}
+                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -189,11 +283,12 @@ export default function NewStudentPage() {
                       </Label>
                       <Input
                         id="weight"
-                        name="weight"
                         type="number"
                         step="0.1"
                         placeholder="82.5"
                         className="h-12 text-base"
+                        value={formData.weight}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                       />
                     </div>
                   </div>
@@ -213,9 +308,10 @@ export default function NewStudentPage() {
                     </Label>
                     <Input
                       id="goal"
-                      name="goal"
                       placeholder="Ex: Hipertrofia, Emagrecimento, Força"
                       className="h-12 text-base"
+                      value={formData.goal}
+                      onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
                     />
                   </div>
 
@@ -226,10 +322,11 @@ export default function NewStudentPage() {
                     </Label>
                     <Textarea
                       id="notes"
-                      name="notes"
                       placeholder="Informações adicionais sobre o aluno, histórico médico, restrições..."
                       rows={4}
                       className="resize-none text-base"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     />
                   </div>
                 </div>

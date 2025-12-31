@@ -15,14 +15,13 @@ namespace VoroFit.Application.DTOs
         public int? Age { get; set; }
         public int? Height { get; set; }
 
-        [Column(TypeName = "decimal(5,2)")]
         public decimal? Weight { get; set; }
 
         public StudentStatusEnum? Status { get; set; } 
             = StudentStatusEnum.Active;
 
-        [StringLength(200)]
         public string? Goal { get; set; } = string.Empty;
+        public string? Notes { get; set; } = string.Empty;
 
         // ===============================
         // RELACIONAMENTOS IMPORTANTES

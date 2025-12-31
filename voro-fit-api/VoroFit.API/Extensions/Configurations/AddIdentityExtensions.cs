@@ -1,6 +1,7 @@
 ﻿using VoroFit.Domain.Entities.Identity;
 using VoroFit.Infrastructure.Factories;
 using Microsoft.AspNetCore.Identity;
+using VoroFit.Domain.Entities;
 
 namespace VoroFit.API.Extensions.Configurations
 {
@@ -11,10 +12,6 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddIdentity<User, Role>()
                 .AddEntityFrameworkStores<JasmimDbContext>()
                 .AddDefaultTokenProviders();
-
-            services.AddScoped<SignInManager<User>>();
-            services.AddScoped<UserManager<User>>();
-            services.AddScoped<RoleManager<Role>>();
 
             return services;
         }

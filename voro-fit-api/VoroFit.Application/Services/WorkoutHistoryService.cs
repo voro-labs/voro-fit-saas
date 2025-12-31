@@ -15,9 +15,9 @@ namespace VoroFit.Application.Services
         {
             var createWorkoutHistoryDto = mapper.Map<WorkoutHistory>(dto);
 
-            var exercise = base.AddAsync(createWorkoutHistoryDto);
+            await base.AddAsync(createWorkoutHistoryDto);
 
-            return mapper.Map<WorkoutHistoryDto>(exercise);
+            return mapper.Map<WorkoutHistoryDto>(createWorkoutHistoryDto);
         }
 
         public Task DeleteAsync(Guid id)

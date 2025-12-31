@@ -110,7 +110,7 @@ export default function NewExercisePage() {
                       Grupo Muscular *
                     </Label>
                     <Select value={muscleGroup} onValueChange={setMuscleGroup} required>
-                      <SelectTrigger className="h-12 text-base">
+                      <SelectTrigger className="w-full text-base">
                         <SelectValue placeholder="Selecione o grupo muscular" />
                       </SelectTrigger>
                       <SelectContent>

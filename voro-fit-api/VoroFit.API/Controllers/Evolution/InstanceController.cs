@@ -18,12 +18,9 @@ namespace VoroFit.API.Controllers.Evolution
     [Tags("Evolution")]
     [ApiController]
     [Authorize]
-    public class InstanceController(IMapper mapper, IInstanceService instanceService, IEvolutionService evolutionService, IOptions<EvolutionUtil> evolutionUtil) : ControllerBase
+    public class InstanceController(IMapper mapper, IInstanceService instanceService,
+        IEvolutionService evolutionService, IOptions<EvolutionUtil> evolutionUtil) : ControllerBase
     {
-        private readonly IMapper _mapper = mapper;
-        private readonly IInstanceService _instanceService = instanceService;
-        private readonly IEvolutionService _evolutionService = evolutionService;
-        private readonly EvolutionUtil _evolutionUtil = evolutionUtil.Value;
 
         // ✅ GET api/v1/instance
         [HttpGet]
@@ -31,10 +28,10 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                var instances = await _instanceService.Query()
+                var instances = await instanceService.Query()
                     .Include(i => i.InstanceExtension).ToListAsync();
 
-                var instancesDto = _mapper.Map<IEnumerable<InstanceDto>>(instances);
+                var instancesDto = mapper.Map<IEnumerable<InstanceDto>>(instances);
 
                 return ResponseViewModel<IEnumerable<InstanceDto>>
                     .SuccessWithMessage("Instances loaded successfully.", instancesDto)
@@ -49,16 +46,16 @@ namespace VoroFit.API.Controllers.Evolution
         }
 
         // ✅ POST api/v1/instance
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] InstanceRequestDto dto)
+        [HttpPost("{phoneNumber}")]
+        public async Task<IActionResult> Create(string phoneNumber, [FromBody] InstanceRequestDto dto)
         {
             try
             {
-                dto.SetWebhookUrl(_evolutionUtil);
+                dto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await _instanceService.GetOrCreateInstance(dto);
+                var instance = await instanceService.GetOrCreateInstance(dto, phoneNumber);
 
-                var instanceDto = _mapper.Map<InstanceDto>(instance);
+                var instanceDto = mapper.Map<InstanceDto>(instance);
 
                 return ResponseViewModel<InstanceDto>
                     .SuccessWithMessage("Instance created successfully.", instanceDto)
@@ -78,19 +75,19 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await _evolutionService.SetInstanceName(instanceName);
+                await evolutionService.SetInstanceName(instanceName);
 
-                await _evolutionService.DeleteInstanceAsync();
+                await evolutionService.DeleteInstanceAsync();
 
                 var instanceRequestDto = new InstanceRequestDto() { InstanceName = instanceName };
 
-                instanceRequestDto.SetWebhookUrl(_evolutionUtil);
+                instanceRequestDto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await _instanceService.GetOrCreateInstance(instanceRequestDto);
+                var instance = await instanceService.GetOrCreateInstance(instanceRequestDto);
 
-                await _instanceService.DeleteAsync(instance.Id);
+                await instanceService.DeleteAsync(instance.Id);
 
-                await _instanceService.SaveChangesAsync();
+                await instanceService.SaveChangesAsync();
 
                 return ResponseViewModel<object>
                     .SuccessWithMessage("Instance deleted successfully.", null)
@@ -110,9 +107,9 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await _evolutionService.SetInstanceName(instanceName);
+                await evolutionService.SetInstanceName(instanceName);
 
-                var instance = await _evolutionService.RefreshQrCodeAsync();
+                var instance = await evolutionService.RefreshQrCodeAsync();
 
                 return ResponseViewModel<QrCodeJsonDto>
                     .SuccessWithMessage("QR Code refreshed successfully.", instance)
@@ -132,9 +129,9 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await _evolutionService.SetInstanceName(instanceName);
+                await evolutionService.SetInstanceName(instanceName);
 
-                var response = await _evolutionService.GetInstanceStatusAsync();
+                var response = await evolutionService.GetInstanceStatusAsync();
 
                 var status = response.Instance!.State switch
                 {
@@ -145,18 +142,18 @@ namespace VoroFit.API.Controllers.Evolution
 
                 var instanceRequestDto = new InstanceRequestDto() { InstanceName = instanceName };
 
-                instanceRequestDto.SetWebhookUrl(_evolutionUtil);
+                instanceRequestDto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await _instanceService.GetOrCreateInstance(instanceRequestDto);
+                var instance = await instanceService.GetOrCreateInstance(instanceRequestDto);
                 
-                var instanceDto = _mapper.Map<InstanceDto>(instance);
+                var instanceDto = mapper.Map<InstanceDto>(instance);
                 
                 if (instanceDto == null)
                     throw new Exception("Instance not found!");
 
-                await _instanceService.UpdateStatus(instanceDto.Id ?? Guid.Empty, status ?? InstanceStatusEnum.Unspecified);
+                await instanceService.UpdateStatus(instanceDto.Id ?? Guid.Empty, status ?? InstanceStatusEnum.Unspecified);
 
-                await _instanceService.SaveChangesAsync();
+                await instanceService.SaveChangesAsync();
 
                 return ResponseViewModel<InstanceDto>
                     .SuccessWithMessage("Status successful.", instanceDto)
