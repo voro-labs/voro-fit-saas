@@ -118,10 +118,6 @@ namespace VoroFit.Infrastructure.Factories
                 .HasKey(mp => mp.Id);
 
             builder.Entity<MealPlanDay>()
-                .Property(mp => mp.DayOfWeek)
-                .HasMaxLength(20);
-
-            builder.Entity<MealPlanDay>()
                 .HasOne(mp => mp.MealPlan)
                 .WithMany(p => p.Days)
                 .HasForeignKey(mp => mp.MealPlanId)

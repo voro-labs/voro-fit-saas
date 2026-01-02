@@ -1,8 +1,9 @@
 export enum MealPeriodEnum {
-  CafeDaManha = 1,
-  LancheDaManha = 2,
-  Almoco = 3,
-  LancheDaTarde = 4,
-  Jantar = 5,
-  Ceia = 6,
+  Unspecified = 0,
+  Breakfast = 100,
+  MorningSnack = 200,
+  Lunch = 300,
+  AfternoonSnack = 400,
+  Dinner = 500,
+  Supper = 600,
 }

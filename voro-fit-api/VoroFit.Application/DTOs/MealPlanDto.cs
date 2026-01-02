@@ -4,17 +4,15 @@ namespace VoroFit.Application.DTOs
 {
     public class MealPlanDto
     {
-        public Guid? Id { get; set; } = null;
+        public Guid? Id { get; set; }
         public MealPlanStatusEnum? Status { get; set; }
 
         public Guid? StudentId { get; set; }
-        public StudentDto? Student { get; set; } = null;
-
-        public DateTimeOffset? LastUpdated { get; set; } = null;
+        public StudentDto? Student { get; set; }
 
         public ICollection<MealPlanDayDto>? Days { get; set; } = [];
 
-        public DateTimeOffset? CreatedAt { get; set; } = null;
-        public DateTimeOffset? UpdatedAt { get; set; } = null;
+        public DateTimeOffset? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

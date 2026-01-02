@@ -9,6 +9,6 @@ namespace VoroFit.Application.Services.Interfaces.Evolution
         Task AddAsync(ContactDto contactDto);
         Task AddRangeAsync(IEnumerable<ContactDto> contactDtos);
         Task<Contact?> FindByAnyAsync(string jid);
-        Task<Contact?> UpdateContact(Contact contact, string? displayName, string? profilePicture);
+        Contact? UpdateContact(Contact contact, string? displayName, string? profilePicture);
     }
 }

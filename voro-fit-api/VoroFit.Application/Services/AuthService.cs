@@ -29,7 +29,7 @@ namespace VoroFit.Application.Services
         {
             var (user, rolesNames) = await _userService.GetByEmailAndPassword(signInDto.Email, signInDto.Password);
 
-            return await GenerateAuthDto(user, rolesNames);
+            return GenerateAuthDto(user, rolesNames);
         }
 
         public async Task<User> SignUpAsync(SignUpDto signUpDto, ICollection<string> roles)
@@ -77,7 +77,7 @@ namespace VoroFit.Application.Services
             return reseted;
         } 
 
-        private static async Task<List<Claim>> GenerateClaims(User user, IList<string>? rolesNames)
+        private static List<Claim> GenerateClaims(User user, IList<string>? rolesNames)
         {
             List<Claim> claims =
             [
@@ -105,7 +105,7 @@ namespace VoroFit.Application.Services
             return claims;
         }
 
-        private async Task<AuthDto> GenerateAuthDto(User user, IList<string>? rolesNames)
+        private AuthDto GenerateAuthDto(User user, IList<string>? rolesNames)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Get<ConfigUtil>()?.JwtKey!));
 
@@ -116,7 +116,7 @@ namespace VoroFit.Application.Services
             var token = new JwtSecurityToken(
                 issuer: _cookieUtil.Issuer,
                 audience: _cookieUtil.Audience,
-                claims: await GenerateClaims(user, rolesNames),
+                claims: GenerateClaims(user, rolesNames),
                 expires: expiration,
                 signingCredentials: credentials
             );

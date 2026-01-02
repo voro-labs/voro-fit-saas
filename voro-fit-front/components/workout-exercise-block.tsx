@@ -30,7 +30,7 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
 
   const addExercise = (exercise: (typeof availableExercises)[0]) => {
     const newExercise: WorkoutPlanExerciseDto = {
-      id: crypto.randomUUID(),
+      id: null,
       exerciseId: exercise.id,
       exercise: exercise,
       sets: 3,

@@ -1,11 +1,12 @@
-﻿using VoroFit.Domain.Interfaces.Entities;
+﻿using VoroFit.Domain.Enums;
+using VoroFit.Domain.Interfaces.Entities;
 
 namespace VoroFit.Domain.Entities
 {
     public class MealPlanDay : ISoftDeletable
     {
         public Guid Id { get; set; }
-        public string DayOfWeek { get; set; } = null!; // Segunda, Terça...
+        public DayOfWeekEnum DayOfWeek { get; set; } = DayOfWeekEnum.Sunday; // Segunda, Terça...
 
         public Guid MealPlanId { get; set; }
         public MealPlan MealPlan { get; set; } = null!;

@@ -5,10 +5,10 @@
         public Guid? Id { get; set; }
 
         public Guid? WorkoutPlanDayId { get; set; }
-        public WorkoutPlanDayDto? WorkoutPlanDay { get; set; } = null!;
+        public WorkoutPlanDayDto? WorkoutPlanDay { get; set; }
 
         public Guid? ExerciseId { get; set; }
-        public ExerciseDto? Exercise { get; set; } = null!;
+        public ExerciseDto? Exercise { get; set; }
 
         public int? Order { get; set; }
         public int? Sets { get; set; }

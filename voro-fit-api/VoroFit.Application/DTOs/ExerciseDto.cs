@@ -7,11 +7,11 @@ namespace VoroFit.Application.DTOs
         public Guid? Id { get; set; }
 
         // Dados principais
-        public string? Name { get; set; } = null!;
-        public string? MuscleGroup { get; set; } = null!;
+        public string? Name { get; set; }
+        public string? MuscleGroup { get; set; }
         public ExerciseTypeEnum? Type { get; set; }
 
-        public string? Thumbnail { get; set; } = null!;
+        public string? Thumbnail { get; set; }
 
         // Conteúdo educacional
         public string? Description { get; set; }

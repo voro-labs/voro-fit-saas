@@ -1,7 +1,7 @@
 import type { ExerciseDto } from "./exercise.interface"
 
 export interface WorkoutPlanExerciseDto {
-  id?: string
+  id?: string | null
   workoutPlanDayId?: string
   exerciseId?: string
   exercise?: ExerciseDto

@@ -11,8 +11,6 @@ namespace VoroFit.Domain.Entities
         public Guid StudentId { get; set; }
         public Student Student { get; set; } = null!;
 
-        public DateTimeOffset LastUpdated { get; set; } = DateTime.UtcNow;
-
         public ICollection<MealPlanDay> Days { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;

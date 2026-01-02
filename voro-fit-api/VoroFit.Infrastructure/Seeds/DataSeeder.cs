@@ -41,55 +41,55 @@ namespace VoroFit.Infrastructure.Seeds
 
             await context.SaveChangesAsync();
 
-            // SEED: Measurements
-            SeedMeasurements(context);
+            // // SEED: Measurements
+            // SeedMeasurements(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout Plans
-            SeedWorkoutPlans(context);
+            // // SEED: Workout Plans
+            // SeedWorkoutPlans(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout Plan Weeks
-            SeedWorkoutPlanWeeks(context);
+            // // SEED: Workout Plan Weeks
+            // SeedWorkoutPlanWeeks(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout Plan Days
-            SeedWorkoutPlanDays(context);
+            // // SEED: Workout Plan Days
+            // SeedWorkoutPlanDays(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout Plan Exercises
-            SeedWorkoutPlanExercises(context);
+            // // SEED: Workout Plan Exercises
+            // SeedWorkoutPlanExercises(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout Histories
-            SeedWorkoutHistories(context);
+            // // SEED: Workout Histories
+            // SeedWorkoutHistories(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Workout History Exercises
-            SeedWorkoutHistoryExercises(context);
+            // // SEED: Workout History Exercises
+            // SeedWorkoutHistoryExercises(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Meal Plans
-            SeedMealPlans(context);
+            // // SEED: Meal Plans
+            // SeedMealPlans(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Meal Plan Days
-            SeedMealPlanDays(context);
+            // // SEED: Meal Plan Days
+            // SeedMealPlanDays(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
-            // SEED: Meal Plan Meals
-            SeedMealPlanMeals(context);
+            // // SEED: Meal Plan Meals
+            // SeedMealPlanMeals(context);
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
         }
 
         private static void SeedNotifications(JasmimDbContext context)
@@ -223,13 +223,13 @@ namespace VoroFit.Infrastructure.Seeds
 
                 var admin = new User
                 {
-                    UserName = "admin",
-                    NormalizedUserName = "admin".ToUpper(),
-                    Email = "contato@vorolabs.app",
-                    NormalizedEmail = "contato@vorolabs.app".ToUpper(),
-                    FirstName = "System",
-                    LastName = "Administrator",
-                    CountryCode = "BR",
+                    UserName = "jordan.silva",
+                    NormalizedUserName = "jordan.silva".ToUpper(),
+                    Email = "jordan@vorolabs.app",
+                    NormalizedEmail = "jordan@vorolabs.app".ToUpper(),
+                    FirstName = "Jordan",
+                    LastName = "Silva",
+                    CountryCode = "+55",
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     BirthDate = DateTime.UtcNow,
@@ -249,13 +249,13 @@ namespace VoroFit.Infrastructure.Seeds
 
                 var trainer = new User
                 {
-                    UserName = "trainer",
-                    NormalizedUserName = "trainer".ToUpper(),
-                    Email = "contato@vorolabs.app",
-                    NormalizedEmail = "contato@vorolabs.app".ToUpper(),
-                    FirstName = "System",
+                    UserName = "joao.treinador",
+                    NormalizedUserName = "joao.treinador".ToUpper(),
+                    Email = "joao@vorolabs.app",
+                    NormalizedEmail = "joao@vorolabs.app".ToUpper(),
+                    FirstName = "João",
                     LastName = "Treinador",
-                    CountryCode = "BR",
+                    CountryCode = "+55",
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     BirthDate = DateTime.UtcNow,
@@ -275,13 +275,13 @@ namespace VoroFit.Infrastructure.Seeds
 
                 var student = new User
                 {
-                    UserName = "student",
-                    NormalizedUserName = "student".ToUpper(),
-                    Email = "contato@vorolabs.app",
-                    NormalizedEmail = "contato@vorolabs.app".ToUpper(),
-                    FirstName = "System",
+                    UserName = "felipe.estudante",
+                    NormalizedUserName = "felipe.estudante".ToUpper(),
+                    Email = "felipe@vorolabs.app",
+                    NormalizedEmail = "felipe@vorolabs.app".ToUpper(),
+                    FirstName = "Felipe",
                     LastName = "Estudante",
-                    CountryCode = "BR",
+                    CountryCode = "+55",
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     BirthDate = DateTime.UtcNow,
@@ -716,7 +716,7 @@ namespace VoroFit.Infrastructure.Seeds
                 {
                     Status = MealPlanStatusEnum.Active,
                     StudentId = student.UserExtensionId,
-                    LastUpdated = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -739,7 +739,13 @@ namespace VoroFit.Infrastructure.Seeds
                 // ------------------------
                 var days = new[]
                 {
-                    "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"
+                    DayOfWeekEnum.Monday,
+                    DayOfWeekEnum.Tuesday,
+                    DayOfWeekEnum.Wednesday,
+                    DayOfWeekEnum.Thursday,
+                    DayOfWeekEnum.Friday,
+                    DayOfWeekEnum.Saturday,
+                    DayOfWeekEnum.Sunday
                 };
 
                 var mealPlanDays = new List<MealPlanDay>();
@@ -777,7 +783,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new MealPlanMeal
                     {
                         MealPlanDayId = day.Id,
-                        Period = "Café da Manhã",
+                        Period = MealPeriodEnum.Breakfast,
                         Time = "07:00",
                         Description = "Ovos mexidos + Aveia com frutas",
                         Quantity = "3 ovos + 50g de aveia + 1 banana",
@@ -789,7 +795,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new MealPlanMeal
                     {
                         MealPlanDayId = day.Id,
-                        Period = "Almoço",
+                        Period = MealPeriodEnum.Lunch,
                         Time = "12:30",
                         Description = "Arroz + Feijão + Frango grelhado",
                         Quantity = "150g frango + 100g arroz + 1 concha feijão",
@@ -801,7 +807,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new MealPlanMeal
                     {
                         MealPlanDayId = day.Id,
-                        Period = "Jantar",
+                        Period = MealPeriodEnum.Dinner,
                         Time = "19:30",
                         Description = "Crepioca de frango + chá",
                         Quantity = "2 ovos + 1 colher de tapioca + 80g frango",

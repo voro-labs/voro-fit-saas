@@ -5,6 +5,7 @@ using VoroFit.Application.DTOs;
 using VoroFit.Application.Services.Base;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Domain.Entities;
+using VoroFit.Domain.Enums;
 using VoroFit.Domain.Interfaces.Repositories;
 using VoroFit.Shared.Helpers;
 
@@ -59,17 +60,19 @@ namespace VoroFit.Application.Services
 
         public async Task<WorkoutPlanDto> UpdateAsync(Guid id, WorkoutPlanDto dto)
         {
-            var existingWorkoutPlan = await base.GetByIdAsync(wp => 
-                wp.Id == id,
+            var existingWorkoutPlan = await base.GetByIdAsync(
+                wp => wp.Id == id,
                 wp => wp.Include(wp => wp.Student),
                 wp => wp.Include(wp => wp.Weeks)
                     .ThenInclude(w => w.Days)
-                    .ThenInclude(d => d.Exercises)) 
-                ?? throw new Exception("WorkoutPlan não encontrado");
-                
+                    .ThenInclude(d => d.Exercises)
+            ) ?? throw new Exception("WorkoutPlan não encontrado");
+
             mapper.Map(dto, existingWorkoutPlan);
 
             SyncWeeks(existingWorkoutPlan, dto);
+
+            existingWorkoutPlan.UpdatedAt = DateTimeOffset.UtcNow;
 
             base.Update(existingWorkoutPlan);
 
@@ -83,15 +86,23 @@ namespace VoroFit.Application.Services
                 dto.Weeks ?? [],
                 db => db.Id,
                 d => d.Id ?? Guid.Empty,
-                d => new WorkoutPlanWeek
+                d =>
                 {
-                    Id = Guid.NewGuid(),
-                    WeekNumber = d.WeekNumber ?? 0,
-                    CreatedAt = DateTimeOffset.UtcNow
+                    var week = new WorkoutPlanWeek
+                    {
+                        WorkoutPlanId = plan.Id,
+                        WorkoutPlan = plan,
+                        WeekNumber = d.WeekNumber ?? 0,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    };
+
+                    SyncDays(week, d);
+
+                    return week;
                 },
                 (db, d) =>
                 {
-                    db.WeekNumber = d.WeekNumber ?? 0;
+                    db.WeekNumber = d.WeekNumber ?? db.WeekNumber;
                     db.UpdatedAt = DateTimeOffset.UtcNow;
                     SyncDays(db, d);
                 },
@@ -103,6 +114,7 @@ namespace VoroFit.Application.Services
             );
         }
 
+
         private static void SyncDays(WorkoutPlanWeek week, WorkoutPlanWeekDto dto)
         {
             CollectionSyncHelper.Sync(
@@ -110,20 +122,35 @@ namespace VoroFit.Application.Services
                 dto.Days ?? [],
                 db => db.Id,
                 d => d.Id ?? Guid.Empty,
-                d => new WorkoutPlanDay
+                d => 
                 {
-                    Id = Guid.NewGuid(),
-                    DayOfWeek = d.DayOfWeek ?? Domain.Enums.DayOfWeekEnum.Monday,
-                    CreatedAt = DateTimeOffset.UtcNow
+                    var day = new WorkoutPlanDay
+                    {
+                        WorkoutPlanWeekId = week.Id,
+                        WorkoutPlanWeek = week,
+                        DayOfWeek = d.DayOfWeek ?? DayOfWeekEnum.Monday,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    };
+
+                    SyncExercises(day, d);
+
+                    return day;
                 },
                 (db, d) =>
                 {
-                    db.DayOfWeek = d.DayOfWeek ?? Domain.Enums.DayOfWeekEnum.Monday;
+                    db.DayOfWeek = d.DayOfWeek ?? db.DayOfWeek;
                     db.UpdatedAt = DateTimeOffset.UtcNow;
                     SyncExercises(db, d);
                 },
                 db =>
                 {
+                    if (db.WorkoutHistories.Any())
+                    {
+                        db.IsDeleted = true;
+                        db.DeletedAt = DateTimeOffset.UtcNow;
+                        return;
+                    }
+
                     db.IsDeleted = true;
                     db.DeletedAt = DateTimeOffset.UtcNow;
                 }
@@ -137,22 +164,28 @@ namespace VoroFit.Application.Services
                 dto.Exercises ?? [],
                 db => db.Id,
                 d => d.Id ?? Guid.Empty,
-                d => new WorkoutPlanExercise
+                d =>
                 {
-                    Id = Guid.NewGuid(),
-                    ExerciseId = d.ExerciseId ?? Guid.Empty,
-                    Order = d.Order ?? 0,
-                    Sets = d.Sets ?? 0,
-                    Reps = d.Reps ?? 0,
-                    RestInSeconds = d.RestInSeconds ?? 0,
-                    Weight = d.Weight
+                    var exercise = new WorkoutPlanExercise
+                    {
+                        WorkoutPlanDayId = day.Id,
+                        WorkoutPlanDay = day,
+                        ExerciseId = d.ExerciseId ?? Guid.Empty,
+                        Order = d.Order ?? 0,
+                        Sets = d.Sets ?? 0,
+                        Reps = d.Reps ?? 0,
+                        RestInSeconds = d.RestInSeconds ?? 0,
+                        Weight = d.Weight
+                    };
+
+                    return exercise;
                 },
                 (db, d) =>
                 {
-                    db.Order = d.Order ?? 0;
-                    db.Sets = d.Sets ?? 0;
-                    db.Reps = d.Reps ?? 0;
-                    db.RestInSeconds = d.RestInSeconds ?? 0;
+                    db.Order = d.Order ?? db.Order;
+                    db.Sets = d.Sets ?? db.Sets;
+                    db.Reps = d.Reps ?? db.Reps;
+                    db.RestInSeconds = d.RestInSeconds ?? db.RestInSeconds;
                     db.Weight = d.Weight;
                 },
                 db =>

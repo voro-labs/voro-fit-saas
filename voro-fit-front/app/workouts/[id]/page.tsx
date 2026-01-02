@@ -18,13 +18,13 @@ import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
 import { Loading } from "@/components/ui/custom/loading/loading"
 
 const daysOfWeek = [
-  { key: DayOfWeekEnum.Segunda, label: "Segunda" },
-  { key: DayOfWeekEnum.Terca, label: "Terça" },
-  { key: DayOfWeekEnum.Quarta, label: "Quarta" },
-  { key: DayOfWeekEnum.Quinta, label: "Quinta" },
-  { key: DayOfWeekEnum.Sexta, label: "Sexta" },
-  { key: DayOfWeekEnum.Sabado, label: "Sábado" },
-  { key: DayOfWeekEnum.Domingo, label: "Domingo" },
+  { key: DayOfWeekEnum.Monday, label: "Segunda" },
+  { key: DayOfWeekEnum.Tuesday, label: "Terça" },
+  { key: DayOfWeekEnum.Wednesday, label: "Quarta" },
+  { key: DayOfWeekEnum.Thursday, label: "Quinta" },
+  { key: DayOfWeekEnum.Friday, label: "Sexta" },
+  { key: DayOfWeekEnum.Saturday, label: "Sábado" },
+  { key: DayOfWeekEnum.Sunday, label: "Domingo" },
 ]
 
 export default function WorkoutDetailPage() {

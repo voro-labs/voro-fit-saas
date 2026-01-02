@@ -676,9 +676,6 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -704,10 +701,8 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -753,9 +748,8 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Quantity")
                         .IsRequired()
@@ -942,10 +936,19 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<Guid>("WorkoutPlanDayId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("WorkoutPlanDayId1")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("WorkoutPlanId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("WorkoutPlanId1")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("WorkoutPlanWeekId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WorkoutPlanWeekId1")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -954,9 +957,15 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.HasIndex("WorkoutPlanDayId");
 
+                    b.HasIndex("WorkoutPlanDayId1");
+
                     b.HasIndex("WorkoutPlanId");
 
+                    b.HasIndex("WorkoutPlanId1");
+
                     b.HasIndex("WorkoutPlanWeekId");
+
+                    b.HasIndex("WorkoutPlanWeekId1");
 
                     b.ToTable("WorkoutHistories");
                 });
@@ -1195,7 +1204,7 @@ namespace VoroFit.Infrastructure.Migrations
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Chat", b =>
                 {
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Contact", "Contact")
-                        .WithMany()
+                        .WithMany("Chats")
                         .HasForeignKey("ContactId");
 
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Group", "Group")
@@ -1430,17 +1439,29 @@ namespace VoroFit.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanDayId1");
+
                     b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", "WorkoutPlan")
                         .WithMany()
                         .HasForeignKey("WorkoutPlanId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanId1");
+
                     b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", "WorkoutPlanWeek")
                         .WithMany()
                         .HasForeignKey("WorkoutPlanWeekId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanWeekId1");
 
                     b.Navigation("Student");
 
@@ -1529,6 +1550,8 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Contact", b =>
                 {
+                    b.Navigation("Chats");
+
                     b.Navigation("GroupMemberships");
 
                     b.Navigation("Identifiers");
@@ -1615,16 +1638,22 @@ namespace VoroFit.Infrastructure.Migrations
             modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlan", b =>
                 {
                     b.Navigation("Weeks");
+
+                    b.Navigation("WorkoutHistories");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanDay", b =>
                 {
                     b.Navigation("Exercises");
+
+                    b.Navigation("WorkoutHistories");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanWeek", b =>
                 {
                     b.Navigation("Days");
+
+                    b.Navigation("WorkoutHistories");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,7 +5,7 @@ namespace VoroFit.Application.Services.Interfaces.Evolution
 {
     public interface IEvolutionService
     {
-        Task SetInstanceName(string instanceName);
+        void SetInstanceName(string instanceName);
 
         Task<IEnumerable<InstanceResponseDto>> GetAllInstancesAsync();
         Task<InstanceCreateResponseDto> CreateInstanceAsync(InstanceRequestDto dto);

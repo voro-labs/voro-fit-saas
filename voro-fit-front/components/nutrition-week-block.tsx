@@ -4,16 +4,15 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Calendar, ChevronDown, ChevronUp } from "lucide-react"
-import { WorkoutDayBlock } from "./workout-day-block"
-import type { WorkoutPlanWeekDto } from "@/types/DTOs/workout-plan-week.interface"
-import type { WorkoutPlanDayDto } from "@/types/DTOs/workout-plan-day.interface"
+import { NutritionDayBlock } from "./nutrition-day-block"
+import type { MealPlanDayDto } from "@/types/DTOs/meal-plan-day.interface"
 import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
+import type { MealPlanDto } from "@/types/DTOs/meal-plan.interface"
 
-interface WorkoutWeekBlockProps {
-  week: WorkoutPlanWeekDto
-  weekIndex: number
-  onRemove: () => void
-  onChange: (days: WorkoutPlanDayDto[]) => void
+interface NutritionWeekBlockProps {
+  meal: MealPlanDto
+  days?: MealPlanDayDto[]
+  onChange: (days: MealPlanDayDto[]) => void
 }
 
 const dayOptions = [
@@ -26,9 +25,8 @@ const dayOptions = [
   { value: DayOfWeekEnum.Sunday, label: "Domingo" },
 ]
 
-export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: WorkoutWeekBlockProps) {
+export function NutritionWeekBlock({ meal, days = [], onChange }: NutritionWeekBlockProps) {
   const [isExpanded, setIsExpanded] = useState(true)
-  const days = week.days || []
 
   const addDay = () => {
     const usedDays = days.map((d) => d.dayOfWeek)
@@ -39,11 +37,11 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
       return
     }
 
-    const newDay: WorkoutPlanDayDto = {
+    const newDay: MealPlanDayDto = {
       id: null,
-      workoutPlanWeekId: week.id || null,
+      mealPlanId: meal.id || null,
       dayOfWeek: availableDay.value,
-      exercises: [],
+      meals: [],
     }
     onChange([...days, newDay])
   }
@@ -52,7 +50,7 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
     onChange(days.filter((_, i) => i !== dayIndex))
   }
 
-  const updateDay = (dayIndex: number, updatedDay: WorkoutPlanDayDto) => {
+  const updateDay = (dayIndex: number, updatedDay: MealPlanDayDto) => {
     const updated = [...days]
     updated[dayIndex] = updatedDay
     onChange(updated)
@@ -63,26 +61,27 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button type="button" variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)} className="h-8 w-8">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="h-8 w-8"
+            >
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
             <CardTitle className="text-lg flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" />
-              Semana {weekIndex + 1}
+              Dias da Semana
             </CardTitle>
             <span className="text-sm text-muted-foreground">
               ({days.length} {days.length === 1 ? "dia" : "dias"})
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button type="button" size="sm" onClick={addDay} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Dia
-            </Button>
-            <Button type="button" size="sm" onClick={onRemove} variant="destructive">
-              Remover Semana
-            </Button>
-          </div>
+          <Button type="button" size="sm" onClick={addDay} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Dia
+          </Button>
         </div>
       </CardHeader>
 
@@ -93,7 +92,7 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground mb-3" />
                 <p className="text-base font-medium mb-1">Nenhum dia adicionado ainda</p>
-                <p className="text-sm text-muted-foreground mb-4">Adicione dias de treino para esta semana</p>
+                <p className="text-sm text-muted-foreground mb-4">Adicione dias para o plano alimentar</p>
                 <Button type="button" size="sm" onClick={addDay} variant="outline">
                   <Plus className="h-4 w-4 mr-2" />
                   Adicionar Primeiro Dia
@@ -102,7 +101,7 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
             </Card>
           ) : (
             days.map((day, dayIndex) => (
-              <WorkoutDayBlock
+              <NutritionDayBlock
                 key={day.id || dayIndex}
                 day={day}
                 onRemove={() => removeDay(dayIndex)}

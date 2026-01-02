@@ -3,7 +3,7 @@ import type { MealPlanDayDto } from "./meal-plan-day.interface"
 import type { StudentDto } from "./student.interface"
 
 export interface MealPlanDto {
-  id?: string
+  id?: string | null
   studentId?: string
   student?: StudentDto
   status?: MealPlanStatusEnum

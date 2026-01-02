@@ -162,7 +162,7 @@ namespace VoroFit.API.Controllers.Evolution
                 }
                     
 
-                await contactService.UpdateContact(senderContact, request.DisplayName, profilePicture);
+                contactService.UpdateContact(senderContact, request.DisplayName, profilePicture);
 
                 await contactService.SaveChangesAsync();
 
@@ -242,7 +242,7 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Number = $"{contact.Number}@s.whatsapp.net";
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.SendMessageAsync(request);
 
@@ -327,7 +327,7 @@ namespace VoroFit.API.Controllers.Evolution
                     request.Quoted.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.SendQuotedMessageAsync(request);
 
@@ -415,7 +415,7 @@ namespace VoroFit.API.Controllers.Evolution
                     return BadRequest("Anexo não pode ser nulo.");
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.SendMediaMessageAsync(mediaRequest);
 
@@ -554,7 +554,7 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Key.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.SendReactionMessageAsync(request);
 
@@ -636,7 +636,7 @@ namespace VoroFit.API.Controllers.Evolution
                 request.Id = message.ExternalId;
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.DeleteMessageAsync(request);
 
@@ -710,7 +710,7 @@ namespace VoroFit.API.Controllers.Evolution
                 };
 
                 // EvolutionService retorna STRING → ajustado
-                await evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
+                evolutionService.SetInstanceName(chat.InstanceExtension.Instance.Name);
 
                 var responseString = await evolutionService.SendMessageAsync(messageRequest);
 

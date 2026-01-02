@@ -136,7 +136,7 @@ namespace VoroFit.Application.Services.Identity
             var user = await userManager.FindByEmailAsync(email)
                 ?? throw new KeyNotFoundException("Usuário não encontrado.");
 
-            var result = await userManager.ConfirmEmailAsync(user, authViewModel.Token);
+            var result = await userManager.ConfirmEmailAsync(user, $"{authViewModel.Token}");
             
             return result.Succeeded;
         }

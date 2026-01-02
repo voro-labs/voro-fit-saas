@@ -371,7 +371,7 @@ namespace VoroFit.API.Controllers.Evolution
             var contactIdentifier = await contactIdentifierService
                     .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
 
-            await contactService.UpdateContact(
+            contactService.UpdateContact(
                 contactIdentifier.Contact,
                 data.PushName,
                 data.ProfilePicUrl
@@ -395,7 +395,7 @@ namespace VoroFit.API.Controllers.Evolution
                 var contactIdentifier = await contactIdentifierService
                     .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
 
-                await contactService.UpdateContact(
+                contactService.UpdateContact(
                     contactIdentifier.Contact,
                     data.PushName,
                     data.ProfilePicUrl

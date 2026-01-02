@@ -57,7 +57,7 @@ namespace VoroFit.Application.Services
                 contactIdentifier = await _contactIdentifierService
                     .GetOrCreateAsync(pushName, normalizedParticipantJid, remoteJid, "");
 
-                await _contactService.UpdateContact(
+                _contactService.UpdateContact(
                     contactIdentifier.Contact,
                     pushName,
                     ""

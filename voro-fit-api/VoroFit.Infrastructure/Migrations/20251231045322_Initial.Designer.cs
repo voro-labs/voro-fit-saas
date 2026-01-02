@@ -12,8 +12,8 @@ using VoroFit.Infrastructure.Factories;
 namespace VoroFit.Infrastructure.Migrations
 {
     [DbContext(typeof(JasmimDbContext))]
-    [Migration("20251229034315_UpdatedDayOfWeek")]
-    partial class UpdatedDayOfWeek
+    [Migration("20251231045322_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -481,8 +481,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("MuscleGroup")
                         .IsRequired()
@@ -551,6 +557,9 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("BirthDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -566,6 +575,9 @@ namespace VoroFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("TIMEZONE('utc', NOW())");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -583,6 +595,9 @@ namespace VoroFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -658,8 +673,11 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("LastUpdated")
+                    b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -686,10 +704,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("MealPlanId")
                         .HasColumnType("uuid");
@@ -713,9 +735,15 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("MealPlanDayId")
                         .HasColumnType("uuid");
@@ -723,9 +751,8 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Quantity")
                         .IsRequired()
@@ -762,6 +789,12 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
@@ -801,7 +834,13 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -835,6 +874,11 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Property<int>("Height")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -871,8 +915,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset>("ExecutionDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -914,6 +964,9 @@ namespace VoroFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("ExecutedReps")
                         .HasColumnType("integer");
 
@@ -925,6 +978,9 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Property<Guid>("ExerciseId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -965,6 +1021,12 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -993,6 +1055,15 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("WorkoutPlanWeekId")
                         .HasColumnType("uuid");
 
@@ -1012,8 +1083,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Alternative")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ExerciseId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -1052,6 +1129,15 @@ namespace VoroFit.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("WeekNumber")
@@ -1106,7 +1192,7 @@ namespace VoroFit.Infrastructure.Migrations
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Chat", b =>
                 {
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Contact", "Contact")
-                        .WithMany()
+                        .WithMany("Chats")
                         .HasForeignKey("ContactId");
 
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Group", "Group")
@@ -1440,6 +1526,8 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Contact", b =>
                 {
+                    b.Navigation("Chats");
+
                     b.Navigation("GroupMemberships");
 
                     b.Navigation("Identifiers");

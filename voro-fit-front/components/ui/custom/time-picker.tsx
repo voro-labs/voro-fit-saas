@@ -193,7 +193,7 @@ export function TimePicker({
             >
               <ChevronUp size={16} />
             </button>
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg font-mono text-lg font-semibold">
+            <div className="w-12 h-12 flex items-center justify-center rounded-lg font-mono text-lg font-semibold">
               {selectedHour.toString().padStart(2, "0")}
             </div>
             <button
@@ -217,7 +217,7 @@ export function TimePicker({
             >
               <ChevronUp size={16} />
             </button>
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg font-mono text-lg font-semibold">
+            <div className="w-12 h-12 flex items-center justify-center rounded-lg font-mono text-lg font-semibold">
               {selectedMinute.toString().padStart(2, "0")}
             </div>
             <button
@@ -243,7 +243,7 @@ export function TimePicker({
               key={time.label}
               type="button"
               onClick={() => setQuickTime(time.hour, time.minute)}
-              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
             >
               {time.label}
             </button>
@@ -262,7 +262,7 @@ export function TimePicker({
               key={time.label}
               type="button"
               onClick={() => setQuickTime(time.hour, time.minute)}
-              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
             >
               {time.label}
             </button>
@@ -283,7 +283,7 @@ export function TimePicker({
           onBlur={handleInputBlur}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            "w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "w-full px-3 py-2 pr-10 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring",
             className,
           )}
           placeholder={placeholder}
@@ -302,9 +302,9 @@ export function TimePicker({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[280px]">
+        <div className="absolute top-full left-0 mt-1 bg-accent border border-input rounded-lg shadow-lg z-50 min-w-[280px]">
           {/* Header */}
-          <div className="flex items-center justify-center px-4 py-2 border-b border-gray-200 bg-blue-50">
+          <div className="flex items-center justify-center px-4 py-2 border-b border-gray-200">
             <Clock size={16} className="mr-2 text-blue-600" />
             <span className="text-sm font-medium text-blue-600">Seletor de Horário</span>
           </div>

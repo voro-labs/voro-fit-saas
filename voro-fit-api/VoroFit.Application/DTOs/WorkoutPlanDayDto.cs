@@ -6,10 +6,10 @@ namespace VoroFit.Application.DTOs
     {
         public Guid? Id { get; set; }
 
-        public DayOfWeekEnum? DayOfWeek { get; set; } // Segunda, Terça...
+        public DayOfWeekEnum? DayOfWeek { get; set; }
 
         public Guid? WorkoutPlanWeekId { get; set; }
-        public WorkoutPlanWeekDto? WorkoutPlanWeek { get; set; } = null!;
+        public WorkoutPlanWeekDto? WorkoutPlanWeek { get; set; }
 
         public ICollection<WorkoutPlanExerciseDto>? Exercises { get; set; } = [];
 

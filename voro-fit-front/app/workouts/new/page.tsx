@@ -26,7 +26,7 @@ export default function NewWorkoutPage() {
 
   const addWeek = () => {
     const newWeek: WorkoutPlanWeekDto = {
-      id: crypto.randomUUID(),
+      id: null,
       weekNumber: weeks.length + 1,
       days: [],
     }

@@ -14,6 +14,8 @@ namespace VoroFit.API.Extensions.Configurations
                 cfg.AddProfile<GeneralMappingProfile>();
                 cfg.AddProfile<ContactMappingProfile>();
                 cfg.AddProfile<GroupMappingProfile>();
+                cfg.AddProfile<ReadMappingProfile>();
+                cfg.AddProfile<WriteMappingProfile>();
             });
 
             return services;

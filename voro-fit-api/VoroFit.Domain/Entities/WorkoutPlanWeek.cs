@@ -12,6 +12,7 @@ namespace VoroFit.Domain.Entities
         public WorkoutPlan WorkoutPlan { get; set; } = null!;
 
         public ICollection<WorkoutPlanDay> Days { get; set; } = [];
+        public ICollection<WorkoutHistory> WorkoutHistories { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;

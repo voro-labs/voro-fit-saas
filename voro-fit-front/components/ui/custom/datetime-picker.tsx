@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight, Clock, ChevronUp, ChevronDown } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "../input"
 import { cn } from "@/lib/utils"
 
@@ -56,6 +57,7 @@ export function DateTimePicker({
   ]
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+  const years = Array.from({ length: 20 }, (_, i) => new Date().getUTCFullYear() - 10 + i)
 
   // Format datetime to Brazilian format (dd/MM/yyyy hh:mm)
   const formatDateTimeToBR = (isoDateTime: string): string => {
@@ -142,7 +144,11 @@ export function DateTimePicker({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node) &&
+        !(event.target instanceof HTMLElement && event.target.closest("[data-radix-popper-content-wrapper]"))
+      ) {
         setIsOpen(false)
       }
     }
@@ -185,20 +191,6 @@ export function DateTimePicker({
     setActiveTab("time")
   }
 
-  const handleTimeChange = () => {
-    if (value) {
-      const currentDate = new Date(value)
-      const newDate = new Date(
-        currentDate.getUTCFullYear(),
-        currentDate.getUTCMonth(),
-        currentDate.getDate(),
-        selectedHour,
-        selectedMinute,
-      )
-      onChange(newDate.toISOString())
-    }
-  }
-
   const navigateMonth = (direction: "prev" | "next") => {
     if (direction === "prev") {
       if (currentMonth === 0) {
@@ -218,27 +210,17 @@ export function DateTimePicker({
   }
 
   const adjustTime = (type: "hour" | "minute", direction: "up" | "down") => {
+    let newHour = selectedHour
+    let newMinute = selectedMinute
+
     if (type === "hour") {
-      let newHour = selectedHour
       if (direction === "up") {
         newHour = selectedHour === 23 ? 0 : selectedHour + 1
       } else {
         newHour = selectedHour === 0 ? 23 : selectedHour - 1
       }
       setSelectedHour(newHour)
-      if (value) {
-        const currentDate = new Date(value)
-        const newDate = new Date(
-          currentDate.getUTCFullYear(),
-          currentDate.getUTCMonth(),
-          currentDate.getDate(),
-          newHour,
-          selectedMinute,
-        )
-        onChange(newDate.toISOString())
-      }
     } else {
-      let newMinute = selectedMinute
       if (direction === "up") {
         newMinute = selectedMinute + timeStep
         if (newMinute >= 60) newMinute = 0
@@ -247,23 +229,52 @@ export function DateTimePicker({
         if (newMinute < 0) newMinute = 60 - timeStep
       }
       setSelectedMinute(newMinute)
-      if (value) {
-        const currentDate = new Date(value)
-        const newDate = new Date(
-          currentDate.getUTCFullYear(),
-          currentDate.getUTCMonth(),
-          currentDate.getDate(),
-          selectedHour,
-          newMinute,
-        )
-        onChange(newDate.toISOString())
-      }
+    }
+
+    if (value) {
+      const currentDate = new Date(value)
+      const newDate = new Date(
+        currentDate.getUTCFullYear(),
+        currentDate.getUTCMonth(),
+        currentDate.getDate(),
+        type === "hour" ? newHour : selectedHour,
+        type === "minute" ? newMinute : selectedMinute,
+      )
+      onChange(newDate.toISOString())
+    } else {
+      // If no date selected yet, use today
+      const today = new Date()
+      const newDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        type === "hour" ? newHour : selectedHour,
+        type === "minute" ? newMinute : selectedMinute,
+      )
+      onChange(newDate.toISOString())
     }
   }
 
-  // useEffect(() => {
-  //   handleTimeChange()
-  // }, [selectedHour, selectedMinute])
+  const setQuickTime = (hour: number, minute: number) => {
+    setSelectedHour(hour)
+    setSelectedMinute(minute)
+
+    if (value) {
+      const currentDate = new Date(value)
+      const newDate = new Date(
+        currentDate.getUTCFullYear(),
+        currentDate.getUTCMonth(),
+        currentDate.getDate(),
+        hour,
+        minute,
+      )
+      onChange(newDate.toISOString())
+    } else {
+      const today = new Date()
+      const newDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, minute)
+      onChange(newDate.toISOString())
+    }
+  }
 
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentMonth, currentYear)
@@ -298,7 +309,7 @@ export function DateTimePicker({
               ? "bg-blue-600 text-white hover:bg-blue-700"
               : isToday
                 ? "bg-blue-100 text-blue-600 font-semibold"
-                : "text-gray-700 hover:text-blue-600"
+                : "text-white-700 hover:text-blue-600"
           }`}
         >
           {day}
@@ -313,7 +324,7 @@ export function DateTimePicker({
     return (
       <div className="p-4">
         <div className="text-center mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Selecionar Horário</h4>
+          <h4 className="text-sm font-medium text-white mb-2">Selecionar Horário</h4>
         </div>
 
         <div className="flex items-center justify-center space-x-4">
@@ -336,7 +347,7 @@ export function DateTimePicker({
             >
               <ChevronDown size={16} />
             </button>
-            <span className="text-xs text-gray-500 mt-1">Hora</span>
+            <span className="text-xs text-white mt-1">Hora</span>
           </div>
 
           <div className="text-2xl font-bold text-gray-400">:</div>
@@ -360,7 +371,7 @@ export function DateTimePicker({
             >
               <ChevronDown size={16} />
             </button>
-            <span className="text-xs text-gray-500 mt-1">Min</span>
+            <span className="text-xs text-white mt-1">Min</span>
           </div>
         </div>
 
@@ -375,22 +386,27 @@ export function DateTimePicker({
             <button
               key={time.label}
               type="button"
-              onClick={() => {
-                setSelectedHour(time.hour)
-                setSelectedMinute(time.minute)
-                if (value) {
-                  const currentDate = new Date(value)
-                  const newDate = new Date(
-                    currentDate.getUTCFullYear(),
-                    currentDate.getUTCMonth(),
-                    currentDate.getDate(),
-                    time.hour,
-                    time.minute,
-                  )
-                  onChange(newDate.toISOString())
-                }
-              }}
-              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+              onClick={() => setQuickTime(time.hour, time.minute)}
+              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
+            >
+              {time.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Additional quick times */}
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {[
+            { label: "08:00", hour: 8, minute: 0 },
+            { label: "13:00", hour: 13, minute: 0 },
+            { label: "16:00", hour: 16, minute: 0 },
+            { label: "20:00", hour: 20, minute: 0 },
+          ].map((time) => (
+            <button
+              key={time.label}
+              type="button"
+              onClick={() => setQuickTime(time.hour, time.minute)}
+              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
             >
               {time.label}
             </button>
@@ -411,7 +427,7 @@ export function DateTimePicker({
           onBlur={handleInputBlur}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            "w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "w-full px-3 py-2 pr-10 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring",
             className,
           )}
           placeholder={placeholder}
@@ -430,16 +446,16 @@ export function DateTimePicker({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[320px]">
+        <div className="absolute top-full left-0 mt-1 bg-accent border border-input rounded-lg shadow-lg z-50 min-w-[320px]">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-input">
             <button
               type="button"
               onClick={() => setActiveTab("date")}
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === "date"
                   ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-white hover:text-white-700"
               }`}
             >
               <Calendar size={16} className="inline mr-2" />
@@ -451,7 +467,7 @@ export function DateTimePicker({
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === "time"
                   ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-white hover:text-white-700"
               }`}
             >
               <Clock size={16} className="inline mr-2" />
@@ -473,29 +489,31 @@ export function DateTimePicker({
                 </button>
 
                 <div className="flex items-center space-x-2">
-                  <select
-                    value={currentMonth}
-                    onChange={(e) => setCurrentMonth(Number(e.target.value))}
-                    className="text-sm font-medium bg-transparent border-none focus:outline-none cursor-pointer"
-                  >
-                    {months.map((month, index) => (
-                      <option key={index} value={index}>
-                        {month}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={`${currentMonth}`} onValueChange={(v) => setCurrentMonth(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month, index) => (
+                        <SelectItem key={index} value={`${index}`}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                  <select
-                    value={currentYear}
-                    onChange={(e) => setCurrentYear(Number(e.target.value))}
-                    className="text-sm font-medium bg-transparent border-none focus:outline-none cursor-pointer"
-                  >
-                    {Array.from({ length: 20 }, (_, i) => currentYear - 10 + i).map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={`${currentYear}`} onValueChange={(v) => setCurrentYear(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={`${year}`}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <button
@@ -510,7 +528,7 @@ export function DateTimePicker({
               {/* Week Days */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {weekDays.map((day) => (
-                  <div key={day} className="text-xs font-medium text-gray-500 text-center py-1">
+                  <div key={day} className="text-xs font-medium text-white text-center py-1">
                     {day}
                   </div>
                 ))}
@@ -548,7 +566,7 @@ export function DateTimePicker({
                   onChange("")
                   setIsOpen(false)
                 }}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-white hover:text-white-700"
               >
                 Limpar
               </button>

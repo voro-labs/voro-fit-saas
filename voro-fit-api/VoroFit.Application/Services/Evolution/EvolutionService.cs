@@ -26,7 +26,7 @@ namespace VoroFit.Application.Services.Evolution
             _httpClient.DefaultRequestHeaders.Add("apikey", _evolutionUtil.Key);
         }
 
-        public async Task SetInstanceName(string instanceName)
+        public void SetInstanceName(string instanceName)
         {
             this.InstanceName = instanceName;
         }

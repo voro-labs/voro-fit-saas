@@ -6,13 +6,21 @@ using VoroFit.Application.Services.Base;
 using VoroFit.Domain.Interfaces.Repositories;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Email;
+using Microsoft.Extensions.Configuration;
 
 namespace VoroFit.Application.Services
 {
-    public class NotificationService(IMailKitEmailService emailService, INotificationRepository notificationRepository) : ServiceBase<Notification>(notificationRepository), INotificationService
+    public class NotificationService(IMailKitEmailService emailService, IConfiguration configuration, INotificationRepository notificationRepository) : ServiceBase<Notification>(notificationRepository), INotificationService
     {
+        private readonly IConfiguration _configuration = configuration;
         private readonly IMailKitEmailService _emailService = emailService;
         private readonly INotificationRepository _notificationRepository = notificationRepository;
+
+        private string UrlBase => 
+            _configuration
+                .GetSection("CorsSettings")
+                .GetSection("AllowedOrigins")
+                .Get<string[]>()?[0] ?? "{UrlBase}";
 
         public async Task SendWelcomeAsync(string email, string userName)
         {
@@ -42,7 +50,7 @@ namespace VoroFit.Application.Services
                 throw new InvalidOperationException("Template de e-mail de reset de senha não encontrado.");
 
             // Gera o link de reset (ajuste conforme sua URL base)
-            var resetLink = $"https://fit.vorolabs.app/admin/reset-password?email={email}&token={token}";
+            var resetLink = $"{UrlBase}/admin/reset-password?email={email}&token={token}";
 
             // Substitui placeholders no corpo e no assunto
             var subject = template.Subject
@@ -65,7 +73,7 @@ namespace VoroFit.Application.Services
                 throw new InvalidOperationException("Template de e-mail de confirmação de e-mail não encontrado.");
 
             // Gera o link de confirmação (ajuste conforme sua URL base)
-            var confirmLink = $"https://fit.vorolabs.app/admin/confirm-email?email={email}&token={token}";
+            var confirmLink = $"{UrlBase}/admin/confirm-email?email={email}&token={token}";
 
             // Substitui placeholders no corpo e no assunto
             var subject = template.Subject

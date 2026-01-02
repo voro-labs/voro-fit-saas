@@ -17,13 +17,13 @@ interface WorkoutDayBlockProps {
 }
 
 const dayOptions = [
-  { value: String(DayOfWeekEnum.Segunda), label: "Segunda-feira" },
-  { value: String(DayOfWeekEnum.Terca), label: "Terça-feira" },
-  { value: String(DayOfWeekEnum.Quarta), label: "Quarta-feira" },
-  { value: String(DayOfWeekEnum.Quinta), label: "Quinta-feira" },
-  { value: String(DayOfWeekEnum.Sexta), label: "Sexta-feira" },
-  { value: String(DayOfWeekEnum.Sabado), label: "Sábado" },
-  { value: String(DayOfWeekEnum.Domingo), label: "Domingo" },
+  { value: String(DayOfWeekEnum.Monday), label: "Segunda-feira" },
+  { value: String(DayOfWeekEnum.Tuesday), label: "Terça-feira" },
+  { value: String(DayOfWeekEnum.Wednesday), label: "Quarta-feira" },
+  { value: String(DayOfWeekEnum.Thursday), label: "Quinta-feira" },
+  { value: String(DayOfWeekEnum.Friday), label: "Sexta-feira" },
+  { value: String(DayOfWeekEnum.Saturday), label: "Sábado" },
+  { value: String(DayOfWeekEnum.Sunday), label: "Domingo" },
 ]
 
 export function WorkoutDayBlock({ day, onRemove, onChange }: WorkoutDayBlockProps) {
@@ -41,7 +41,7 @@ export function WorkoutDayBlock({ day, onRemove, onChange }: WorkoutDayBlockProp
             <Calendar className="h-4 w-4 text-primary" />
             Dia de Treino
           </CardTitle>
-          <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+          <Button type="button" size="sm" onClick={onRemove} variant="destructive">
             Remover Dia
           </Button>
         </div>

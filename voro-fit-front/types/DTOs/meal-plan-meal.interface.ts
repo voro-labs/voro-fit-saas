@@ -1,8 +1,8 @@
 import { MealPeriodEnum } from "../Enums/mealPeriodEnum.enum"
 
 export interface MealPlanMealDto {
-  id: string
-  mealPlanDayId: string
+  id?: string | null
+  mealPlanDayId?: string | null
   period: MealPeriodEnum
   time?: string
   description: string

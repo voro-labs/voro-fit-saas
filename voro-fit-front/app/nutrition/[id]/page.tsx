@@ -18,22 +18,23 @@ import { MealPlanDto } from "@/types/DTOs/meal-plan.interface"
 import { Loading } from "@/components/ui/custom/loading/loading"
 
 const daysOfWeek = [
-  { key: DayOfWeekEnum.Segunda, label: "Segunda" },
-  { key: DayOfWeekEnum.Terca, label: "Terça" },
-  { key: DayOfWeekEnum.Quarta, label: "Quarta" },
-  { key: DayOfWeekEnum.Quinta, label: "Quinta" },
-  { key: DayOfWeekEnum.Sexta, label: "Sexta" },
-  { key: DayOfWeekEnum.Sabado, label: "Sábado" },
-  { key: DayOfWeekEnum.Domingo, label: "Domingo" },
+  { key: DayOfWeekEnum.Monday, label: "Segunda" },
+  { key: DayOfWeekEnum.Tuesday, label: "Terça" },
+  { key: DayOfWeekEnum.Wednesday, label: "Quarta" },
+  { key: DayOfWeekEnum.Thursday, label: "Quinta" },
+  { key: DayOfWeekEnum.Friday, label: "Sexta" },
+  { key: DayOfWeekEnum.Saturday, label: "Sábado" },
+  { key: DayOfWeekEnum.Sunday, label: "Domingo" },
 ]
 
 const periodLabels: Record<MealPeriodEnum, string> = {
-  [MealPeriodEnum.CafeDaManha]: "Café da Manhã",
-  [MealPeriodEnum.LancheDaManha]: "Lanche da Manhã",
-  [MealPeriodEnum.Almoco]: "Almoço",
-  [MealPeriodEnum.LancheDaTarde]: "Lanche da Tarde",
-  [MealPeriodEnum.Jantar]: "Jantar",
-  [MealPeriodEnum.Ceia]: "Ceia",
+  [MealPeriodEnum.Unspecified]: "Desconhecido",
+  [MealPeriodEnum.Breakfast]: "Café da Manhã",
+  [MealPeriodEnum.MorningSnack]: "Lanche da Manhã",
+  [MealPeriodEnum.Lunch]: "Almoço",
+  [MealPeriodEnum.AfternoonSnack]: "Lanche da Tarde",
+  [MealPeriodEnum.Dinner]: "Jantar",
+  [MealPeriodEnum.Supper]: "Ceia",
 }
 
 export default function MealPlanDetailPage() {
@@ -150,7 +151,7 @@ export default function MealPlanDetailPage() {
           </Card>
 
           {/* Days Tabs */}
-          <Tabs defaultValue={String(DayOfWeekEnum.Segunda)} className="space-y-6">
+          <Tabs defaultValue={String(DayOfWeekEnum.Monday)} className="space-y-6">
             <TabsList className="flex-wrap h-auto">
               {daysOfWeek.map((day) => (
                 <TabsTrigger key={day.key} value={String(day.key)}>
@@ -162,7 +163,7 @@ export default function MealPlanDetailPage() {
             {daysOfWeek.map((day) => {
               const meals = getMealsForDay(day.key)
               return (
-                <TabsContent key={day.key} value={String(day.key)} className="space-y-4 max-w-4xl">
+                <TabsContent key={day.key} value={String(day.key)} className="space-y-4">
                   {meals.length > 0 ? (
                     meals.map((meal) => (
                       <Card key={meal.id}>

@@ -9,7 +9,7 @@ namespace VoroFit.Application.DTOs
         public WorkoutPlanStatusEnum? Status { get; set; }
 
         public Guid? StudentId { get; set; }
-        public StudentDto? Student { get; set; } = null!;
+        public StudentDto? Student { get; set; }
 
         public ICollection<WorkoutPlanWeekDto>? Weeks { get; set; } = [];
 

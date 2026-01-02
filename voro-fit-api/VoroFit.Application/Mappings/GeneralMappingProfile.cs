@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Evolution;
-using VoroFit.Application.DTOs.Identity;
-using VoroFit.Domain.Entities;
 using VoroFit.Domain.Entities.Evolution;
-using VoroFit.Domain.Entities.Identity;
 
 namespace VoroFit.Application.Mappings
 {
@@ -27,124 +23,9 @@ namespace VoroFit.Application.Mappings
             CreateMap<Group, GroupDto>().ReverseMap();
             CreateMap<GroupMember, GroupMemberDto>().ReverseMap();
             CreateMap<Instance, InstanceDto>().ReverseMap();
-            CreateMap<MessageReaction, MessageReactionDto>().ReverseMap();
-            CreateMap<Message, MessageDto>().ReverseMap();
-            
             CreateMap<InstanceExtension, InstanceExtensionDto>().ReverseMap();
-            
-            // =========================
-            // USER EXTENSION
-            // =========================
-            CreateMap<UserExtension, UserExtensionDto>();
-
-            CreateMap<UserExtensionDto, UserExtension>()
-                .ForMember(d => d.UserId, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            // =========================
-            // STUDENT
-            // =========================
-            CreateMap<Student, StudentDto>();
-
-            CreateMap<StudentDto, Student>()
-                .ForMember(d => d.UserExtensionId, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-            
-            // =========================
-            // MEASUREMENT
-            // =========================
-            CreateMap<Measurement, MeasurementDto>();
-
-            CreateMap<MeasurementDto, Measurement>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            // =========================
-            // EXERCISE
-            // =========================
-            CreateMap<Exercise, ExerciseDto>();
-
-            CreateMap<ExerciseDto, Exercise>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            // =========================
-            // WORKOUT PLAN
-            // =========================
-            CreateMap<WorkoutPlan, WorkoutPlanDto>();
-
-            CreateMap<WorkoutPlanDto, WorkoutPlan>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForMember(x => x.Weeks, opt => opt.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<WorkoutPlanWeek, WorkoutPlanWeekDto>();
-
-            CreateMap<WorkoutPlanWeekDto, WorkoutPlanWeek>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<WorkoutPlanDay, WorkoutPlanDayDto>();
-
-            CreateMap<WorkoutPlanDayDto, WorkoutPlanDay>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<WorkoutPlanExercise, WorkoutPlanExerciseDto>();
-
-            CreateMap<WorkoutPlanExerciseDto, WorkoutPlanExercise>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            // =========================
-            // WORKOUT HISTORY
-            // =========================
-            CreateMap<WorkoutHistory, WorkoutHistoryDto>();
-
-            CreateMap<WorkoutHistoryDto, WorkoutHistory>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<WorkoutHistoryExercise, WorkoutHistoryExerciseDto>();
-
-            CreateMap<WorkoutHistoryExerciseDto, WorkoutHistoryExercise>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            // =========================
-            // MEAL PLAN
-            // =========================
-            CreateMap<MealPlan, MealPlanDto>();
-
-            CreateMap<MealPlanDto, MealPlan>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<MealPlanDay, MealPlanDayDto>();
-
-            CreateMap<MealPlanDayDto, MealPlanDay>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<MealPlanMeal, MealPlanMealDto>();
-
-            CreateMap<MealPlanMealDto, MealPlanMeal>()
-                .ForMember(d => d.Id, o => o.Ignore())
-                .ForAllMembers(o =>
-                    o.Condition((src, dest, srcMember) => srcMember != null));
-
+            CreateMap<Message, MessageDto>().ReverseMap();
+            CreateMap<MessageReaction, MessageReactionDto>().ReverseMap();
         }
     }
 }

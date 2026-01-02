@@ -34,26 +34,6 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exercises",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    MuscleGroup = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Thumbnail = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true),
-                    Alternatives = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
@@ -83,7 +63,9 @@ namespace VoroFit.Infrastructure.Migrations
                     Bcc = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -112,9 +94,12 @@ namespace VoroFit.Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CountryCode = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: true),
+                    AvatarUrl = table.Column<string>(type: "text", nullable: true),
                     BirthDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "TIMEZONE('utc', NOW())"),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -305,19 +290,18 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Instances",
+                name: "Instance",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UserExtensionUserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Instances", x => x.Id);
+                    table.PrimaryKey("PK_Instance", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Instances_UserExtensions_UserExtensionUserId",
+                        name: "FK_Instance_UserExtensions_UserExtensionUserId",
                         column: x => x.UserExtensionUserId,
                         principalTable: "UserExtensions",
                         principalColumn: "UserId");
@@ -333,7 +317,8 @@ namespace VoroFit.Infrastructure.Migrations
                     Height = table.Column<int>(type: "integer", nullable: false),
                     Weight = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Goal = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                    Goal = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Notes = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -353,37 +338,63 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chats",
+                name: "InstanceExtensions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RemoteJid = table.Column<string>(type: "text", nullable: false),
-                    IsGroup = table.Column<bool>(type: "boolean", nullable: false),
                     InstanceId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastMessageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Hash = table.Column<string>(type: "text", nullable: false),
+                    Base64 = table.Column<string>(type: "text", nullable: false),
+                    Integration = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ContactId = table.Column<Guid>(type: "uuid", nullable: true),
-                    GroupId = table.Column<Guid>(type: "uuid", nullable: true)
+                    ConnectedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    UserExtensionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.PrimaryKey("PK_InstanceExtensions", x => x.InstanceId);
                     table.ForeignKey(
-                        name: "FK_Chats_Contacts_ContactId",
-                        column: x => x.ContactId,
-                        principalTable: "Contacts",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Chats_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Chats_Instances_InstanceId",
+                        name: "FK_InstanceExtensions_Instance_InstanceId",
                         column: x => x.InstanceId,
-                        principalTable: "Instances",
+                        principalTable: "Instance",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InstanceExtensions_UserExtensions_UserExtensionId",
+                        column: x => x.UserExtensionId,
+                        principalTable: "UserExtensions",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Exercises",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    MuscleGroup = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Thumbnail = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    Alternatives = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    StudentUserExtensionId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exercises_Students_StudentUserExtensionId",
+                        column: x => x.StudentUserExtensionId,
+                        principalTable: "Students",
+                        principalColumn: "UserExtensionId");
                 });
 
             migrationBuilder.CreateTable(
@@ -393,9 +404,10 @@ namespace VoroFit.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastUpdated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -420,7 +432,9 @@ namespace VoroFit.Infrastructure.Migrations
                     Arms = table.Column<float>(type: "real", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -434,24 +448,105 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkoutHistories",
+                name: "WorkoutPlans",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LastUpdated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkoutHistories", x => x.Id);
+                    table.PrimaryKey("PK_WorkoutPlans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkoutHistories_Students_StudentId",
+                        name: "FK_WorkoutPlans_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "UserExtensionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Chats",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RemoteJid = table.Column<string>(type: "text", nullable: false),
+                    IsGroup = table.Column<bool>(type: "boolean", nullable: false),
+                    InstanceExtensionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastMessageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ContactId = table.Column<Guid>(type: "uuid", nullable: true),
+                    GroupId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Chats_Contacts_ContactId",
+                        column: x => x.ContactId,
+                        principalTable: "Contacts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Chats_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Chats_InstanceExtensions_InstanceExtensionId",
+                        column: x => x.InstanceExtensionId,
+                        principalTable: "InstanceExtensions",
+                        principalColumn: "InstanceId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MealPlanDays",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    MealPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MealPlanDays", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MealPlanDays_MealPlans_MealPlanId",
+                        column: x => x.MealPlanId,
+                        principalTable: "MealPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkoutPlanWeeks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    WeekNumber = table.Column<int>(type: "integer", nullable: false),
+                    WorkoutPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutPlanWeeks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutPlanWeeks_WorkoutPlans_WorkoutPlanId",
+                        column: x => x.WorkoutPlanId,
+                        principalTable: "WorkoutPlans",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -510,61 +605,51 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MealPlanDays",
+                name: "MealPlanMeals",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DayOfWeek = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    MealPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Period = table.Column<int>(type: "integer", nullable: false),
+                    Time = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Quantity = table.Column<string>(type: "text", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    MealPlanDayId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MealPlanDays", x => x.Id);
+                    table.PrimaryKey("PK_MealPlanMeals", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MealPlanDays_MealPlans_MealPlanId",
-                        column: x => x.MealPlanId,
-                        principalTable: "MealPlans",
+                        name: "FK_MealPlanMeals_MealPlanDays_MealPlanDayId",
+                        column: x => x.MealPlanDayId,
+                        principalTable: "MealPlanDays",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkoutExercises",
+                name: "WorkoutPlanDays",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkoutHistoryId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ExerciseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    Sets = table.Column<int>(type: "integer", nullable: false),
-                    Reps = table.Column<int>(type: "integer", nullable: false),
-                    RestInSeconds = table.Column<int>(type: "integer", nullable: false),
-                    Weight = table.Column<float>(type: "real", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true),
-                    Alternative = table.Column<string>(type: "text", nullable: true)
+                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    WorkoutPlanWeekId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkoutExercises", x => x.Id);
+                    table.PrimaryKey("PK_WorkoutPlanDays", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkoutExercises_Exercises_ExerciseId",
-                        column: x => x.ExerciseId,
-                        principalTable: "Exercises",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WorkoutExercises_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "UserExtensionId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WorkoutExercises_WorkoutHistories_WorkoutHistoryId",
-                        column: x => x.WorkoutHistoryId,
-                        principalTable: "WorkoutHistories",
+                        name: "FK_WorkoutPlanDays_WorkoutPlanWeeks_WorkoutPlanWeekId",
+                        column: x => x.WorkoutPlanWeekId,
+                        principalTable: "WorkoutPlanWeeks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -599,26 +684,117 @@ namespace VoroFit.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MealPlanMeals",
+                name: "WorkoutHistories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Period = table.Column<string>(type: "text", nullable: false),
-                    Time = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Quantity = table.Column<string>(type: "text", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkoutPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkoutPlanWeekId = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkoutPlanDayId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExecutionDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: true),
-                    MealPlanDayId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MealPlanMeals", x => x.Id);
+                    table.PrimaryKey("PK_WorkoutHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MealPlanMeals_MealPlanDays_MealPlanDayId",
-                        column: x => x.MealPlanDayId,
-                        principalTable: "MealPlanDays",
+                        name: "FK_WorkoutHistories_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "UserExtensionId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkoutHistories_WorkoutPlanDays_WorkoutPlanDayId",
+                        column: x => x.WorkoutPlanDayId,
+                        principalTable: "WorkoutPlanDays",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkoutHistories_WorkoutPlanWeeks_WorkoutPlanWeekId",
+                        column: x => x.WorkoutPlanWeekId,
+                        principalTable: "WorkoutPlanWeeks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkoutHistories_WorkoutPlans_WorkoutPlanId",
+                        column: x => x.WorkoutPlanId,
+                        principalTable: "WorkoutPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkoutPlanExercises",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkoutPlanDayId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExerciseId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    Sets = table.Column<int>(type: "integer", nullable: false),
+                    Reps = table.Column<int>(type: "integer", nullable: false),
+                    RestInSeconds = table.Column<int>(type: "integer", nullable: false),
+                    Weight = table.Column<float>(type: "real", nullable: true),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    Alternative = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutPlanExercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutPlanExercises_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkoutPlanExercises_WorkoutPlanDays_WorkoutPlanDayId",
+                        column: x => x.WorkoutPlanDayId,
+                        principalTable: "WorkoutPlanDays",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkoutHistoryExercises",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkoutHistoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExerciseId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    PlannedSets = table.Column<int>(type: "integer", nullable: false),
+                    PlannedReps = table.Column<int>(type: "integer", nullable: false),
+                    ExecutedSets = table.Column<int>(type: "integer", nullable: false),
+                    ExecutedReps = table.Column<int>(type: "integer", nullable: false),
+                    PlannedWeight = table.Column<float>(type: "real", nullable: true),
+                    ExecutedWeight = table.Column<float>(type: "real", nullable: true),
+                    RestInSeconds = table.Column<int>(type: "integer", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkoutHistoryExercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutHistoryExercises_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkoutHistoryExercises_WorkoutHistories_WorkoutHistoryId",
+                        column: x => x.WorkoutHistoryId,
+                        principalTable: "WorkoutHistories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -634,14 +810,19 @@ namespace VoroFit.Infrastructure.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Chats_InstanceId",
+                name: "IX_Chats_InstanceExtensionId",
                 table: "Chats",
-                column: "InstanceId");
+                column: "InstanceExtensionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContactIdentifier_ContactId",
                 table: "ContactIdentifier",
                 column: "ContactId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_StudentUserExtensionId",
+                table: "Exercises",
+                column: "StudentUserExtensionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMembers_ContactId",
@@ -654,9 +835,14 @@ namespace VoroFit.Infrastructure.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Instances_UserExtensionUserId",
-                table: "Instances",
+                name: "IX_Instance_UserExtensionUserId",
+                table: "Instance",
                 column: "UserExtensionUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InstanceExtensions_UserExtensionId",
+                table: "InstanceExtensions",
+                column: "UserExtensionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MealPlanDays_MealPlanId",
@@ -751,24 +937,59 @@ namespace VoroFit.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkoutExercises_ExerciseId",
-                table: "WorkoutExercises",
-                column: "ExerciseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkoutExercises_StudentId",
-                table: "WorkoutExercises",
-                column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkoutExercises_WorkoutHistoryId",
-                table: "WorkoutExercises",
-                column: "WorkoutHistoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WorkoutHistories_StudentId",
                 table: "WorkoutHistories",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutHistories_WorkoutPlanDayId",
+                table: "WorkoutHistories",
+                column: "WorkoutPlanDayId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutHistories_WorkoutPlanId",
+                table: "WorkoutHistories",
+                column: "WorkoutPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutHistories_WorkoutPlanWeekId",
+                table: "WorkoutHistories",
+                column: "WorkoutPlanWeekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutHistoryExercises_ExerciseId",
+                table: "WorkoutHistoryExercises",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutHistoryExercises_WorkoutHistoryId",
+                table: "WorkoutHistoryExercises",
+                column: "WorkoutHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutPlanDays_WorkoutPlanWeekId",
+                table: "WorkoutPlanDays",
+                column: "WorkoutPlanWeekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutPlanExercises_ExerciseId",
+                table: "WorkoutPlanExercises",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutPlanExercises_WorkoutPlanDayId",
+                table: "WorkoutPlanExercises",
+                column: "WorkoutPlanDayId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutPlans_StudentId",
+                table: "WorkoutPlans",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutPlanWeeks_WorkoutPlanId",
+                table: "WorkoutPlanWeeks",
+                column: "WorkoutPlanId");
         }
 
         /// <inheritdoc />
@@ -808,7 +1029,10 @@ namespace VoroFit.Infrastructure.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
-                name: "WorkoutExercises");
+                name: "WorkoutHistoryExercises");
+
+            migrationBuilder.DropTable(
+                name: "WorkoutPlanExercises");
 
             migrationBuilder.DropTable(
                 name: "MealPlanDays");
@@ -820,10 +1044,10 @@ namespace VoroFit.Infrastructure.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "Exercises");
+                name: "WorkoutHistories");
 
             migrationBuilder.DropTable(
-                name: "WorkoutHistories");
+                name: "Exercises");
 
             migrationBuilder.DropTable(
                 name: "MealPlans");
@@ -832,7 +1056,7 @@ namespace VoroFit.Infrastructure.Migrations
                 name: "Chats");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "WorkoutPlanDays");
 
             migrationBuilder.DropTable(
                 name: "Contacts");
@@ -841,7 +1065,19 @@ namespace VoroFit.Infrastructure.Migrations
                 name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "Instances");
+                name: "InstanceExtensions");
+
+            migrationBuilder.DropTable(
+                name: "WorkoutPlanWeeks");
+
+            migrationBuilder.DropTable(
+                name: "Instance");
+
+            migrationBuilder.DropTable(
+                name: "WorkoutPlans");
+
+            migrationBuilder.DropTable(
+                name: "Students");
 
             migrationBuilder.DropTable(
                 name: "UserExtensions");

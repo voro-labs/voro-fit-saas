@@ -89,12 +89,19 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var updated = await workoutService.UpdateAsync(id, model);
+                var result = await workoutService.UpdateAsync(id, model);
 
                 await workoutService.SaveChangesAsync();
 
+                if (result is null)
+                {
+                    return ResponseViewModel<WorkoutPlanDto>
+                        .Fail("Treino não encontrado.")
+                        .ToActionResult();
+                }
+
                 return ResponseViewModel<WorkoutPlanDto>
-                    .SuccessWithMessage("Treino atualizado com sucesso.", updated)
+                    .SuccessWithMessage("Treino atualizado com sucesso.", result)
                     .ToActionResult();
             }
             catch (Exception ex)

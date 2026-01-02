@@ -12,8 +12,8 @@ using VoroFit.Infrastructure.Factories;
 namespace VoroFit.Infrastructure.Migrations
 {
     [DbContext(typeof(JasmimDbContext))]
-    [Migration("20251211013456_UpdateInstance")]
-    partial class UpdateInstance
+    [Migration("20251231194218_UpdateWorkout")]
+    partial class UpdateWorkout
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,10 +125,7 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("InstanceExtensionInstanceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("InstanceId")
+                    b.Property<Guid>("InstanceExtensionId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsGroup")
@@ -150,9 +147,7 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("InstanceExtensionInstanceId");
-
-                    b.HasIndex("InstanceId");
+                    b.HasIndex("InstanceExtensionId");
 
                     b.ToTable("Chats");
                 });
@@ -335,7 +330,12 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UserExtensionId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("InstanceId");
+
+                    b.HasIndex("UserExtensionId");
 
                     b.ToTable("InstanceExtensions");
                 });
@@ -481,8 +481,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("MuscleGroup")
                         .IsRequired()
@@ -495,6 +501,9 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("StudentUserExtensionId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Thumbnail")
                         .IsRequired()
                         .HasColumnType("text");
@@ -506,6 +515,8 @@ namespace VoroFit.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentUserExtensionId");
 
                     b.ToTable("Exercises");
                 });
@@ -546,6 +557,9 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("BirthDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -561,6 +575,9 @@ namespace VoroFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("TIMEZONE('utc', NOW())");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -578,6 +595,9 @@ namespace VoroFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -653,8 +673,11 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("LastUpdated")
+                    b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -681,10 +704,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("MealPlanId")
                         .HasColumnType("uuid");
@@ -708,9 +735,15 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("MealPlanDayId")
                         .HasColumnType("uuid");
@@ -718,9 +751,8 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Quantity")
                         .IsRequired()
@@ -757,6 +789,12 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
@@ -796,7 +834,13 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -831,6 +875,11 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<int>("Height")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -857,7 +906,190 @@ namespace VoroFit.Infrastructure.Migrations
                     b.ToTable("UserExtensions");
                 });
 
-            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutExercise", b =>
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExecutionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("WorkoutPlanDayId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WorkoutPlanDayId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WorkoutPlanId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WorkoutPlanId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WorkoutPlanWeekId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WorkoutPlanWeekId1")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("WorkoutPlanDayId");
+
+                    b.HasIndex("WorkoutPlanDayId1");
+
+                    b.HasIndex("WorkoutPlanId");
+
+                    b.HasIndex("WorkoutPlanId1");
+
+                    b.HasIndex("WorkoutPlanWeekId");
+
+                    b.HasIndex("WorkoutPlanWeekId1");
+
+                    b.ToTable("WorkoutHistories");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistoryExercise", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ExecutedReps")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ExecutedSets")
+                        .HasColumnType("integer");
+
+                    b.Property<float?>("ExecutedWeight")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("ExerciseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlannedReps")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlannedSets")
+                        .HasColumnType("integer");
+
+                    b.Property<float?>("PlannedWeight")
+                        .HasColumnType("real");
+
+                    b.Property<int>("RestInSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("WorkoutHistoryId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("WorkoutHistoryId");
+
+                    b.ToTable("WorkoutHistoryExercises");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("WorkoutPlans");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanDay", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("WorkoutPlanWeekId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkoutPlanWeekId");
+
+                    b.ToTable("WorkoutPlanDays");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanExercise", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -866,8 +1098,14 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<string>("Alternative")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ExerciseId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -884,53 +1122,50 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<int>("Sets")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid");
-
                     b.Property<float?>("Weight")
                         .HasColumnType("real");
 
-                    b.Property<Guid>("WorkoutHistoryId")
+                    b.Property<Guid>("WorkoutPlanDayId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ExerciseId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("WorkoutPlanDayId");
 
-                    b.HasIndex("WorkoutHistoryId");
-
-                    b.ToTable("WorkoutExercises");
+                    b.ToTable("WorkoutPlanExercises");
                 });
 
-            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistory", b =>
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanWeek", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("CreatedDate")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("LastUpdated")
+                    b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
-                    b.Property<int>("Status")
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("WeekNumber")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("WorkoutPlanId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("WorkoutPlanId");
 
-                    b.ToTable("WorkoutHistories");
+                    b.ToTable("WorkoutPlanWeeks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -972,20 +1207,16 @@ namespace VoroFit.Infrastructure.Migrations
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Chat", b =>
                 {
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Contact", "Contact")
-                        .WithMany()
+                        .WithMany("Chats")
                         .HasForeignKey("ContactId");
 
                     b.HasOne("VoroFit.Domain.Entities.Evolution.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");
 
-                    b.HasOne("VoroFit.Domain.Entities.Evolution.InstanceExtension", null)
+                    b.HasOne("VoroFit.Domain.Entities.Evolution.InstanceExtension", "InstanceExtension")
                         .WithMany("Chats")
-                        .HasForeignKey("InstanceExtensionInstanceId");
-
-                    b.HasOne("VoroFit.Domain.Entities.Evolution.Instance", "Instance")
-                        .WithMany()
-                        .HasForeignKey("InstanceId")
+                        .HasForeignKey("InstanceExtensionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -993,7 +1224,7 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Navigation("Group");
 
-                    b.Navigation("Instance");
+                    b.Navigation("InstanceExtension");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.ContactIdentifier", b =>
@@ -1041,7 +1272,15 @@ namespace VoroFit.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("VoroFit.Domain.Entities.UserExtension", "UserExtension")
+                        .WithMany()
+                        .HasForeignKey("UserExtensionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Instance");
+
+                    b.Navigation("UserExtension");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Message", b =>
@@ -1088,6 +1327,13 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Navigation("Contact");
 
                     b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.Exercise", b =>
+                {
+                    b.HasOne("VoroFit.Domain.Entities.Student", null)
+                        .WithMany("FavoriteExercises")
+                        .HasForeignKey("StudentUserExtensionId");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Identity.UserRole", b =>
@@ -1182,18 +1428,59 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutExercise", b =>
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistory", b =>
                 {
-                    b.HasOne("VoroFit.Domain.Entities.Exercise", "Exercise")
-                        .WithMany("WorkoutExercises")
-                        .HasForeignKey("ExerciseId")
+                    b.HasOne("VoroFit.Domain.Entities.Student", "Student")
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VoroFit.Domain.Entities.Student", "Student")
-                        .WithMany("WorkoutExercises")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanDayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanDayId1");
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", "WorkoutPlan")
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanId1");
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", "WorkoutPlanWeek")
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanWeekId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", null)
+                        .WithMany("WorkoutHistories")
+                        .HasForeignKey("WorkoutPlanWeekId1");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("WorkoutPlan");
+
+                    b.Navigation("WorkoutPlanDay");
+
+                    b.Navigation("WorkoutPlanWeek");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistoryExercise", b =>
+                {
+                    b.HasOne("VoroFit.Domain.Entities.Exercise", "Exercise")
+                        .WithMany("WorkoutHistoryExercises")
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VoroFit.Domain.Entities.WorkoutHistory", "WorkoutHistory")
@@ -1204,20 +1491,59 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.Navigation("Exercise");
 
-                    b.Navigation("Student");
-
                     b.Navigation("WorkoutHistory");
                 });
 
-            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistory", b =>
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlan", b =>
                 {
                     b.HasOne("VoroFit.Domain.Entities.Student", "Student")
-                        .WithMany("WorkoutHistories")
+                        .WithMany("WorkoutPlans")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanDay", b =>
+                {
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", "WorkoutPlanWeek")
+                        .WithMany("Days")
+                        .HasForeignKey("WorkoutPlanWeekId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlanWeek");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanExercise", b =>
+                {
+                    b.HasOne("VoroFit.Domain.Entities.Exercise", "Exercise")
+                        .WithMany("WorkoutPlanExercises")
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
+                        .WithMany("Exercises")
+                        .HasForeignKey("WorkoutPlanDayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("WorkoutPlanDay");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanWeek", b =>
+                {
+                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Weeks")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlan");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Chat", b =>
@@ -1227,6 +1553,8 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Evolution.Contact", b =>
                 {
+                    b.Navigation("Chats");
+
                     b.Navigation("GroupMemberships");
 
                     b.Navigation("Identifiers");
@@ -1258,7 +1586,9 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Exercise", b =>
                 {
-                    b.Navigation("WorkoutExercises");
+                    b.Navigation("WorkoutHistoryExercises");
+
+                    b.Navigation("WorkoutPlanExercises");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Identity.Role", b =>
@@ -1285,13 +1615,15 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Student", b =>
                 {
+                    b.Navigation("FavoriteExercises");
+
                     b.Navigation("MealPlans");
 
                     b.Navigation("Measurements");
 
-                    b.Navigation("WorkoutExercises");
-
                     b.Navigation("WorkoutHistories");
+
+                    b.Navigation("WorkoutPlans");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.UserExtension", b =>
@@ -1304,6 +1636,27 @@ namespace VoroFit.Infrastructure.Migrations
             modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistory", b =>
                 {
                     b.Navigation("Exercises");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlan", b =>
+                {
+                    b.Navigation("Weeks");
+
+                    b.Navigation("WorkoutHistories");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanDay", b =>
+                {
+                    b.Navigation("Exercises");
+
+                    b.Navigation("WorkoutHistories");
+                });
+
+            modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutPlanWeek", b =>
+                {
+                    b.Navigation("Days");
+
+                    b.Navigation("WorkoutHistories");
                 });
 #pragma warning restore 612, 618
         }

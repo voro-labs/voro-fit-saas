@@ -22,7 +22,7 @@ namespace VoroFit.API.Controllers
                 var result = await mealPlanService.GetAllAsync();
 
                 return ResponseViewModel<IEnumerable<MealPlanDto>>
-                    .SuccessWithMessage("Meal plans loaded successfully.", result)
+                    .SuccessWithMessage("Alimentações carregadas com sucesso.", result)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -44,12 +44,12 @@ namespace VoroFit.API.Controllers
                 if (result is null)
                 {
                     return ResponseViewModel<MealPlanDto>
-                        .Fail("Meal plan not found.")
+                        .Fail("Alimentação não encontrada.")
                         .ToActionResult();
                 }
 
                 return ResponseViewModel<MealPlanDto>
-                    .SuccessWithMessage("Meal plan loaded successfully.", result)
+                    .SuccessWithMessage("Alimentação carregada com sucesso.", result)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace VoroFit.API.Controllers
                 await mealPlanService.SaveChangesAsync();
 
                 return ResponseViewModel<MealPlanDto>
-                    .SuccessWithMessage("Meal plan created successfully.", result)
+                    .SuccessWithMessage("Alimentação criada com sucesso.", result)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -95,12 +95,12 @@ namespace VoroFit.API.Controllers
                 if (result is null)
                 {
                     return ResponseViewModel<MealPlanDto>
-                        .Fail("Meal plan not found.")
+                        .Fail("Alimentação não encontrada.")
                         .ToActionResult();
                 }
 
                 return ResponseViewModel<MealPlanDto>
-                    .SuccessWithMessage("Meal plan updated successfully.", result)
+                    .SuccessWithMessage("Alimentação atualizado com sucesso.", result)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -122,7 +122,7 @@ namespace VoroFit.API.Controllers
                 await mealPlanService.SaveChangesAsync();
 
                 return ResponseViewModel<object>
-                    .SuccessWithMessage("Meal plan deleted successfully.", true)
+                    .SuccessWithMessage("Alimentação excluída com sucesso.", true)
                     .ToActionResult();
             }
             catch (Exception ex)

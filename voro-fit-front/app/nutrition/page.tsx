@@ -15,13 +15,13 @@ export default function NutritionPage() {
   const { mealPlans, loading, error } = useMealPlans()
 
   const dayLabels: Record<DayOfWeekEnum, string> = {
-    [DayOfWeekEnum.Segunda]: "Segunda",
-    [DayOfWeekEnum.Terca]: "Terça",
-    [DayOfWeekEnum.Quarta]: "Quarta",
-    [DayOfWeekEnum.Quinta]: "Quinta",
-    [DayOfWeekEnum.Sexta]: "Sexta",
-    [DayOfWeekEnum.Sabado]: "Sábado",
-    [DayOfWeekEnum.Domingo]: "Domingo",
+    [DayOfWeekEnum.Monday]: "Segunda",
+    [DayOfWeekEnum.Tuesday]: "Terça",
+    [DayOfWeekEnum.Wednesday]: "Quarta",
+    [DayOfWeekEnum.Thursday]: "Quinta",
+    [DayOfWeekEnum.Friday]: "Sexta",
+    [DayOfWeekEnum.Saturday]: "Sábado",
+    [DayOfWeekEnum.Sunday]: "Domingo",
   }
 
   const getDaysOfWeek = (days?: { dayOfWeek: DayOfWeekEnum }[]) => {

@@ -75,7 +75,7 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await evolutionService.SetInstanceName(instanceName);
+                evolutionService.SetInstanceName(instanceName);
 
                 await evolutionService.DeleteInstanceAsync();
 
@@ -107,7 +107,7 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await evolutionService.SetInstanceName(instanceName);
+                evolutionService.SetInstanceName(instanceName);
 
                 var instance = await evolutionService.RefreshQrCodeAsync();
 
@@ -129,7 +129,7 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                await evolutionService.SetInstanceName(instanceName);
+                evolutionService.SetInstanceName(instanceName);
 
                 var response = await evolutionService.GetInstanceStatusAsync();
 

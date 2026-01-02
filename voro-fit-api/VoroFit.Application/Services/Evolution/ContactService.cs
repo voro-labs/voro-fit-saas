@@ -34,7 +34,7 @@ namespace VoroFit.Application.Services.Evolution
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Contact?> UpdateContact(
+        public Contact? UpdateContact(
             Contact contact,
             string? displayName,
             string? profilePicture)
