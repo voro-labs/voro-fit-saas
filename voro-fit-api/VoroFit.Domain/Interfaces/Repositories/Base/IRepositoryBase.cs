@@ -5,6 +5,7 @@ namespace VoroFit.Domain.Interfaces.Repositories.Base
     public interface IRepositoryBase<T> where T : class
     {
         Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, params Func<IQueryable<T>, IQueryable<T>>[] includes);
         Task<T?> GetByIdAsync(params object[] keyValues);
         Task<T?> GetByIdAsync(Expression<Func<T, bool>> predicate, params Func<IQueryable<T>, IQueryable<T>>[] includes);
         IQueryable<T> Query(Expression<Func<T, bool>>? predicate = null, bool asNoTracking = true);

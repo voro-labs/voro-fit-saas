@@ -1,11 +1,13 @@
-﻿using VoroFit.Shared.Utils;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Text;
+using VoroFit.Shared.Utils;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace VoroFit.API.Extensions.Configurations
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddAuthExtensions
+    public static class AddAuthExtension
     {
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {

@@ -1,9 +1,10 @@
-﻿using VoroFit.API.ViewModels;
+﻿using VoroFit.Shared.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
-namespace VoroFit.API.Extensions
+namespace VoroFit.Shared.Extensions
 {
-    public static class ResponseExtensions
+    public static class ResponseExtension
     {
         public static IActionResult ToActionResult<T>(this ResponseViewModel<T> response) where T : class?
         {

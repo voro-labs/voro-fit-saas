@@ -1,6 +1,9 @@
-﻿namespace VoroFit.API.Extensions.Configurations
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddCorsExtensions
+    public static class AddCorsExtension
     {
         public static IServiceCollection AddCustomCors(this IServiceCollection services, IConfiguration configuration)
         {

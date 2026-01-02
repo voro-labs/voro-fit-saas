@@ -11,6 +11,9 @@ namespace VoroFit.Application.Services.Base
         public Task<IEnumerable<T>> GetAllAsync(bool asNoTracking = true)
             => _repository.GetAllAsync(asNoTracking);
 
+        public Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, params Func<IQueryable<T>, IQueryable<T>>[] includes)
+            => _repository.GetAllAsync(predicate, asNoTracking, includes);
+
         public Task<T?> GetByIdAsync(params object[] keyValues)
             => _repository.GetByIdAsync(keyValues);
 

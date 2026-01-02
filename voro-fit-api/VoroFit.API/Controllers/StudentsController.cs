@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VoroFit.API.Extensions;
-using VoroFit.API.ViewModels;
+using VoroFit.Shared.Extensions;
+using VoroFit.Shared.ViewModels;
 using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Identity;
 using VoroFit.Application.Services.Interfaces;

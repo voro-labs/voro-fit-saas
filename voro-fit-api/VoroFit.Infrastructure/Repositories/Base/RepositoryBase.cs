@@ -41,6 +41,22 @@ namespace VoroFit.Infrastructure.Repositories.Base
             return await query.ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>> predicate,
+            bool asNoTracking = true,
+            params Func<IQueryable<T>, IQueryable<T>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
+            foreach (var include in includes)
+                query = include(query);
+
+            return await query.Where(predicate).ToListAsync();
+        }
+
         public async Task<T?> GetByIdAsync(params object[] keyValues)
         {
             return await _dbSet.FindAsync(keyValues);

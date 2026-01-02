@@ -1,5 +1,5 @@
-﻿using VoroFit.API.Extensions;
-using VoroFit.API.ViewModels;
+﻿using VoroFit.Shared.Extensions;
+using VoroFit.Shared.ViewModels;
 using VoroFit.Application.DTOs;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Shared.Constants;

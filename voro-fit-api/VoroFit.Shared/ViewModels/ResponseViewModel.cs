@@ -1,4 +1,6 @@
-﻿namespace VoroFit.API.ViewModels
+﻿using Microsoft.AspNetCore.Http;
+
+namespace VoroFit.Shared.ViewModels
 {
     public class ResponseViewModel<T> where T : class?
     {

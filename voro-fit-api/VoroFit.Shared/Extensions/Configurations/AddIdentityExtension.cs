@@ -1,11 +1,11 @@
-﻿using VoroFit.Domain.Entities.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using VoroFit.Infrastructure.Factories;
-using Microsoft.AspNetCore.Identity;
-using VoroFit.Domain.Entities;
+using VoroFit.Domain.Entities.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.API.Extensions.Configurations
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddIdentityExtensions
+    public static class AddIdentityExtension
     {
         public static IServiceCollection AddCustomIdentity(this IServiceCollection services)
         {

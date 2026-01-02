@@ -4,99 +4,76 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Users, Dumbbell, TrendingUp, Calendar, AlertCircle, ArrowRight } from "lucide-react"
 import { AuthGuard } from "@/components/auth/auth.guard"
-
-// Mock data
-const stats = [
-  {
-    title: "Total de Alunos",
-    value: "24",
-    change: "+3 este mês",
-    icon: Users,
-    color: "text-primary",
-  },
-  {
-    title: "Treinos Ativos",
-    value: "18",
-    change: "5 pendentes",
-    icon: Dumbbell,
-    color: "text-accent",
-  },
-  {
-    title: "Taxa de Adesão",
-    value: "87%",
-    change: "+5% vs. mês anterior",
-    icon: TrendingUp,
-    color: "text-chart-2",
-  },
-]
-
-const upcomingWorkouts = [
-  {
-    student: "Carlos Silva",
-    time: "09:00",
-    type: "Treino A - Peito e Tríceps",
-    avatar: "/student-male-studying.png",
-  },
-  {
-    student: "Ana Costa",
-    time: "10:30",
-    type: "Treino B - Costas e Bíceps",
-    avatar: "/diverse-female-student.png",
-  },
-  {
-    student: "Pedro Santos",
-    time: "14:00",
-    type: "Avaliação Física",
-    avatar: "/student-male-fitness.jpg",
-  },
-]
-
-const recentAlerts = [
-  {
-    message: "Maria Oliveira não treina há 5 dias",
-    time: "2h atrás",
-    type: "warning",
-  },
-  {
-    message: "João Souza completou treino semanal",
-    time: "4h atrás",
-    type: "success",
-  },
-  {
-    message: "Nova mensagem de Lucas Ferreira",
-    time: "6h atrás",
-    type: "info",
-  },
-]
-
-const studentProgress = [
-  {
-    name: "Carlos Silva",
-    progress: 85,
-    goal: "Hipertrofia",
-    avatar: "/student-male-studying.png",
-  },
-  {
-    name: "Ana Costa",
-    progress: 70,
-    goal: "Emagrecimento",
-    avatar: "/diverse-female-student.png",
-  },
-  {
-    name: "Pedro Santos",
-    progress: 92,
-    goal: "Força",
-    avatar: "/student-male-fitness.jpg",
-  },
-  {
-    name: "Mariana Lima",
-    progress: 65,
-    goal: "Condicionamento",
-    avatar: "/student-female-athlete.jpg",
-  },
-]
+import { useDashboard } from "@/hooks/use-dashboard.hook"
+import { Loader2 } from "lucide-react"
+import { AlertTypeEnum } from "@/types/Enums/alertTypeEnum.enum"
 
 export default function DashboardPage() {
+  const { dashboardData, loading, error } = useDashboard()
+
+  if (loading && !dashboardData) {
+    return (
+      <AuthGuard requiredRoles={["Trainer"]}>
+        <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Carregando dashboard...</p>
+          </div>
+        </div>
+      </AuthGuard>
+    )
+  }
+
+  if (error) {
+    return (
+      <AuthGuard requiredRoles={["Trainer"]}>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-balance">Dashboard</h1>
+            <p className="text-destructive mt-2">{error}</p>
+          </div>
+        </div>
+      </AuthGuard>
+    )
+  }
+
+  if (!dashboardData) {
+    return (
+      <AuthGuard requiredRoles={["Trainer"]}>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-balance">Dashboard</h1>
+            <p className="text-muted-foreground">Nenhum dado disponível</p>
+          </div>
+        </div>
+      </AuthGuard>
+    )
+  }
+
+  const stats = [
+    {
+      title: "Total de Alunos",
+      value: dashboardData.stats.totalStudents.toString(),
+      change: `${dashboardData.stats.studentsChangeThisMonth > 0 ? "+" : ""}${dashboardData.stats.studentsChangeThisMonth} este mês`,
+      icon: Users,
+      color: "text-primary",
+    },
+    {
+      title: "Treinos Ativos",
+      value: dashboardData.stats.activeWorkouts.toString(),
+      change: `${dashboardData.stats.pendingWorkouts} pendentes`,
+      icon: Dumbbell,
+      color: "text-accent",
+    },
+    {
+      title: "Taxa de Adesão",
+      value: `${dashboardData.stats.adherenceRate}%`,
+      change: `${dashboardData.stats.adherenceChange > 0 ? "+" : ""}${dashboardData.stats.adherenceChange}% vs. mês anterior`,
+      icon: TrendingUp,
+      color: "text-chart-2",
+    },
+  ]
+
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
       <div className="flex-1 overflow-y-auto p-6">
@@ -140,27 +117,31 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {upcomingWorkouts.map((workout, i) => (
-                  <div key={i} className="flex items-center gap-4 rounded-lg border p-4">
-                    <Avatar>
-                      <AvatarImage src={workout.avatar || "/placeholder.svg"} alt={`${workout.student}`} />
-                      <AvatarFallback>
-                        {`${workout.student}`
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">{`${workout.student}`}</p>
-                      <p className="text-sm text-muted-foreground">{workout.type}</p>
+                {dashboardData.upcomingWorkouts.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum treino agendado</p>
+                ) : (
+                  dashboardData.upcomingWorkouts.map((workout) => (
+                    <div key={workout.id} className="flex items-center gap-4 rounded-lg border p-4">
+                      <Avatar>
+                        <AvatarImage src={workout.studentAvatar || "/placeholder.svg"} alt={workout.studentName} />
+                        <AvatarFallback>
+                          {workout.studentName
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">{workout.studentName}</p>
+                        <p className="text-sm text-muted-foreground">{workout.workoutType}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold">{workout.time}</p>
+                        <p className="text-xs text-muted-foreground">{workout.date}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold">{workout.time}</p>
-                      <p className="text-xs text-muted-foreground">Hoje</p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -179,23 +160,27 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentAlerts.map((alert, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-lg border p-4">
-                    <div
-                      className={`mt-0.5 h-2 w-2 rounded-full ${
-                        alert.type === "warning"
-                          ? "bg-destructive"
-                          : alert.type === "success"
-                            ? "bg-accent"
-                            : "bg-primary"
-                      }`}
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
+                {dashboardData.recentAlerts.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum alerta recente</p>
+                ) : (
+                  dashboardData.recentAlerts.map((alert) => (
+                    <div key={alert.id} className="flex items-start gap-3 rounded-lg border p-4">
+                      <div
+                        className={`mt-0.5 h-2 w-2 rounded-full ${
+                          alert.type === AlertTypeEnum.Warning
+                            ? "bg-destructive"
+                            : alert.type === AlertTypeEnum.Success
+                              ? "bg-accent"
+                              : "bg-primary"
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm">{alert.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -207,29 +192,33 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {studentProgress.map((student) => (
-                  <div key={`${student.name}`} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={student.avatar || "/placeholder.svg"} alt={`${student.name}`} />
-                          <AvatarFallback>
-                            {`${student.name}`
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">{`${student.name}`}</p>
-                          <p className="text-xs text-muted-foreground">{student.goal}</p>
+                {dashboardData.studentProgress.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum progresso registrado</p>
+                ) : (
+                  dashboardData.studentProgress.map((student) => (
+                    <div key={student.studentId} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={student.studentAvatar || "/placeholder.svg"} alt={student.studentName} />
+                            <AvatarFallback>
+                              {student.studentName
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">{student.studentName}</p>
+                            <p className="text-xs text-muted-foreground">{student.goal}</p>
+                          </div>
                         </div>
+                        <span className="text-sm font-semibold">{student.progress}%</span>
                       </div>
-                      <span className="text-sm font-semibold">{student.progress}%</span>
+                      <Progress value={student.progress} />
                     </div>
-                    <Progress value={student.progress} />
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

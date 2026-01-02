@@ -1,9 +1,11 @@
-﻿using VoroFit.Infrastructure.Factories;
+﻿using Microsoft.AspNetCore.Builder;
 using VoroFit.Infrastructure.Seeds;
+using VoroFit.Infrastructure.Factories;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.API.Extensions.Configurations
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddSeedExtensions
+    public static class AddSeedExtension
     {
         public static async Task<IApplicationBuilder> UseSeedAsync(this IApplicationBuilder app)
         {

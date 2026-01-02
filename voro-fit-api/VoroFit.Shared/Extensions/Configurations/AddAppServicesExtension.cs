@@ -1,4 +1,6 @@
-﻿using VoroFit.Application.Services;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using VoroFit.Application.Services;
 using VoroFit.Application.Services.Evolution;
 using VoroFit.Application.Services.Identity;
 using VoroFit.Application.Services.Interfaces;
@@ -15,9 +17,9 @@ using VoroFit.Infrastructure.Seeds;
 using VoroFit.Infrastructure.UnitOfWork;
 using VoroFit.Shared.Utils;
 
-namespace VoroFit.API.Extensions.Configurations
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddAppServicesExtensions
+    public static class AddAppServicesExtension
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -33,8 +35,6 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IMailKitEmailService, MailKitEmailService>();
 
-            services.AddSignalR();
-
             #region Identity Repositories
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -48,20 +48,24 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<IGroupRepository, GroupRepository>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IInstanceRepository, InstanceRepository>();
-
-            services.AddScoped<IExerciseRepository, ExerciseRepository>();
-            services.AddScoped<IMealPlanRepository, MealPlanRepository>();
-            services.AddScoped<IMealPlanDayRepository, MealPlanDayRepository>();
-            services.AddScoped<IMealPlanMealRepository, MealPlanMealRepository>();
-            services.AddScoped<IMeasurementRepository, MeasurementRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
-            services.AddScoped<IWorkoutHistoryRepository, WorkoutHistoryRepository>();
+            #endregion
 
+            #region Workout Repositories
+            services.AddScoped<IExerciseRepository, ExerciseRepository>();
+            services.AddScoped<IWorkoutHistoryRepository, WorkoutHistoryRepository>();
             services.AddScoped<IWorkoutHistoryExerciseRepository, WorkoutHistoryExerciseRepository>();
             services.AddScoped<IWorkoutPlanExerciseRepository, WorkoutPlanExerciseRepository>();
             services.AddScoped<IWorkoutPlanWeekRepository, WorkoutPlanWeekRepository>();
             services.AddScoped<IWorkoutPlanDayRepository, WorkoutPlanDayRepository>();
             services.AddScoped<IWorkoutPlanRepository, WorkoutPlanRepository>();
+            #endregion
+
+            #region Nutrition Repositories
+            services.AddScoped<IMealPlanRepository, MealPlanRepository>();
+            services.AddScoped<IMealPlanDayRepository, MealPlanDayRepository>();
+            services.AddScoped<IMealPlanMealRepository, MealPlanMealRepository>();
+            services.AddScoped<IMeasurementRepository, MeasurementRepository>();
             #endregion
 
             #region Identity Services
@@ -77,20 +81,28 @@ namespace VoroFit.API.Extensions.Configurations
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IInstanceService, InstanceService>();
-
-            services.AddScoped<IExerciseService, ExerciseService>();
-            services.AddScoped<IMealPlanService, MealPlanService>();
-            services.AddScoped<IMealPlanDayService, MealPlanDayService>();
-            services.AddScoped<IMealPlanMealService, MealPlanMealService>();
-            services.AddScoped<IMeasurementService, MeasurementService>();
             services.AddScoped<IStudentService, StudentService>();
+            #endregion
+            
+            #region Workout Services
+            services.AddScoped<IExerciseService, ExerciseService>();
             services.AddScoped<IWorkoutHistoryService, WorkoutHistoryService>();
-
             services.AddScoped<IWorkoutHistoryExerciseService, WorkoutHistoryExerciseService>();
             services.AddScoped<IWorkoutPlanExerciseService, WorkoutPlanExerciseService>();
             services.AddScoped<IWorkoutPlanWeekService, WorkoutPlanWeekService>();
             services.AddScoped<IWorkoutPlanDayService, WorkoutPlanDayService>();
             services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
+            #endregion
+
+            #region Nutrition Services
+            services.AddScoped<IMealPlanService, MealPlanService>();
+            services.AddScoped<IMealPlanDayService, MealPlanDayService>();
+            services.AddScoped<IMealPlanMealService, MealPlanMealService>();
+            services.AddScoped<IMeasurementService, MeasurementService>();
+            #endregion
+
+            #region Dashboard Services
+            services.AddScoped<IDashboardService, DashboardService>();
             #endregion
 
             return services;

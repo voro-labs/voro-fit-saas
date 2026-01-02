@@ -1,10 +1,11 @@
 ﻿using VoroFit.Application.Mappings;
-using VoroFit.Application.Mappings.Evolution;
 using VoroFit.Application.Mappings.Identity;
+using VoroFit.Application.Mappings.Evolution;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.API.Extensions.Configurations
+namespace VoroFit.Shared.Extensions.Configurations
 {
-    public static class AddMappingExtensions
+    public static class AddMappingExtension
     {
         public static IServiceCollection AddAutoMapperConfig(this IServiceCollection services)
         {

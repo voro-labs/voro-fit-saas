@@ -20,6 +20,7 @@ export const API_CONFIG = {
     MESSAGE: "/message",
     CONTACT: "/contact",
     INSTANCE: "/instance",
+    DASHBOARD: "/dashboard"
   },
   HEADERS: {
     "Content-Type": "application/json",
