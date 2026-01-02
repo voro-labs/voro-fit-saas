@@ -1,10 +1,10 @@
 using Asp.Versioning;
 using Scalar.AspNetCore;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using VoroFit.API.Extensions.Configurations;
 using VoroFit.API.Filters;
 using VoroFit.API.Middlewares;
+using System.Text.Json.Serialization;
+using VoroFit.Contract.Extensions.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 

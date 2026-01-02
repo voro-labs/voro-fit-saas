@@ -3,7 +3,7 @@ using VoroFit.Infrastructure.Factories;
 using VoroFit.Domain.Entities.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.Shared.Extensions.Configurations
+namespace VoroFit.Contract.Extensions.Configurations
 {
     public static class AddIdentityExtension
     {

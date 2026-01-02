@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using VoroFit.Infrastructure.Factories;
 using VoroFit.Shared.Utils;
 
-namespace VoroFit.Shared.Extensions.Configurations
+namespace VoroFit.Contract.Extensions.Configurations
 {
     public static class AddDatabaseExtension
     {

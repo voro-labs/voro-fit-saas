@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.Shared.Extensions.Configurations
+namespace VoroFit.Contract.Extensions.Configurations
 {
     public static class AddCorsExtension
     {

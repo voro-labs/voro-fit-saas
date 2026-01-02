@@ -17,7 +17,7 @@ using VoroFit.Infrastructure.Seeds;
 using VoroFit.Infrastructure.UnitOfWork;
 using VoroFit.Shared.Utils;
 
-namespace VoroFit.Shared.Extensions.Configurations
+namespace VoroFit.Contract.Extensions.Configurations
 {
     public static class AddAppServicesExtension
     {

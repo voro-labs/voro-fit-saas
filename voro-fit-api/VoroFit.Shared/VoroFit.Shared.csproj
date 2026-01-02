@@ -10,20 +10,4 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\VoroFit.Application\VoroFit.Application.csproj" />
-    <ProjectReference Include="..\VoroFit.Domain\VoroFit.Domain.csproj" />
-    <ProjectReference Include="..\VoroFit.Infrastructure\VoroFit.Infrastructure.csproj" />
-    <ProjectReference Include="..\VoroFit.Shared\VoroFit.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

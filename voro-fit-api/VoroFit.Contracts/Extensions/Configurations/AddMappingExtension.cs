@@ -3,7 +3,7 @@ using VoroFit.Application.Mappings.Identity;
 using VoroFit.Application.Mappings.Evolution;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace VoroFit.Shared.Extensions.Configurations
+namespace VoroFit.Contract.Extensions.Configurations
 {
     public static class AddMappingExtension
     {
