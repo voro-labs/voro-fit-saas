@@ -12,8 +12,12 @@ namespace VoroFit.Application.DTOs
         public StudentDto? Student { get; set; }
 
         public ICollection<WorkoutPlanWeekDto>? Weeks { get; set; } = [];
+        public ICollection<WorkoutHistoryDto>? WorkoutHistories { get; set; } = [];
 
-        public DateTimeOffset? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

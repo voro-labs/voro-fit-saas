@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VoroFit.Application\VoroFit.Application.csproj" />
-    <ProjectReference Include="..\VoroFit.Contracts\VoroFit.Contract.csproj" />
+    <ProjectReference Include="..\VoroFit.Contract\VoroFit.Contract.csproj" />
     <ProjectReference Include="..\VoroFit.Domain\VoroFit.Domain.csproj" />
     <ProjectReference Include="..\VoroFit.Infrastructure\VoroFit.Infrastructure.csproj" />
     <ProjectReference Include="..\VoroFit.Shared\VoroFit.Shared.csproj" />

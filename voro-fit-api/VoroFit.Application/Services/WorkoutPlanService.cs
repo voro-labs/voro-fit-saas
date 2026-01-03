@@ -15,11 +15,15 @@ namespace VoroFit.Application.Services
     {
         public async Task<WorkoutPlanDto> CreateAsync(WorkoutPlanDto dto)
         {
-            var createWorkoutPlanDto = mapper.Map<WorkoutPlan>(dto);
+            var workoutPlan = mapper.Map<WorkoutPlan>(dto);
 
-            await base.AddAsync(createWorkoutPlanDto);
+            workoutPlan.StudentId = dto.StudentId!.Value;
 
-            return mapper.Map<WorkoutPlanDto>(createWorkoutPlanDto);
+            SyncWeeks(workoutPlan, dto);
+
+            await base.AddAsync(workoutPlan);
+
+            return mapper.Map<WorkoutPlanDto>(workoutPlan);
         }
 
         public Task DeleteAsync(Guid id)
@@ -85,7 +89,7 @@ namespace VoroFit.Application.Services
                 plan.Weeks,
                 dto.Weeks ?? [],
                 db => db.Id,
-                d => d.Id ?? Guid.Empty,
+                d => d.Id,
                 d =>
                 {
                     var week = new WorkoutPlanWeek
@@ -121,13 +125,14 @@ namespace VoroFit.Application.Services
                 week.Days,
                 dto.Days ?? [],
                 db => db.Id,
-                d => d.Id ?? Guid.Empty,
+                d => d.Id,
                 d => 
                 {
                     var day = new WorkoutPlanDay
                     {
                         WorkoutPlanWeekId = week.Id,
                         WorkoutPlanWeek = week,
+                        Time = d.Time!,
                         DayOfWeek = d.DayOfWeek ?? DayOfWeekEnum.Monday,
                         CreatedAt = DateTimeOffset.UtcNow
                     };
@@ -163,7 +168,7 @@ namespace VoroFit.Application.Services
                 day.Exercises,
                 dto.Exercises ?? [],
                 db => db.Id,
-                d => d.Id ?? Guid.Empty,
+                d => d.Id,
                 d =>
                 {
                     var exercise = new WorkoutPlanExercise

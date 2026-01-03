@@ -637,6 +637,7 @@ namespace VoroFit.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    Time = table.Column<string>(type: "text", nullable: false),
                     WorkoutPlanWeekId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -689,8 +690,6 @@ namespace VoroFit.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkoutPlanId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkoutPlanWeekId = table.Column<Guid>(type: "uuid", nullable: false),
                     WorkoutPlanDayId = table.Column<Guid>(type: "uuid", nullable: false),
                     ExecutionDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
@@ -698,7 +697,9 @@ namespace VoroFit.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    WorkoutPlanId = table.Column<Guid>(type: "uuid", nullable: true),
+                    WorkoutPlanWeekId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -719,14 +720,12 @@ namespace VoroFit.Infrastructure.Migrations
                         name: "FK_WorkoutHistories_WorkoutPlanWeeks_WorkoutPlanWeekId",
                         column: x => x.WorkoutPlanWeekId,
                         principalTable: "WorkoutPlanWeeks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_WorkoutHistories_WorkoutPlans_WorkoutPlanId",
                         column: x => x.WorkoutPlanId,
                         principalTable: "WorkoutPlans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

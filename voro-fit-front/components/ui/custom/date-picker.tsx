@@ -250,7 +250,7 @@ export function DatePicker({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           disabled={disabled}
         >
           <Calendar size={18} />
@@ -258,14 +258,14 @@ export function DatePicker({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-accent border border-input rounded-lg shadow-lg z-50 min-w-[320px]">
+        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-lg shadow-lg z-50 min-w-[320px]">
           <div className="p-4">
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
                 onClick={() => navigateMonth("prev")}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1 hover:bg-accent rounded-full transition-colors text-foreground"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -301,7 +301,7 @@ export function DatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth("next")}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1 hover:bg-accent rounded-full transition-colors text-foreground"
               >
                 <ChevronRight size={18} />
               </button>
@@ -310,7 +310,7 @@ export function DatePicker({
             {/* Week Days */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {weekDays.map((day) => (
-                <div key={day} className="text-xs font-medium text-white text-center py-1">
+                <div key={day} className="text-xs font-medium text-muted-foreground text-center py-1">
                   {day}
                 </div>
               ))}
@@ -321,7 +321,7 @@ export function DatePicker({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center px-4 py-3 border-t border-gray-200">
+          <div className="flex justify-between items-center px-4 py-3 border-t border-border">
             <button
               type="button"
               onClick={() => {
@@ -331,7 +331,7 @@ export function DatePicker({
                 setCurrentYear(now.getUTCFullYear())
                 setIsOpen(false)
               }}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Hoje
             </button>
@@ -343,7 +343,7 @@ export function DatePicker({
                   onChange("")
                   setIsOpen(false)
                 }}
-                className="text-sm text-white hover:text-white-700"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Limpar
               </button>
@@ -351,7 +351,7 @@ export function DatePicker({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
               >
                 OK
               </button>

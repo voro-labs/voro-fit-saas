@@ -212,20 +212,8 @@ namespace VoroFit.Infrastructure.Factories
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<WorkoutHistory>()
-                .HasOne(wh => wh.WorkoutPlan)
-                .WithMany()
-                .HasForeignKey(wh => wh.WorkoutPlanId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<WorkoutHistory>()
-                .HasOne(wh => wh.WorkoutPlanWeek)
-                .WithMany()
-                .HasForeignKey(wh => wh.WorkoutPlanWeekId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<WorkoutHistory>()
                 .HasOne(wh => wh.WorkoutPlanDay)
-                .WithMany()
+                .WithMany(wpd => wpd.WorkoutHistories)
                 .HasForeignKey(wh => wh.WorkoutPlanDayId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -247,26 +235,6 @@ namespace VoroFit.Infrastructure.Factories
                 .HasForeignKey(whe => whe.ExerciseId)
                 .OnDelete(DeleteBehavior.Restrict);
             
-            // ---------------------------
-            // SOFT DELETE GLOBAL FILTER
-            // ---------------------------
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
-                {
-                    var method = typeof(DbContext)
-                        .GetMethod(nameof(Set), Type.EmptyTypes)!
-                        .MakeGenericMethod(entityType.ClrType);
-
-                    var parameter = Expression.Parameter(entityType.ClrType, "e");
-                    var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
-                    var condition = Expression.Equal(property, Expression.Constant(false));
-                    var lambda = Expression.Lambda(condition, parameter);
-
-                    builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-                }
-            }
-
             // ---------------------------
             // IDENTITY CONFIG
             // ---------------------------

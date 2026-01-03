@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,6 +12,11 @@ import { AlertTypeEnum } from "@/types/Enums/alertTypeEnum.enum"
 
 export default function DashboardPage() {
   const { dashboardData, loading, error } = useDashboard()
+
+  const formatDate = (date?: Date) => {
+    if (!date) return "-"
+    return new Date(date).toLocaleDateString("pt-BR")
+  }
 
   if (loading && !dashboardData) {
     return (
@@ -137,7 +144,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{workout.time}</p>
-                        <p className="text-xs text-muted-foreground">{workout.date}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(workout.date)}</p>
                       </div>
                     </div>
                   ))

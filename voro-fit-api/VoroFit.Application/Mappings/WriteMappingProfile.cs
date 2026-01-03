@@ -65,7 +65,6 @@ namespace VoroFit.Application.Mappings
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.Student, o => o.Ignore())
                 .ForMember(d => d.WorkoutPlanDay, o => o.Ignore())
-                .ForMember(d => d.WorkoutPlanWeek, o => o.Ignore())
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.IsDeleted, o => o.Ignore())
                 .ForMember(d => d.DeletedAt, o => o.Ignore());

@@ -655,18 +655,14 @@ namespace VoroFit.Infrastructure.Seeds
             if (context.WorkoutHistories.Any()) return;
 
             var student = context.Students.FirstOrDefault();
-            var plan = context.WorkoutPlans.FirstOrDefault();
-            var week = context.WorkoutPlanWeeks.FirstOrDefault();
             var day = context.WorkoutPlanDays.FirstOrDefault();
 
-            if (student == null || plan == null || week == null || day == null) return;
+            if (student == null || day == null) return;
 
             var history = new WorkoutHistory
             {
                 Id = Guid.NewGuid(),
                 StudentId = student.UserExtensionId,
-                WorkoutPlanId = plan.Id,
-                WorkoutPlanWeekId = week.Id,
                 WorkoutPlanDayId = day.Id,
                 ExecutionDate = DateTime.UtcNow.AddDays(-1),
                 Status = WorkoutExecutionStatusEnum.Completed

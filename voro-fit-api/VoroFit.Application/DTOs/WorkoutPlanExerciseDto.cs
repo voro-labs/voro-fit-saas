@@ -18,5 +18,8 @@
 
         public string? Notes { get; set; }
         public string? Alternative { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

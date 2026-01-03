@@ -11,6 +11,12 @@
 
         public ICollection<WorkoutPlanDayDto>? Days { get; set; } = [];
 
-        public DateTimeOffset? CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<WorkoutHistoryDto>? WorkoutHistories { get; set; } = [];
+
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

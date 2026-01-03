@@ -5,8 +5,6 @@ import { WorkoutPlanDto } from "./workout-plan.interface"
 
 export interface WorkoutHistoryDto {
   id?: string
-  workoutPlanId?: string
-  workoutPlanWeekId?: string
   workoutPlanDayId?: string
   executionDate?: Date
   status?: "Completed" | "Partial" | "Skipped"
@@ -14,7 +12,5 @@ export interface WorkoutHistoryDto {
   notes?: string
   createdAt?: Date
   updatedAt?: Date
-  workoutPlan?: WorkoutPlanDto
-  workoutPlanWeek?: WorkoutPlanWeekDto
   workoutPlanDay?: WorkoutPlanDayDto
 }

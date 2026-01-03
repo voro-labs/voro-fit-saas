@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using VoroFit.Application.DTOs;
 using VoroFit.Application.Services.Base;

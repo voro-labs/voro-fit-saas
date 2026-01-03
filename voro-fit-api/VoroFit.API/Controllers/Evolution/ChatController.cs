@@ -12,7 +12,6 @@ using VoroFit.Application.DTOs.Evolution.Webhook;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Enums;
-using VoroFit.Shared.Extensions;
 
 namespace VoroFit.API.Controllers.Evolution
 {

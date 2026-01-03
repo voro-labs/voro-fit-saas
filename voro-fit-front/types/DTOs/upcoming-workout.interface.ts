@@ -5,5 +5,5 @@ export interface UpcomingWorkoutDto {
   studentAvatar?: string
   time: string
   workoutType: string
-  date: string
+  date: Date
 }

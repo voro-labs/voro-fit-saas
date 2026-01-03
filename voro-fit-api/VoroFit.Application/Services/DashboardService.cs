@@ -10,7 +10,12 @@ namespace VoroFit.Application.Services
     {
         public async Task<DashboardDataDto> GetAllAsync()
         {
-            var students = await studentRepository.GetAllAsync();
+            var students = await studentRepository.GetAllAsync(
+                wp => wp.Status == StudentStatusEnum.Active,
+                false,
+                wp => wp.Include(wp => wp.UserExtension)
+                    .ThenInclude(ue => ue.User)
+            );
             
             var workoutPlans = await workoutPlanRepository.GetAllAsync(
                 wp => wp.Status == WorkoutPlanStatusEnum.Active,
@@ -55,7 +60,7 @@ namespace VoroFit.Application.Services
                 .Where(wp => !wp.IsDeleted)
                 .SelectMany(wp => wp.Weeks)
                 .SelectMany(w => w.Days)
-                .Where(d => d.CreatedAt >= now)
+                .Where(d => (int)d.DayOfWeek == (int)now.DayOfWeek)
                 .Take(5)
                 .Select(d => new UpcomingWorkoutDto
                 {
@@ -63,9 +68,9 @@ namespace VoroFit.Application.Services
                     StudentId = d.WorkoutPlanWeek.WorkoutPlan.StudentId,
                     StudentName = $"{d.WorkoutPlanWeek.WorkoutPlan.Student.UserExtension.User.FirstName} {d.WorkoutPlanWeek.WorkoutPlan.Student.UserExtension.User.LastName}",
                     StudentAvatar = d.WorkoutPlanWeek.WorkoutPlan.Student.UserExtension.User.AvatarUrl,
-                    Time = d.CreatedAt,
+                    Time = d.Time,
                     WorkoutType = "Treino",
-                    Date = DateOnly.FromDateTime(d.CreatedAt.UtcDateTime)
+                    Date = now
                 })
                 .ToList();
 
@@ -77,7 +82,7 @@ namespace VoroFit.Application.Services
                     StudentName = $"{s.UserExtension.User.FirstName} {s.UserExtension.User.LastName}",
                     StudentAvatar = s.UserExtension.User.AvatarUrl,
                     Progress = 0,
-                    Goal = "Manter consistência"
+                    Goal = s.Goal
                 })
                 .ToList();
 

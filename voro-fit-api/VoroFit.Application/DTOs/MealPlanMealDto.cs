@@ -14,7 +14,10 @@ namespace VoroFit.Application.DTOs
         public Guid? MealPlanDayId { get; set; }
         public MealPlanDayDto? MealPlanDay { get; set; }
 
-        public DateTimeOffset? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

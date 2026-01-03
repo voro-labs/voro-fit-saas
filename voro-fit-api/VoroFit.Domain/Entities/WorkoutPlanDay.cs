@@ -8,6 +8,7 @@ namespace VoroFit.Domain.Entities
         public Guid Id { get; set; }
 
         public DayOfWeekEnum DayOfWeek { get; set; } = DayOfWeekEnum.Sunday; // Segunda, Terça...
+        public string Time { get; set; } = null!; // 07:00
 
         public Guid WorkoutPlanWeekId { get; set; }
         public WorkoutPlanWeek WorkoutPlanWeek { get; set; } = null!;

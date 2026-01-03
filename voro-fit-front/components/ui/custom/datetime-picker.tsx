@@ -324,7 +324,7 @@ export function DateTimePicker({
     return (
       <div className="p-4">
         <div className="text-center mb-4">
-          <h4 className="text-sm font-medium text-white mb-2">Selecionar Horário</h4>
+          <h4 className="text-sm font-medium text-foreground mb-2">Selecionar Horário</h4>
         </div>
 
         <div className="flex items-center justify-center space-x-4">
@@ -333,50 +333,50 @@ export function DateTimePicker({
             <button
               type="button"
               onClick={() => adjustTime("hour", "up")}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-accent rounded-md transition-colors text-foreground"
             >
-              <ChevronUp size={16} />
+              <ChevronUp size={18} />
             </button>
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg font-mono text-lg font-semibold">
+            <div className="w-16 h-16 flex items-center justify-center bg-primary/10 border-2 border-primary/20 rounded-lg font-mono text-2xl font-semibold text-primary">
               {selectedHour.toString().padStart(2, "0")}
             </div>
             <button
               type="button"
               onClick={() => adjustTime("hour", "down")}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-accent rounded-md transition-colors text-foreground"
             >
-              <ChevronDown size={16} />
+              <ChevronDown size={18} />
             </button>
-            <span className="text-xs text-white mt-1">Hora</span>
+            <span className="text-xs text-muted-foreground mt-2 font-medium">Hora</span>
           </div>
 
-          <div className="text-2xl font-bold text-gray-400">:</div>
+          <div className="text-3xl font-bold text-muted-foreground/50 mb-6">:</div>
 
           {/* Minute Picker */}
           <div className="flex flex-col items-center">
             <button
               type="button"
               onClick={() => adjustTime("minute", "up")}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-accent rounded-md transition-colors text-foreground"
             >
-              <ChevronUp size={16} />
+              <ChevronUp size={18} />
             </button>
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg font-mono text-lg font-semibold">
+            <div className="w-16 h-16 flex items-center justify-center bg-primary/10 border-2 border-primary/20 rounded-lg font-mono text-2xl font-semibold text-primary">
               {selectedMinute.toString().padStart(2, "0")}
             </div>
             <button
               type="button"
               onClick={() => adjustTime("minute", "down")}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-accent rounded-md transition-colors text-foreground"
             >
-              <ChevronDown size={16} />
+              <ChevronDown size={18} />
             </button>
-            <span className="text-xs text-white mt-1">Min</span>
+            <span className="text-xs text-muted-foreground mt-2 font-medium">Min</span>
           </div>
         </div>
 
         {/* Quick time buttons */}
-        <div className="mt-4 grid grid-cols-4 gap-2">
+        <div className="mt-6 grid grid-cols-4 gap-2">
           {[
             { label: "09:00", hour: 9, minute: 0 },
             { label: "12:00", hour: 12, minute: 0 },
@@ -387,7 +387,7 @@ export function DateTimePicker({
               key={time.label}
               type="button"
               onClick={() => setQuickTime(time.hour, time.minute)}
-              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
+              className="px-3 py-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground rounded-md transition-colors font-medium"
             >
               {time.label}
             </button>
@@ -406,7 +406,7 @@ export function DateTimePicker({
               key={time.label}
               type="button"
               onClick={() => setQuickTime(time.hour, time.minute)}
-              className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded transition-colors"
+              className="px-3 py-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground rounded-md transition-colors font-medium"
             >
               {time.label}
             </button>
@@ -438,7 +438,7 @@ export function DateTimePicker({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           disabled={disabled}
         >
           <Calendar size={18} />
@@ -446,16 +446,16 @@ export function DateTimePicker({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 mt-1 bg-accent border border-input rounded-lg shadow-lg z-50 min-w-[320px]">
+        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-lg shadow-lg z-50 min-w-[320px]">
           {/* Tabs */}
-          <div className="flex border-b border-input">
+          <div className="flex border-b border-border">
             <button
               type="button"
               onClick={() => setActiveTab("date")}
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === "date"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                  : "text-white hover:text-white-700"
+                  ? "text-primary border-b-2 border-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Calendar size={16} className="inline mr-2" />
@@ -466,8 +466,8 @@ export function DateTimePicker({
               onClick={() => setActiveTab("time")}
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === "time"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                  : "text-white hover:text-white-700"
+                  ? "text-primary border-b-2 border-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Clock size={16} className="inline mr-2" />
@@ -483,7 +483,7 @@ export function DateTimePicker({
                 <button
                   type="button"
                   onClick={() => navigateMonth("prev")}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-accent rounded-full transition-colors text-foreground"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -519,7 +519,7 @@ export function DateTimePicker({
                 <button
                   type="button"
                   onClick={() => navigateMonth("next")}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-accent rounded-full transition-colors text-foreground"
                 >
                   <ChevronRight size={18} />
                 </button>
@@ -528,7 +528,7 @@ export function DateTimePicker({
               {/* Week Days */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {weekDays.map((day) => (
-                  <div key={day} className="text-xs font-medium text-white text-center py-1">
+                  <div key={day} className="text-xs font-medium text-muted-foreground text-center py-1">
                     {day}
                   </div>
                 ))}
@@ -542,7 +542,7 @@ export function DateTimePicker({
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center px-4 py-3 border-t border-gray-200">
+          <div className="flex justify-between items-center px-4 py-3 border-t border-border">
             <button
               type="button"
               onClick={() => {
@@ -554,7 +554,7 @@ export function DateTimePicker({
                 setSelectedMinute(now.getMinutes())
                 setIsOpen(false)
               }}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Agora
             </button>
@@ -566,7 +566,7 @@ export function DateTimePicker({
                   onChange("")
                   setIsOpen(false)
                 }}
-                className="text-sm text-white hover:text-white-700"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Limpar
               </button>
@@ -574,7 +574,7 @@ export function DateTimePicker({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
               >
                 OK
               </button>

@@ -5,6 +5,7 @@ export interface WorkoutPlanDayDto {
   id?: string | null
   workoutPlanWeekId?: string | null
   dayOfWeek?: DayOfWeekEnum
+  time?: string
   exercises?: WorkoutPlanExerciseDto[]
   createdAt?: Date
   updatedAt?: Date

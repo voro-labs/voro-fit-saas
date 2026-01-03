@@ -43,7 +43,7 @@ export function Navbar({ isOpen, onMenuClick }: NavbarProps) {
             >
               <Menu size={20} />
             </button>
-            <span className="text-xl font-bold text-gray-900">VoroLabs</span>
+            <span className="text-xl font-bold text-gray-600">VoroLabs</span>
           </div>
         </div>
       </nav>

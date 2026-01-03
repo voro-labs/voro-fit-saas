@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Dumbbell } from "lucide-react"
+import { Calendar, Clock, Dumbbell } from "lucide-react"
 import { WorkoutExerciseBlock } from "./workout-exercise-block"
 import type { WorkoutPlanDayDto } from "@/types/DTOs/workout-plan-day.interface"
 import type { WorkoutPlanExerciseDto } from "@/types/DTOs/workout-plan-exercise.interface"
 import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
+import { TimePicker } from "./ui/custom/time-picker"
 
 interface WorkoutDayBlockProps {
   day: WorkoutPlanDayDto
@@ -68,6 +69,19 @@ export function WorkoutDayBlock({ day, onRemove, onChange }: WorkoutDayBlockProp
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Horário do Treino
+            </Label>
+            <TimePicker
+              value={day.time || ""}
+              onChange={(value) => onChange({ ...day, time: value })}
+              placeholder="hh:mm"
+              className="h-12"
+            />
+          </div>
 
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-primary">

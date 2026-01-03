@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Clock, Edit, User, Loader2 } from "lucide-react"
+import { ArrowLeft, Clock, Edit, User, Loader2, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useMealPlans } from "@/hooks/use-meal-plans.hook"
 import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
@@ -54,6 +54,11 @@ export default function MealPlanDetailPage() {
     if (!mealPlan?.days) return []
     const day = mealPlan.days.find((d) => d.dayOfWeek === dayOfWeek)
     return day?.meals?.sort((a, b) => a.order - b.order) || []
+  }
+
+  const formatDate = (date?: Date) => {
+    if (!date) return "-"
+    return new Date(date).toLocaleDateString("pt-BR")
   }
 
   if (error) {
@@ -124,10 +129,26 @@ export default function MealPlanDetailPage() {
                       </Avatar>
                       <div>
                         <p className="font-medium">{`${mealPlan?.student.userExtension?.user?.firstName}`}</p>
-                        <p className="text-sm text-muted-foreground">Plano semanal completo</p>
+                        <p className="text-sm text-muted-foreground">
+                          {mealPlan?.days?.length || 0} {mealPlan?.days?.length === 1 ? "dia" : "dias"} de
+                          alimentação
+                        </p>
                       </div>
                     </div>
                   )}
+
+                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Criado em {formatDate(mealPlan?.createdAt)}
+                    </div>
+                    {mealPlan?.updatedAt && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Atualizado {formatDate(mealPlan?.updatedAt)}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex gap-2">

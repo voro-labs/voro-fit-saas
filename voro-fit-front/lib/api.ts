@@ -11,9 +11,8 @@ export const API_CONFIG = {
     FORGOT_PASSWORD: "/auth/forgot-password",
     STUDENTS: "/students",
     EXERCISES: "/exercises",
-    WORKOUTS: "/workouts", // Mantido para compatibilidade (pode ser depreciado)
-    WORKOUT_PLANS: "/workout-plans", // Novo: planejamento de treinos
-    WORKOUT_HISTORIES: "/workout-histories", // Novo: execução de treinos
+    WORKOUT_PLANS: "/workout-plans",
+    WORKOUT_HISTORIES: "/workout-histories",
     MEAL_PLANS: "/meal-plans",
     MEASUREMENTS: "/measurements",
     CHAT: "/chat",

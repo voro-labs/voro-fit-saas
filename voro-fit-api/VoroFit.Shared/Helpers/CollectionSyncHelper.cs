@@ -2,16 +2,16 @@
 {
     public static class CollectionSyncHelper
     {
-       public static void Sync<TDb, TDto, TKey>(
-            ICollection<TDb> dbItems,
-            ICollection<TDto> dtoItems,
-            Func<TDb, TKey> dbKey,
-            Func<TDto, TKey> dtoKey,
-            Func<TDto, TDb> onCreate,
-            Action<TDb, TDto> onUpdate,
-            Action<TDb> onDelete
-        )
-            where TKey : struct
+        public static void Sync<TDb, TDto, TKey>(
+             ICollection<TDb> dbItems,
+             ICollection<TDto> dtoItems,
+             Func<TDb, TKey> dbKey,
+             Func<TDto, TKey?> dtoKey,
+             Func<TDto, TDb> onCreate,
+             Action<TDb, TDto> onUpdate,
+             Action<TDb> onDelete
+             )
+             where TKey : struct
         {
             var dtoItemsWithKey = dtoItems
                 .Where(d => !dtoKey(d).Equals(default))

@@ -15,11 +15,15 @@ namespace VoroFit.Application.Services
     {
         public async Task<MealPlanDto> CreateAsync(MealPlanDto dto)
         {
-            var createMealPlanDto = mapper.Map<MealPlan>(dto);
+            var mealPlan = mapper.Map<MealPlan>(dto);
 
-            await base.AddAsync(createMealPlanDto);
+            mealPlan.StudentId = dto.StudentId!.Value;
 
-            return mapper.Map<MealPlanDto>(createMealPlanDto);
+            SyncDays(mealPlan, dto);
+
+            await base.AddAsync(mealPlan);
+
+            return mapper.Map<MealPlanDto>(mealPlan);
         }
 
         public Task DeleteAsync(Guid id)
@@ -79,7 +83,7 @@ namespace VoroFit.Application.Services
                 plan.Days,
                 dto.Days ?? [],
                 db => db.Id,
-                d => d.Id ?? Guid.Empty,
+                d => d.Id,
                 d =>
                 {
                     var day = new MealPlanDay
@@ -114,7 +118,7 @@ namespace VoroFit.Application.Services
                 day.Meals,
                 dto.Meals ?? [],
                 db => db.Id,
-                d => d.Id ?? Guid.Empty,
+                d => d.Id,
                 d => new MealPlanMeal
                 {
                     Period = d.Period!.Value,

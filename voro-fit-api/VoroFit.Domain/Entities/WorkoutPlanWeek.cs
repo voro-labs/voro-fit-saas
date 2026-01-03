@@ -15,7 +15,7 @@ namespace VoroFit.Domain.Entities
         public ICollection<WorkoutHistory> WorkoutHistories { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public bool IsDeleted { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }

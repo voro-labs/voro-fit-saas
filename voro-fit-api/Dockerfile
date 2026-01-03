@@ -9,6 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["VoroFit.API/VoroFit.API.csproj", "VoroFit.API/"]
 COPY ["VoroFit.Application/VoroFit.Application.csproj", "VoroFit.Application/"]
+COPY ["VoroFit.Contract/VoroFit.Contract.csproj", "VoroFit.Contract/"]
 COPY ["VoroFit.Domain/VoroFit.Domain.csproj", "VoroFit.Domain/"]
 COPY ["VoroFit.Infrastructure/VoroFit.Infrastructure.csproj", "VoroFit.Infrastructure/"]
 COPY ["VoroFit.Shared/VoroFit.Shared.csproj", "VoroFit.Shared/"]

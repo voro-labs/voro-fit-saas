@@ -15,7 +15,7 @@ namespace VoroFit.Application.DTOs.Evolution.API.Request
 
         public void SetWebhookUrl(EvolutionUtil evolutionUtil)
         {
-            this.Webhook.Url = evolutionUtil.BaseUrl;
+            this.Webhook.Url = evolutionUtil.BaseWebhookUrl;
         }
     }
 

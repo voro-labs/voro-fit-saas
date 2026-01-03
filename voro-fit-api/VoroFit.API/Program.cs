@@ -18,16 +18,16 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
-            .AddDatabase(builder.Configuration)
-            .AddCustomIdentity()
-            .AddJwtAuthentication(builder.Configuration)
-            .AddMemoryCache()
-            .AddLogging()
-            .AddHttpContextAccessor()
-            .AddHttpClient()
-            .AddAutoMapperConfig()
-            .AddApplicationServices(builder.Configuration)
-            .AddCustomCors(builder.Configuration);
+    .AddDatabase(builder.Configuration)
+    .AddCustomIdentity()
+    .AddJwtAuthentication(builder.Configuration)
+    .AddMemoryCache()
+    .AddLogging()
+    .AddHttpContextAccessor()
+    .AddHttpClient()
+    .AddAutoMapperConfig()
+    .AddApplicationServices(builder.Configuration)
+    .AddCustomCors(builder.Configuration);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

@@ -12,12 +12,6 @@ namespace VoroFit.Domain.Entities
         public Student Student { get; set; } = null!;
 
         // vínculo com o planejamento
-        public Guid WorkoutPlanId { get; set; }
-        public WorkoutPlan WorkoutPlan { get; set; } = null!;
-
-        public Guid WorkoutPlanWeekId { get; set; }
-        public WorkoutPlanWeek WorkoutPlanWeek { get; set; } = null!;
-
         public Guid WorkoutPlanDayId { get; set; }
         public WorkoutPlanDay WorkoutPlanDay { get; set; } = null!;
 

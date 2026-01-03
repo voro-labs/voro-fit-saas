@@ -12,8 +12,8 @@ using VoroFit.Infrastructure.Factories;
 namespace VoroFit.Infrastructure.Migrations
 {
     [DbContext(typeof(JasmimDbContext))]
-    [Migration("20251231194218_UpdateWorkout")]
-    partial class UpdateWorkout
+    [Migration("20260102213710_UpdateExercise")]
+    partial class UpdateExercise
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -939,19 +939,10 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<Guid>("WorkoutPlanDayId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("WorkoutPlanDayId1")
+                    b.Property<Guid?>("WorkoutPlanId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("WorkoutPlanId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("WorkoutPlanId1")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("WorkoutPlanWeekId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("WorkoutPlanWeekId1")
+                    b.Property<Guid?>("WorkoutPlanWeekId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -960,15 +951,9 @@ namespace VoroFit.Infrastructure.Migrations
 
                     b.HasIndex("WorkoutPlanDayId");
 
-                    b.HasIndex("WorkoutPlanDayId1");
-
                     b.HasIndex("WorkoutPlanId");
 
-                    b.HasIndex("WorkoutPlanId1");
-
                     b.HasIndex("WorkoutPlanWeekId");
-
-                    b.HasIndex("WorkoutPlanWeekId1");
 
                     b.ToTable("WorkoutHistories");
                 });
@@ -1076,6 +1061,10 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Time")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1152,7 +1141,7 @@ namespace VoroFit.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
+                    b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("WeekNumber")
@@ -1437,42 +1426,22 @@ namespace VoroFit.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", "WorkoutPlanDay")
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanDayId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanDay", null)
                         .WithMany("WorkoutHistories")
-                        .HasForeignKey("WorkoutPlanDayId1");
-
-                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", "WorkoutPlan")
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanId")
+                        .HasForeignKey("WorkoutPlanDayId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VoroFit.Domain.Entities.WorkoutPlan", null)
                         .WithMany("WorkoutHistories")
-                        .HasForeignKey("WorkoutPlanId1");
-
-                    b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", "WorkoutPlanWeek")
-                        .WithMany()
-                        .HasForeignKey("WorkoutPlanWeekId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("WorkoutPlanId");
 
                     b.HasOne("VoroFit.Domain.Entities.WorkoutPlanWeek", null)
                         .WithMany("WorkoutHistories")
-                        .HasForeignKey("WorkoutPlanWeekId1");
+                        .HasForeignKey("WorkoutPlanWeekId");
 
                     b.Navigation("Student");
 
-                    b.Navigation("WorkoutPlan");
-
                     b.Navigation("WorkoutPlanDay");
-
-                    b.Navigation("WorkoutPlanWeek");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.WorkoutHistoryExercise", b =>
