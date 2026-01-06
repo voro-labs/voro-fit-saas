@@ -1,5 +1,6 @@
 import type { DayOfWeekEnum } from "../Enums/dayOfWeekEnum.enum"
 import type { WorkoutPlanExerciseDto } from "./workout-plan-exercise.interface"
+import { WorkoutPlanWeekDto } from "./workout-plan-week.interface"
 
 export interface WorkoutPlanDayDto {
   id?: string | null
@@ -9,4 +10,5 @@ export interface WorkoutPlanDayDto {
   exercises?: WorkoutPlanExerciseDto[]
   createdAt?: Date
   updatedAt?: Date
+  workoutPlanWeek?: WorkoutPlanWeekDto
 }

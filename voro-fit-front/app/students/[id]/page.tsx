@@ -323,7 +323,7 @@ export default function StudentDetailPage() {
                       {student?.workoutHistories.map((workout) => (
                         <div key={workout.id} className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-1">
-                            <p className="font-medium">{getWeek(workout.workoutPlanWeek?.weekNumber)} · {getDayOfWeek(workout.workoutPlanDay?.dayOfWeek)}</p>
+                            <p className="font-medium">{getWeek(workout.workoutPlanDay?.workoutPlanWeek?.weekNumber)} · {getDayOfWeek(workout.workoutPlanDay?.dayOfWeek)}</p>
                             <p className="text-sm text-muted-foreground">{formatDate(workout.createdAt)}</p>
                           </div>
                           <div className="text-right">

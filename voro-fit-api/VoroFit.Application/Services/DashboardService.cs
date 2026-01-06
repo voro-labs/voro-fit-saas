@@ -60,7 +60,10 @@ namespace VoroFit.Application.Services
                 .Where(wp => !wp.IsDeleted)
                 .SelectMany(wp => wp.Weeks)
                 .SelectMany(w => w.Days)
-                .Where(d => (int)d.DayOfWeek == (int)now.DayOfWeek)
+                .Where(d => 
+                    (int)d.DayOfWeek == (int)now.DayOfWeek &&
+                    TimeSpan.Parse(d.Time) >= now.TimeOfDay
+                )
                 .Take(5)
                 .Select(d => new UpcomingWorkoutDto
                 {

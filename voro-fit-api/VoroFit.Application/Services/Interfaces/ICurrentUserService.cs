@@ -4,6 +4,8 @@
     {
         Guid? UserId { get; }
         string? Email { get; }
+
+        bool IsTrainer { get; }
         bool IsAuthenticated { get; }
     }
 }

@@ -16,12 +16,12 @@ import {
 import { toTitleCase } from "@/lib/utils"
 
 const navItems = [
-  { title: "Dashboard", href: "/", icon: LayoutDashboard },
-  { title: "Alunos", href: "/students", icon: Users },
-  { title: "Exercícios", href: "/exercises", icon: Dumbbell },
-  { title: "Treinos", href: "/workouts", icon: ClipboardList },
-  { title: "Nutrição", href: "/nutrition", icon: Apple },
-  { title: "Instâncias", href: "/instances", icon: Smartphone }
+  { title: "Dashboard", href: "/", icon: LayoutDashboard, roles: ["Admin", "Trainer", "Student"] },
+  { title: "Alunos", href: "/students", icon: Users, roles: ["Admin", "Trainer"] },
+  { title: "Exercícios", href: "/exercises", icon: Dumbbell, roles: ["Admin", "Trainer"] },
+  { title: "Treinos", href: "/workouts", icon: ClipboardList, roles: ["Admin", "Trainer", "Student"] },
+  { title: "Nutrição", href: "/nutrition", icon: Apple, roles: ["Admin", "Trainer", "Student"] },
+  { title: "Instâncias", href: "/instances", icon: Smartphone, roles: ["Admin", "Trainer"] }
 ]
 
 interface SidebarProps {
@@ -92,6 +92,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav className="p-4 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon
+
+            if (!item.roles.includes((user?.roles?.map((r) => r.name) ?? [])[0]))
+              return null;
 
             return (
               <Link

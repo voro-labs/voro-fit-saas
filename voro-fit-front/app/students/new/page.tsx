@@ -21,6 +21,7 @@ import {
   Weight,
   Target,
   FileText,
+  Info,
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -31,6 +32,7 @@ import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
 import { useAuth } from "@/contexts/auth.context"
 import { StudentDto } from "@/types/DTOs/student.interface"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -43,7 +45,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 export default function NewStudentPage() {
   const router = useRouter()
-  const { user: Trainer } = useAuth()
+  const { user: trainer } = useAuth()
   const { createStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -93,7 +95,7 @@ export default function NewStudentPage() {
           avatarUrl: avatarBase64
         }
       },
-      trainerId: `${Trainer?.userId}`,
+      trainerId: `${trainer?.userId}`,
       height: formData.height ? Number(formData.height) : undefined,
       weight: formData.weight ? Number(formData.weight) : undefined,
       goal: formData.goal || undefined,
@@ -225,6 +227,16 @@ export default function NewStudentPage() {
                       <Label htmlFor="phone" className="text-base flex items-center gap-2">
                         <Phone className="h-4 w-4" />
                         Telefone
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </Label>
                       <PhoneInput
                         id="phone"

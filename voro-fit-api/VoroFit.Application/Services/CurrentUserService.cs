@@ -22,6 +22,9 @@ namespace VoroFit.Application.Services
         public string? Email =>
             _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
 
+        public bool IsTrainer =>
+            _httpContextAccessor.HttpContext?.User?.IsInRole("Trainer") ?? false;
+
         public bool IsAuthenticated =>
             _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
     }

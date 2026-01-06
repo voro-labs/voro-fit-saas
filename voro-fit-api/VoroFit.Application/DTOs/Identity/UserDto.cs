@@ -14,6 +14,7 @@
         
         public DateTimeOffset? BirthDate { get; set; }
 
+        public UserExtensionDto? UserExtension { get; set; }
         public ICollection<UserRoleDto>? UserRoles { get; set; }
     }
 }

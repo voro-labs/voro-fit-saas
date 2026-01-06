@@ -271,6 +271,30 @@ namespace VoroFit.Infrastructure.Seeds
 
                 context.Users.Add(trainer);
 
+                var trainerTwo = new User
+                {
+                    UserName = "vladimir.treinador",
+                    NormalizedUserName = "vladimir.treinador".ToUpper(),
+                    Email = "vladimir@vorolabs.app",
+                    NormalizedEmail = "vladimir@vorolabs.app".ToUpper(),
+                    FirstName = "Vladimir",
+                    LastName = "Treinador",
+                    CountryCode = "+55",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    BirthDate = DateTime.UtcNow,
+                    SecurityStamp = "f6f17455-fa0a-495a-8bfa-53967ee65099",
+                    UserRoles = [
+                        new UserRole()
+                        {
+                            Role = trainerRole
+                        }
+                    ],
+                    UserExtension = new UserExtension()
+                };
+
+                context.Users.Add(trainerTwo);
+
                 var studentRole = context.Roles.FirstOrDefault(r => r.Name == "Student");
 
                 var student = new User

@@ -7,6 +7,7 @@ using VoroFit.Application.DTOs;
 using VoroFit.Application.DTOs.Identity;
 using AutoMapper;
 using VoroFit.Shared.Constants;
+using VoroFit.Domain.Entities;
 
 namespace VoroFit.Application.Services.Identity
 {
@@ -30,29 +31,30 @@ namespace VoroFit.Application.Services.Identity
             return (user, rolesNames);
         }
 
+        public async Task<User> CreateAsync(StudentDto dto, string password, ICollection<string> roles)
+        {
+            var user = mapper.Map<User>(dto);
+
+            user.CreatedAt = DateTimeOffset.UtcNow;
+            user.IsActive = true;
+
+            return await AddAsync(user, password, roles);
+        }
+
         public async Task<User> CreateAsync(UserDto dto, string password, ICollection<string> roles)
         {
-            var user = new User
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                FirstName = $"{dto.FirstName}",
-                LastName = $"{dto.LastName}",
-                BirthDate = dto.BirthDate,
-                CreatedAt = DateTimeOffset.UtcNow,
-                IsActive = true,
-                CountryCode = dto.CountryCode,
-                NormalizedEmail = $"{dto.Email}".ToUpper(),
-                NormalizedUserName = $"{dto.Email}".ToUpper(),
-                AvatarUrl = dto.AvatarUrl,
-                PhoneNumber = dto.PhoneNumber,
-                UserExtension = new()
-                {
-                    Student = roles.Any(r => r == RoleConstant.Student) ? new() : null
-                }
-            };
+            var user = mapper.Map<User>(dto);
 
-            mapper.Map(dto, user);
+            user.CreatedAt = DateTimeOffset.UtcNow;
+            user.IsActive = true;
+
+            if (roles.Any(r => r == RoleConstant.Student))
+            {
+                user.UserExtension = new UserExtension
+                {
+                    Student = new Student()
+                };
+            }
 
             return await AddAsync(user, password, roles);
         }

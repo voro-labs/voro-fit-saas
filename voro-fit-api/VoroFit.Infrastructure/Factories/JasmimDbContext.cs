@@ -6,12 +6,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using VoroFit.Domain.Interfaces.Entities;
 using System.Linq.Expressions;
+using VoroFit.Application.Services.Interfaces;
 
 namespace VoroFit.Infrastructure.Factories
 {
-    public class JasmimDbContext(DbContextOptions<JasmimDbContext> options) : IdentityDbContext<User, Role, Guid,
-        IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options)
+    public class JasmimDbContext : IdentityDbContext<User, Role, Guid,
+        IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
+        private readonly ICurrentUserService _currentUser;
+
+        public JasmimDbContext(
+            DbContextOptions<JasmimDbContext> options,
+            ICurrentUserService currentUser
+        ) : base(options)
+        {
+            _currentUser = currentUser;
+        }
+
+        public Guid? CurrentUserId => _currentUser.UserId;
+        public bool IsTrainer => _currentUser.IsTrainer;
 
         // Expor explicitamente a entidade de junção
         //public DbSet<Exemplo> Exemplo { get; set; }
@@ -71,6 +85,11 @@ namespace VoroFit.Infrastructure.Factories
             // ---------------------------
             // STUDENT
             // ---------------------------
+            builder.Entity<Student>()
+            .HasQueryFilter(s =>
+                !IsTrainer || s.TrainerId == CurrentUserId
+            );
+
             builder.Entity<Student>()
                 .HasKey(s => s.UserExtensionId);
 

@@ -9,6 +9,7 @@ using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Identity;
 using VoroFit.Shared.Constants;
 using VoroFit.Shared.Helpers;
+using VoroFit.Domain.Entities;
 
 namespace VoroFit.API.Controllers
 {
@@ -71,29 +72,12 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var userDto = new UserDto
-                {
-                    Email = $"{model.UserExtension?.User?.Email}",
-                    FirstName = model.UserExtension?.User?.FirstName ?? string.Empty,
-                    LastName = model.UserExtension?.User?.LastName ?? string.Empty,
-                    AvatarUrl = model.UserExtension?.User?.AvatarUrl ?? string.Empty,
-                    CountryCode = model.UserExtension?.User?.CountryCode ?? string.Empty,
-                    PhoneNumber = model.UserExtension?.User?.PhoneNumber ?? string.Empty
-                };
-
                 var user = await userService
-                    .CreateAsync(userDto, RandomTextHelper.GenerateRandomText, [RoleConstant.Student]) 
+                    .CreateAsync(model, RandomTextHelper.GenerateRandomText, [RoleConstant.Student]) 
                         ?? throw new KeyNotFoundException("User não encontrado.");
 
-                model.UserExtensionId = user.Id;
-                model.UserExtension = null;
-
-                var updated = await studentService.UpdateAsync(user.Id, model);
-
-                await studentService.SaveChangesAsync();
-
                 return ResponseViewModel<StudentDto>
-                    .SuccessWithMessage("Aluno criado com sucesso.", updated)
+                    .SuccessWithMessage("Aluno criado com sucesso.", model)
                     .ToActionResult();
             }
             catch (Exception ex)
@@ -175,7 +159,7 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var measurement = await studentService.AddMeasurementAsync(id, model);
+                var measurement = await studentService.AddMeasurementAsync  (id, model);
 
                 return ResponseViewModel<MeasurementDto>
                     .Success(measurement)

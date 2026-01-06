@@ -9,7 +9,7 @@ namespace VoroFit.Application.DTOs
         // Dados principais
         public string? Name { get; set; }
         public string? MuscleGroup { get; set; }
-        public ExerciseTypeEnum? Type { get; set; }
+        public ExerciseTypeEnum? Type { get; set; } = ExerciseTypeEnum.Custom;
 
         public string? Thumbnail { get; set; }
 

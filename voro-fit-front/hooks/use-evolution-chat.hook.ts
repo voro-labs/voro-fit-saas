@@ -16,8 +16,6 @@ export function useEvolutionChat(instanceId: string) {
   // 🔹 Buscar contatos
   const fetchContacts = useCallback(async () => {
     if (!instanceId) return
-
-    setLoading(true)
     setError(null)
 
     try {
@@ -30,8 +28,6 @@ export function useEvolutionChat(instanceId: string) {
       setContacts(response.data ?? [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido")
-    } finally {
-      setLoading(false)
     }
   }, [instanceId])
 
@@ -400,9 +396,10 @@ export function useEvolutionChat(instanceId: string) {
     if (!selectedContactId || !instanceId) return
     const interval = setInterval(() => {
       fetchMessages(selectedContactId)
+      fetchContacts()
     }, 5000)
     return () => clearInterval(interval)
-  }, [selectedContactId, fetchMessages, instanceId])
+  }, [selectedContactId, fetchMessages, fetchContacts, instanceId])
 
   // 🔹 Buscar contatos e conversas ao iniciar
   useEffect(() => {

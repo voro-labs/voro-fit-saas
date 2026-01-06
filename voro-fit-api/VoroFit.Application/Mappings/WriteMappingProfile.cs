@@ -1,6 +1,7 @@
 using AutoMapper;
 using VoroFit.Application.DTOs;
 using VoroFit.Domain.Entities;
+using VoroFit.Domain.Entities.Identity;
 
 namespace VoroFit.Application.Mappings
 {
@@ -8,11 +9,34 @@ namespace VoroFit.Application.Mappings
     {
         public WriteMappingProfile()
         {
-            CreateMap<UserExtensionDto, UserExtension>()
-                .ForMember(d => d.UserId, o => o.Ignore());
+            CreateMap<StudentDto, User>()
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.UserExtension!.User!.Email))
+                .ForMember(d => d.Email, o => o.MapFrom(s => s.UserExtension!.User!.Email))
+                .ForMember(d => d.FirstName, o => o.MapFrom(s => s.UserExtension!.User!.FirstName))
+                .ForMember(d => d.LastName, o => o.MapFrom(s => s.UserExtension!.User!.LastName))
+                .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserExtension!.User!.AvatarUrl))
+                .ForMember(d => d.CountryCode, o => o.MapFrom(s => s.UserExtension!.User!.CountryCode))
+                .ForMember(d => d.PhoneNumber, o => o.MapFrom(s => s.UserExtension!.User!.PhoneNumber))
+                .ForMember(d => d.NormalizedEmail, o => o.MapFrom(s => s.UserExtension!.User!.Email!.ToUpper()))
+                .ForMember(d => d.NormalizedUserName, o => o.MapFrom(s => s.UserExtension!.User!.Email!.ToUpper()))
+                .ForMember(d => d.PasswordHash, o => o.Ignore())
+                .ForMember(d => d.SecurityStamp, o => o.Ignore())
+                .ForMember(d => d.ConcurrencyStamp, o => o.Ignore())
+                .ForMember(d => d.UserRoles, o => o.Ignore())
+                .ForMember(d => d.UserExtension, o => o.MapFrom(s => s))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.IsActive, o => o.Ignore());
+
+            CreateMap<StudentDto, UserExtension>()
+                .ForMember(d => d.UserId, o => o.Ignore())
+                .ForMember(d => d.Student, o => o.MapFrom(s => s));
 
             CreateMap<StudentDto, Student>()
                 .ForMember(d => d.UserExtensionId, o => o.Ignore());
+
+            CreateMap<UserExtensionDto, UserExtension>()
+                .ForMember(d => d.UserId, o => o.Ignore());
 
             CreateMap<MeasurementDto, Measurement>()
                 .ForMember(d => d.Id, o => o.Ignore())
