@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VoroFit.Shared.Extensions;
 using VoroFit.Shared.ViewModels;
 using VoroFit.Application.DTOs;
@@ -9,7 +8,6 @@ using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Identity;
 using VoroFit.Shared.Constants;
 using VoroFit.Shared.Helpers;
-using VoroFit.Domain.Entities;
 
 namespace VoroFit.API.Controllers
 {

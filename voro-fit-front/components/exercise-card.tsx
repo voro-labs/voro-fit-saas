@@ -1,8 +1,12 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Eye, Globe, User } from "lucide-react"
-import Link from "next/link"
+import { Eye, Globe, User, ImageIcon } from "lucide-react"
 
 interface ExerciseCardProps {
   id: string
@@ -12,26 +16,35 @@ interface ExerciseCardProps {
   thumbnail?: string
 }
 
-export function ExerciseCard({ id, name, muscleGroup, type, thumbnail }: ExerciseCardProps) {
+export function ExerciseCard({
+  id,
+  name,
+  muscleGroup,
+  type,
+  thumbnail,
+}: ExerciseCardProps) {
+  const [imgSrc, setImgSrc] = useState(thumbnail)
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <div className="aspect-video bg-muted relative overflow-hidden">
-        {thumbnail ? (
-          <img src={thumbnail || "/placeholder.svg"} alt={name} className="w-full h-full object-cover" />
+    <Card className="overflow-hidden transition-all hover:shadow-md">
+      {/* Thumbnail */}
+      <div className="relative aspect-video bg-muted overflow-hidden">
+        {imgSrc ? (
+          <Image
+            src={imgSrc}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+            onError={() => setImgSrc(undefined)}
+          />
         ) : (
-          <div className="flex items-center justify-center w-full h-full">
-            <div className="text-muted-foreground">
-              <svg className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+            <ImageIcon className="h-14 w-14" />
           </div>
         )}
+
+        {/* Badge */}
         <div className="absolute top-2 right-2">
           <Badge variant="secondary" className="flex items-center gap-1">
             {type === "public" ? (
@@ -49,16 +62,21 @@ export function ExerciseCard({ id, name, muscleGroup, type, thumbnail }: Exercis
         </div>
       </div>
 
+      {/* Content */}
       <CardContent className="p-4">
-        <h3 className="font-semibold text-balance line-clamp-1">{name}</h3>
-        <p className="text-sm text-muted-foreground mt-1">{muscleGroup}</p>
+        <h3 className="font-semibold leading-tight line-clamp-1">{name}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{muscleGroup}</p>
       </CardContent>
 
+      {/* Footer */}
       <CardFooter className="p-4 pt-0">
-        <Button asChild variant="outline" size="sm" className="w-full bg-transparent">
-          <Link href={`/exercises/${id}`}>
-            <Eye className="h-4 w-4 mr-2" />
-            Ver Detalhes
+        <Button asChild variant="outline" size="sm" className="w-full">
+          <Link
+            href={`/exercises/${id}`}
+            className="flex items-center justify-center gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            Ver detalhes
           </Link>
         </Button>
       </CardFooter>

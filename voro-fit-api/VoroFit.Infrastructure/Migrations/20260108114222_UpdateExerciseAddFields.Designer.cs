@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VoroFit.Infrastructure.Factories;
@@ -11,9 +12,11 @@ using VoroFit.Infrastructure.Factories;
 namespace VoroFit.Infrastructure.Migrations
 {
     [DbContext(typeof(JasmimDbContext))]
-    partial class JasmimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108114222_UpdateExerciseAddFields")]
+    partial class UpdateExerciseAddFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -488,9 +491,11 @@ namespace VoroFit.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Media")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("MediaUrl")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("MuscleGroup")
@@ -511,9 +516,6 @@ namespace VoroFit.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("TrainerId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
@@ -523,8 +525,6 @@ namespace VoroFit.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StudentUserExtensionId");
-
-                    b.HasIndex("TrainerId");
 
                     b.ToTable("Exercises");
                 });
@@ -1331,13 +1331,6 @@ namespace VoroFit.Infrastructure.Migrations
                     b.HasOne("VoroFit.Domain.Entities.Student", null)
                         .WithMany("FavoriteExercises")
                         .HasForeignKey("StudentUserExtensionId");
-
-                    b.HasOne("VoroFit.Domain.Entities.UserExtension", "Trainer")
-                        .WithMany("Exercises")
-                        .HasForeignKey("TrainerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Trainer");
                 });
 
             modelBuilder.Entity("VoroFit.Domain.Entities.Identity.UserRole", b =>
@@ -1612,8 +1605,6 @@ namespace VoroFit.Infrastructure.Migrations
 
             modelBuilder.Entity("VoroFit.Domain.Entities.UserExtension", b =>
                 {
-                    b.Navigation("Exercises");
-
                     b.Navigation("Instances");
 
                     b.Navigation("Student");

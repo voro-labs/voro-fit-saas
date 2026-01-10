@@ -5,13 +5,14 @@ import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Edit, Globe, User, Loader2 } from "lucide-react"
+import { ArrowLeft, Edit, Globe, User, ImageIcon, Video } from "lucide-react"
 import Link from "next/link"
 import { useExercises } from "@/hooks/use-exercises.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
-import { ExerciseDto } from "@/types/DTOs/exercise.interface"
+import type { ExerciseDto } from "@/types/DTOs/exercise.interface"
 import { ExerciseTypeEnum } from "@/types/Enums/exerciseTypeEnum.enum"
 import { Loading } from "@/components/ui/custom/loading/loading"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function ExerciseDetailPage() {
   const params = useParams()
@@ -25,6 +26,20 @@ export default function ExerciseDetailPage() {
       })
     }
   }, [params.id, fetchExerciseById])
+
+  const getMediaType = (url?: string, base64?: string): "video" | "image" | null => {
+    const source = url || base64
+    if (!source) return null
+
+    if (source.includes(".mp4") || source.includes("video") || source.startsWith("data:video")) {
+      return "video"
+    }
+    return "image"
+  }
+
+  const hasThumbnail = exercise?.thumbnail
+  const hasMedia = exercise?.mediaUrl || exercise?.media
+  const mediaType = getMediaType(exercise?.mediaUrl, exercise?.media)
 
   if (error) {
     return (
@@ -95,20 +110,86 @@ export default function ExerciseDetailPage() {
               )}
             </div>
 
-            {/* Media */}
-            {(exercise?.thumbnailUrl || exercise?.videoUrl) && (
+            {(hasThumbnail || hasMedia) && (
               <Card className="overflow-hidden">
-                <div className="aspect-video bg-muted">
-                  {exercise?.videoUrl ? (
-                    <video src={exercise?.videoUrl} controls className="w-full h-full object-cover" />
-                  ) : (
+                {hasThumbnail && hasMedia ? (
+                  // Both thumbnail and media available - show tabs
+                  <Tabs defaultValue="media" className="w-full">
+                    <CardHeader className="pb-3">
+                      <TabsList className="grid w-full max-w-md grid-cols-2">
+                        <TabsTrigger value="media" className="flex items-center gap-2">
+                          {mediaType === "video" ? (
+                            <>
+                              <Video className="h-4 w-4" />
+                              Demonstração
+                            </>
+                          ) : (
+                            <>
+                              <ImageIcon className="h-4 w-4" />
+                              Demonstração
+                            </>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="thumbnail" className="flex items-center gap-2">
+                          <ImageIcon className="h-4 w-4" />
+                          Thumbnail
+                        </TabsTrigger>
+                      </TabsList>
+                    </CardHeader>
+                    <TabsContent value="media" className="mt-0">
+                      <div className="aspect-video bg-muted">
+                        {mediaType === "video" ? (
+                          <video
+                            src={exercise?.mediaUrl || exercise?.media}
+                            controls
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <img
+                            src={exercise?.mediaUrl || exercise?.media || "/placeholder.svg"}
+                            alt={`${exercise?.name} - Demonstração`}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="thumbnail" className="mt-0">
+                      <div className="aspect-video bg-muted">
+                        <img
+                          src={exercise?.thumbnail || exercise?.thumbnail || "/placeholder.svg"}
+                          alt={`${exercise?.name} - Thumbnail`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                ) : hasMedia ? (
+                  // Only media available
+                  <div className="aspect-video bg-muted">
+                    {mediaType === "video" ? (
+                      <video
+                        src={exercise?.mediaUrl || exercise?.media}
+                        controls
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={exercise?.mediaUrl || exercise?.media || "/placeholder.svg"}
+                        alt={exercise?.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  // Only thumbnail available
+                  <div className="aspect-video bg-muted">
                     <img
-                      src={exercise?.thumbnailUrl || "/placeholder.svg"}
+                      src={exercise?.thumbnail || exercise?.thumbnail || "/placeholder.svg"}
                       alt={exercise?.name}
                       className="w-full h-full object-cover"
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </Card>
             )}
 

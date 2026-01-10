@@ -8,42 +8,103 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Video, Loader2, Dumbbell, FileText, Lightbulb } from "lucide-react"
+import { ArrowLeft, Video, Loader2, Dumbbell, FileText, Lightbulb, ImageIcon, Link2 } from "lucide-react"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useExercises } from "@/hooks/use-exercises.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
+import { ExerciseTypeEnum } from "@/types/Enums/exerciseTypeEnum.enum"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type { ExerciseDto } from "@/types/DTOs/exercise.interface"
+import { useAuth } from "@/contexts/auth.context"
 
 export default function NewExercisePage() {
   const router = useRouter()
+  const { user: trainer } = useAuth()
   const { createExercise, loading, error } = useExercises()
-  const [mediaPreview, setMediaPreview] = useState<string>("")
-  const [mediaFile, setMediaFile] = useState<File | null>(null)
-  const [muscleGroup, setMuscleGroup] = useState("")
 
-  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [notes, setNotes] = useState("")
+  const [alternatives, setAlternatives] = useState("")
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>("")
+  const [thumbnailBase64, setThumbnailBase64] = useState<string>("")
+  const [mediaUrl, setMediaUrl] = useState<string>("")
+  const [mediaPreview, setMediaPreview] = useState<string>("")
+  const [mediaBase64, setMediaBase64] = useState<string>("")
+  const [activeMediaTab, setActiveMediaTab] = useState<string>("url")
+
+  const [muscleGroup, setMuscleGroup] = useState("")
+  const [exerciseType, setExerciseType] = useState<string>(ExerciseTypeEnum.Custom.toString())
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setMediaFile(file)
+      // Validate file type
+      if (!file.type.match(/image\/(jpg|jpeg|png)/)) {
+        alert("Por favor, selecione apenas imagens JPG ou PNG para thumbnail")
+        return
+      }
+
       const reader = new FileReader()
       reader.onloadend = () => {
-        setMediaPreview(reader.result as string)
+        const base64String = reader.result as string
+        setThumbnailBase64(base64String)
+        setThumbnailPreview(base64String)
       }
       reader.readAsDataURL(file)
     }
   }
 
+  const handleMediaFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      const validTypes = ["image/gif", "image/jpeg", "image/jpg", "image/png", "video/mp4"]
+      if (!validTypes.includes(file.type)) {
+        alert("Por favor, selecione apenas GIF, JPG, PNG ou MP4")
+        return
+      }
+
+      setMediaUrl("")
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setMediaBase64(base64String)
+        setMediaPreview(base64String)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleMediaUrlChange = (url: string) => {
+    setMediaBase64("")
+    setMediaUrl(url)
+    // Basic URL validation and preview
+    if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+      setMediaPreview(url)
+    } else {
+      setMediaPreview("")
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
 
-    formData.set("muscleGroup", muscleGroup)
-
-    if (mediaFile) {
-      formData.append("media", mediaFile)
+    const exerciseData: ExerciseDto = {
+      name,
+      description,
+      muscleGroup,
+      type: Number.parseInt(exerciseType) as ExerciseTypeEnum,
+      notes,
+      alternatives,
+      thumbnail: thumbnailBase64 || undefined,
+      mediaUrl: mediaUrl || undefined,
+      media: mediaBase64 || undefined,
+      trainerId: `${trainer?.userId}`
     }
 
-    const result = await createExercise(formData)
+    const result = await createExercise(exerciseData)
     if (result) {
       router.push("/exercises")
     }
@@ -102,7 +163,27 @@ export default function NewExercisePage() {
                       placeholder="Ex: Supino Inclinado com Halteres"
                       required
                       className="h-12 text-base"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="type" className="text-base">
+                      Tipo do Exercício *
+                    </Label>
+                    <Select value={exerciseType} onValueChange={setExerciseType} required>
+                      <SelectTrigger className="w-full text-base">
+                        <SelectValue placeholder="Selecione o tipo do exercício" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={ExerciseTypeEnum.Public.toString()}>Público</SelectItem>
+                        <SelectItem value={ExerciseTypeEnum.Custom.toString()}>Personalizado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Exercícios públicos são visíveis para todos os treinadores, enquanto personalizados são privados
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -138,49 +219,151 @@ export default function NewExercisePage() {
                       rows={4}
                       required
                       className="resize-none text-base"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                     />
                   </div>
                 </div>
 
-                {/* Media Upload Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                    <ImageIcon className="h-4 w-4" />
+                    <span>Thumbnail (Imagem de Capa)</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Imagem de capa do exercício (JPG ou PNG) - máximo 1 arquivo
+                  </div>
+
+                  {thumbnailPreview && (
+                    <div className="rounded-xl border-2 border-border overflow-hidden shadow-md animate-in fade-in zoom-in-95">
+                      <img
+                        src={thumbnailPreview || "/placeholder.svg"}
+                        alt="Thumbnail Preview"
+                        className="w-full aspect-video object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <Label htmlFor="thumbnail" className="cursor-pointer block">
+                    <div className="flex items-center gap-4 rounded-xl border-2 border-dashed border-border p-6 hover:border-primary hover:bg-primary/5 transition-all duration-200">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
+                        <ImageIcon className="h-7 w-7 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">Clique para fazer upload de thumbnail</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">JPG ou PNG até 10MB</p>
+                      </div>
+                    </div>
+                  </Label>
+                  <Input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/jpg,image/jpeg,image/png"
+                    className="sr-only"
+                    onChange={handleThumbnailChange}
+                  />
+                </div>
+
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                     <Video className="h-4 w-4" />
                     <span>Mídia de Demonstração</span>
                   </div>
+                  <div className="text-sm text-muted-foreground">
+                    Escolha entre link externo ou upload de arquivo - máximo 1 mídia por exercício
+                  </div>
 
-                  {mediaPreview && (
-                    <div className="rounded-xl border-2 border-border overflow-hidden shadow-md animate-in fade-in zoom-in-95">
-                      {mediaPreview.startsWith("data:image") ? (
-                        <img
-                          src={mediaPreview || "/placeholder.svg"}
-                          alt="Preview"
-                          className="w-full aspect-video object-cover"
+                  <Tabs value={activeMediaTab} onValueChange={setActiveMediaTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="url" className="gap-2">
+                        <Link2 className="h-4 w-4" />
+                        Link
+                      </TabsTrigger>
+                      <TabsTrigger value="upload" className="gap-2">
+                        <Video className="h-4 w-4" />
+                        Upload
+                      </TabsTrigger>
+                    </TabsList>
+
+                    {/* Media URL Tab */}
+                    <TabsContent value="url" className="space-y-4">
+                      <div className="text-sm text-muted-foreground">
+                        Adicione um link para um arquivo de mídia (GIF, JPG, PNG ou MP4)
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="mediaUrl" className="text-base">
+                          URL da Mídia
+                        </Label>
+                        <Input
+                          id="mediaUrl"
+                          type="url"
+                          placeholder="https://exemplo.com/video.mp4"
+                          className="h-12 text-base"
+                          value={mediaUrl}
+                          onChange={(e) => handleMediaUrlChange(e.target.value)}
                         />
-                      ) : (
-                        <video src={mediaPreview} controls className="w-full aspect-video bg-muted" />
-                      )}
-                    </div>
-                  )}
+                      </div>
 
-                  <Label htmlFor="media" className="cursor-pointer block">
-                    <div className="flex items-center gap-4 rounded-xl border-2 border-dashed border-border p-6 hover:border-primary hover:bg-primary/5 transition-all duration-200">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                        <Video className="h-7 w-7 text-primary" />
+                      {mediaPreview && mediaUrl && (
+                        <div className="rounded-xl border-2 border-border overflow-hidden shadow-md animate-in fade-in zoom-in-95">
+                          {mediaUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                            <img
+                              src={mediaPreview || "/placeholder.svg"}
+                              alt="Media Preview"
+                              className="w-full aspect-video object-cover"
+                            />
+                          ) : mediaUrl.match(/\.(mp4|mov)$/i) ? (
+                            <video src={mediaPreview} controls className="w-full aspect-video bg-muted" />
+                          ) : (
+                            <div className="w-full aspect-video bg-muted flex items-center justify-center">
+                              <p className="text-muted-foreground">Preview não disponível</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    {/* Media Upload Tab */}
+                    <TabsContent value="upload" className="space-y-4">
+                      <div className="text-sm text-muted-foreground">
+                        Faça upload de um arquivo de mídia (GIF, JPG, PNG ou MP4) que será convertido para base64
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">Clique para fazer upload de vídeo ou imagem</p>
-                        <p className="text-sm text-muted-foreground mt-0.5">MP4, MOV, JPG, PNG até 50MB</p>
-                      </div>
-                    </div>
-                  </Label>
-                  <Input
-                    id="media"
-                    type="file"
-                    accept="video/*,image/*"
-                    className="sr-only"
-                    onChange={handleMediaChange}
-                  />
+
+                      {mediaPreview && mediaBase64 && (
+                        <div className="rounded-xl border-2 border-border overflow-hidden shadow-md animate-in fade-in zoom-in-95">
+                          {mediaBase64.startsWith("data:image") ? (
+                            <img
+                              src={mediaPreview || "/placeholder.svg"}
+                              alt="Media Preview"
+                              className="w-full aspect-video object-cover"
+                            />
+                          ) : (
+                            <video src={mediaPreview} controls className="w-full aspect-video bg-muted" />
+                          )}
+                        </div>
+                      )}
+
+                      <Label htmlFor="media" className="cursor-pointer block">
+                        <div className="flex items-center gap-4 rounded-xl border-2 border-dashed border-border p-6 hover:border-primary hover:bg-primary/5 transition-all duration-200">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
+                            <Video className="h-7 w-7 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">Clique para fazer upload de mídia</p>
+                            <p className="text-sm text-muted-foreground mt-0.5">GIF, JPG, PNG ou MP4 até 50MB</p>
+                          </div>
+                        </div>
+                      </Label>
+                      <Input
+                        id="media"
+                        type="file"
+                        accept="image/gif,image/jpg,image/jpeg,image/png,video/mp4"
+                        className="sr-only"
+                        onChange={handleMediaFileChange}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </div>
 
                 {/* Additional Information Section */}
@@ -200,6 +383,8 @@ export default function NewExercisePage() {
                       placeholder="Dicas de execução, cuidados, postura..."
                       rows={3}
                       className="resize-none text-base"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
                     />
                   </div>
 
@@ -213,6 +398,8 @@ export default function NewExercisePage() {
                       placeholder="Variações do exercício, alternativas com outros equipamentos..."
                       rows={3}
                       className="resize-none text-base"
+                      value={alternatives}
+                      onChange={(e) => setAlternatives(e.target.value)}
                     />
                   </div>
                 </div>

@@ -48,14 +48,17 @@ export function useExercises() {
     }
   }, [])
 
-  const createExercise = useCallback(async (data: FormData): Promise<ExerciseDto | null> => {
+  const createExercise = useCallback(async (data: ExerciseDto): Promise<ExerciseDto | null> => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await secureApiCall<ExerciseDto>(API_CONFIG.ENDPOINTS.EXERCISES, {
         method: "POST",
-        body: data,
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
 
       if (response.hasError) throw new Error(response.message ?? "Erro ao criar exercício")
@@ -73,14 +76,17 @@ export function useExercises() {
     }
   }, [])
 
-  const updateExercise = useCallback(async (id: string, data: FormData): Promise<ExerciseDto | null> => {
+  const updateExercise = useCallback(async (id: string, data: ExerciseDto): Promise<ExerciseDto | null> => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await secureApiCall<ExerciseDto>(`${API_CONFIG.ENDPOINTS.EXERCISES}/${id}`, {
         method: "PUT",
-        body: data,
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
 
       if (response.hasError) throw new Error(response.message ?? "Erro ao atualizar exercício")

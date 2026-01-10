@@ -362,6 +362,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Supino Reto",
                         MuscleGroup = "Peito",
                         Type = ExerciseTypeEnum.Public,
@@ -373,6 +374,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Supino Inclinado",
                         MuscleGroup = "Peito",
                         Type = ExerciseTypeEnum.Public,
@@ -383,6 +385,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Crucifixo com Halteres",
                         MuscleGroup = "Peito",
                         Type = ExerciseTypeEnum.Public,
@@ -396,6 +399,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Barra Fixa",
                         MuscleGroup = "Costas",
                         Type = ExerciseTypeEnum.Public,
@@ -406,6 +410,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Puxada Frontal",
                         MuscleGroup = "Costas",
                         Type = ExerciseTypeEnum.Public,
@@ -415,6 +420,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Remada Curvada",
                         MuscleGroup = "Costas",
                         Type = ExerciseTypeEnum.Public,
@@ -428,6 +434,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Agachamento Livre",
                         MuscleGroup = "Pernas",
                         Type = ExerciseTypeEnum.Public,
@@ -438,6 +445,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Leg Press",
                         MuscleGroup = "Pernas",
                         Type = ExerciseTypeEnum.Public,
@@ -447,6 +455,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Cadeira Extensora",
                         MuscleGroup = "Pernas",
                         Type = ExerciseTypeEnum.Public,
@@ -460,6 +469,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Rosca Direta",
                         MuscleGroup = "Bíceps",
                         Type = ExerciseTypeEnum.Public,
@@ -469,6 +479,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Rosca Alternada",
                         MuscleGroup = "Bíceps",
                         Type = ExerciseTypeEnum.Public,
@@ -481,6 +492,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Tríceps Corda",
                         MuscleGroup = "Tríceps",
                         Type = ExerciseTypeEnum.Public,
@@ -489,6 +501,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Tríceps Testa",
                         MuscleGroup = "Tríceps",
                         Type = ExerciseTypeEnum.Public,
@@ -501,6 +514,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Desenvolvimento com Halteres",
                         MuscleGroup = "Ombros",
                         Type = ExerciseTypeEnum.Public,
@@ -509,6 +523,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Elevação Lateral",
                         MuscleGroup = "Ombros",
                         Type = ExerciseTypeEnum.Public,
@@ -521,6 +536,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Abdominal Supra",
                         MuscleGroup = "Abdômen",
                         Type = ExerciseTypeEnum.Public,
@@ -529,6 +545,7 @@ namespace VoroFit.Infrastructure.Seeds
                     new()
                     {
                         Id = Guid.NewGuid(),
+                        TrainerId = null,
                         Name = "Prancha Isométrica",
                         MuscleGroup = "Abdômen",
                         Type = ExerciseTypeEnum.Public,

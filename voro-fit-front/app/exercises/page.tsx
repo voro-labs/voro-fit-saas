@@ -24,9 +24,9 @@ export default function ExercisesPage() {
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
-      const matchesSearch = !search.trim() || exercise.name.toLowerCase().includes(search.toLowerCase())
+      const matchesSearch = !search.trim() || exercise.name?.toLowerCase().includes(search.toLowerCase())
       const matchesMuscleGroup =
-        muscleGroupFilter === "all" || exercise.muscleGroup.toLowerCase() === muscleGroupFilter.toLowerCase()
+        muscleGroupFilter === "all" || exercise.muscleGroup?.toLowerCase() === muscleGroupFilter.toLowerCase()
       const matchesType =
         typeFilter === "all" ||
         (typeFilter === "public" && exercise.type === ExerciseTypeEnum.Public) ||
@@ -71,7 +71,7 @@ export default function ExercisesPage() {
               <SelectContent>
                 <SelectItem value="all">Todos os grupos</SelectItem>
                 {muscleGroups.map((group) => (
-                  <SelectItem key={group} value={group.toLowerCase()}>
+                  <SelectItem key={group} value={`${group}`.toLowerCase()}>
                     {group}
                   </SelectItem>
                 ))}
@@ -121,11 +121,11 @@ export default function ExercisesPage() {
               {filteredExercises.map((exercise) => (
                 <ExerciseCard
                   key={exercise.id}
-                  id={exercise.id}
-                  name={exercise.name}
-                  muscleGroup={exercise.muscleGroup}
+                  id={`${exercise.id}`}
+                  name={`${exercise.name}`}
+                  muscleGroup={`${exercise.muscleGroup}`}
                   type={exercise.type === ExerciseTypeEnum.Public ? "public" : "custom"}
-                  thumbnail={exercise.thumbnailUrl}
+                  thumbnail={exercise.thumbnail}
                 />
               ))}
             </div>

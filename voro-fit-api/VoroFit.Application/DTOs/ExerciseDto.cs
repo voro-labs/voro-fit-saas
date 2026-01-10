@@ -6,27 +6,29 @@ namespace VoroFit.Application.DTOs
     {
         public Guid? Id { get; set; }
 
-        // Dados principais
+        public Guid? TrainerId { get; set; }
+        public UserExtensionDto? Trainer { get; set; }
+
         public string? Name { get; set; }
         public string? MuscleGroup { get; set; }
-        public ExerciseTypeEnum? Type { get; set; } = ExerciseTypeEnum.Custom;
+        public ExerciseTypeEnum? Type { get; set; }
 
         public string? Thumbnail { get; set; }
+        
+        public string? MediaUrl { get; set; }
+        public string? Media { get; set; }
 
-        // Conteúdo educacional
         public string? Description { get; set; }
         public string? Notes { get; set; }
         public string? Alternatives { get; set; }
 
-        // Relacionamentos
         public ICollection<WorkoutPlanExerciseDto>? WorkoutPlanExercises { get; set; } = [];
         public ICollection<WorkoutHistoryExerciseDto>? WorkoutHistoryExercises { get; set; } = [];
 
-        // Auditoria
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTimeOffset? UpdatedAt { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool? IsDeleted { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }
     }
 }

@@ -158,7 +158,21 @@ namespace VoroFit.Infrastructure.Factories
             // EXERCISE
             // ---------------------------
             builder.Entity<Exercise>()
+                .HasQueryFilter(e =>
+                    e.TrainerId == null ||
+                    (IsTrainer && e.TrainerId == CurrentUserId)
+                );
+
+            builder.Entity<Exercise>()
                 .HasKey(e => e.Id);
+
+            builder.Entity<Exercise>(entity =>
+            {
+                entity.HasOne(e => e.Trainer)
+                    .WithMany(t => t.Exercises)
+                    .HasForeignKey(e => e.TrainerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             // ---------------------------
             // WORKOUT PLAN

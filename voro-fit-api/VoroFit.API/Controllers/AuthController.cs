@@ -4,7 +4,6 @@ using VoroFit.Application.DTOs;
 using VoroFit.Application.Services.Interfaces;
 using VoroFit.Shared.Constants;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VoroFit.API.Controllers

@@ -58,11 +58,10 @@ namespace VoroFit.API.Controllers
         }
 
         // ----------------------------------------------------
-        // POST /exercises (FormData)
+        // POST /exercises
         // ----------------------------------------------------
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Create([FromForm] ExerciseDto model)
+        public async Task<IActionResult> Create([FromBody] ExerciseDto model)
         {
             try
             {
@@ -83,11 +82,10 @@ namespace VoroFit.API.Controllers
         }
 
         // ----------------------------------------------------
-        // PUT /exercises/{id} (FormData)
+        // PUT /exercises/{id}
         // ----------------------------------------------------
         [HttpPut("{id:guid}")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] ExerciseDto model)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ExerciseDto model)
         {
             try
             {

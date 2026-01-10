@@ -12,5 +12,6 @@ namespace VoroFit.Domain.Entities
 
         public Student? Student { get; set; }
         public ICollection<Instance> Instances { get; set; } = [];
+        public ICollection<Exercise> Exercises { get; set; } = [];
     }
 }
