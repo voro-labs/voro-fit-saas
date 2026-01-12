@@ -4,6 +4,7 @@ using VoroFit.Application.DTOs.Evolution;
 using VoroFit.Application.Services.Base;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Entities.Evolution;
+using VoroFit.Domain.Entities.Identity;
 using VoroFit.Domain.Interfaces.Repositories.Evolution;
 
 namespace VoroFit.Application.Services.Evolution
@@ -20,7 +21,7 @@ namespace VoroFit.Application.Services.Evolution
         }
 
         // Cria ou retorna um Contact já existente
-        public async Task<ContactIdentifier> GetOrCreateAsync(string pushName, string remoteJid, string? remoteJidAlt, string? profilePicture)
+        public async Task<ContactIdentifier> GetOrCreateAsync(string pushName, string remoteJid, string? remoteJidAlt, string? profilePicture, User? user = null)
         {
             Contact? contact = null;
 
@@ -61,8 +62,14 @@ namespace VoroFit.Application.Services.Evolution
                 DisplayName = pushName,
                 RemoteJid = remoteJid,
                 ProfilePictureUrl = profilePicture,
-                Number = ExtractNumber(remoteJid, remoteJidAlt)
+                Number = ExtractNumber(remoteJid, remoteJidAlt),
             };
+
+            if (user != null)
+                contact.UserExtensionId = user.Id;
+
+            if (string.IsNullOrEmpty(contact.Number))
+                throw new Exception("Número não encontrado na mensagem!");
 
             await contactRepository.AddAsync(contact);
 

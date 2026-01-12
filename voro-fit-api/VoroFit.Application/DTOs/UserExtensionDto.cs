@@ -8,7 +8,9 @@ namespace VoroFit.Application.DTOs
         public Guid? UserId { get; set; }
         public UserDto? User { get; set; } = null!;
 
+        public ContactDto? Contact { get; set; }
         public StudentDto? Student { get; set; }
         public ICollection<InstanceDto>? Instances { get; set; } = [];
+        public ICollection<ExerciseDto> Exercises { get; set; } = [];
     }
 }

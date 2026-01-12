@@ -42,6 +42,8 @@ namespace VoroFit.Application.Services
             var student = await base.Query()
                 .Include(s => s.UserExtension)
                     .ThenInclude(s => s.User)
+                .Include(s => s.UserExtension)
+                    .ThenInclude(s => s.Contact)
                 .Include(s => s.WorkoutHistories)
                     .ThenInclude(wh => wh.WorkoutPlanDay)
                 .Include(s => s.FavoriteExercises)

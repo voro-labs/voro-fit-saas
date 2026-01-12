@@ -22,7 +22,10 @@ export default function SignInPage() {
   })
 
   const [showPassword, setShowPassword] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<SignInDto>({})
+  const [fieldErrors, setFieldErrors] = useState<SignInDto>({
+    email: "",
+    password: ""
+  })
 
   // Redirecionar se já estiver logado
   useEffect(() => {
@@ -32,7 +35,10 @@ export default function SignInPage() {
   }, [user, router])
 
   const validateForm = (): boolean => {
-    const errors: SignInDto = {}
+    const errors: SignInDto = {
+      email: "",
+      password: ""
+    }
 
     if (!formData.email) {
       errors.email = "email é obrigatório"

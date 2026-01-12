@@ -24,10 +24,10 @@ export default function MessagesPage({ params }: MessagesPageProps) {
   const router = useRouter()
 
   const {
-    contacts,
+    chats,
     messages,
-    selectedContactId,
-    setSelectedContactId,
+    selectedChatId,
+    setSelectedChatId,
     fetchMessages,
     sendMessage,
     sendAttachment,
@@ -35,8 +35,8 @@ export default function MessagesPage({ params }: MessagesPageProps) {
     forwardMessage,
     sendQuotedMessage,
     sendReactionMessage,
-    saveContact,
-    updateContact,
+    saveChat,
+    updateChat,
     loading,
     error,
     setError,
@@ -45,7 +45,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [messageToForward, setMessageToForward] = useState<MessageDto | null>(null)
 
-  const selectedMessages = selectedContactId ? messages[selectedContactId] || [] : []
+  const selectedMessages = selectedChatId ? messages[selectedChatId] || [] : []
 
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
@@ -68,50 +68,50 @@ export default function MessagesPage({ params }: MessagesPageProps) {
           <div className="flex flex-1">
             {/* Lista de conversas */}
             <ConversationList
-              contacts={contacts}
-              selectedId={selectedContactId}
+              chats={chats}
+              selectedId={selectedChatId}
               onSelect={(id) => {
                 fetchMessages(id)
-                setSelectedContactId(id)
+                setSelectedChatId(id)
               }}
-              onAddContact={(name, phoneNumber) => {
-                saveContact(name, phoneNumber)
+              onAddChat={(name, remoteJid) => {
+                saveChat(name, remoteJid)
               }}
             />
 
             <div className="h-screen w-full">
               {/* Área do chat */}
               <ChatArea
-                contact={contacts.find((c) => c.id === selectedContactId)}
+                chat={chats.find((c) => c.id === selectedChatId)}
                 messages={selectedMessages}
-                onSendMessage={(text, quotedMessage) => {
-                  if (!selectedContactId) return
+                onSendMessage={(text: any, quotedMessage: any) => {
+                  if (!selectedChatId) return
 
                   if (quotedMessage) {
-                    sendQuotedMessage(selectedContactId, quotedMessage, text)
+                    sendQuotedMessage(selectedChatId, quotedMessage, text)
                     return
                   }
 
-                  sendMessage(selectedContactId, text)
+                  sendMessage(selectedChatId, text)
                 }}
-                onSendAttachment={(file) => {
-                  if (!selectedContactId) return
-                  sendAttachment(selectedContactId, file)
+                onSendAttachment={(file: any) => {
+                  if (!selectedChatId) return
+                  sendAttachment(selectedChatId, file)
                 }}
-                onReact={(message, emoji) => {
-                  if (!selectedContactId) return
-                  sendReactionMessage(selectedContactId, message, emoji)
+                onReact={(message: any, emoji: any) => {
+                  if (!selectedChatId) return
+                  sendReactionMessage(selectedChatId, message, emoji)
                 }}
-                onForward={(message) => {
+                onForward={(message: any) => {
                   setDialogOpen(true)
                   setMessageToForward(message)
                 }}
-                onDelete={(message) => {
-                  if (!selectedContactId) return
-                  deleteMessage(selectedContactId, message)
+                onDelete={(message: any) => {
+                  if (!selectedChatId) return
+                  deleteMessage(selectedChatId, message)
                 }}
-                onEditContact={(contactId, name, phoneNumber, profilePicture) => {
-                  updateContact(contactId, name, phoneNumber, profilePicture)
+                onEditChat={(chatId: any, name: any, remoteJid: any, profilePicture: any) => {
+                  updateChat(chatId, name, remoteJid, profilePicture)
                 }}
               />
             </div>
@@ -121,39 +121,37 @@ export default function MessagesPage({ params }: MessagesPageProps) {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Selecionar Contato</DialogTitle>
-              <DialogDescription>Escolha o contato para encaminhar a mensagem.</DialogDescription>
+              <DialogTitle>Selecionar Chat</DialogTitle>
+              <DialogDescription>Escolha o chat para encaminhar a mensagem.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="flex flex-col items-center gap-4">
-                {contacts.map((conversation) => (
+                {chats.map((chat) => (
                   <button
-                    key={conversation.id}
+                    key={chat.id}
                     onClick={() => {
-                      if (!conversation.id) return
-                      forwardMessage(conversation.id, messageToForward)
+                      if (!chat.id) return
+                      forwardMessage(chat.id, messageToForward)
                       setMessageToForward(null)
                       setDialogOpen(false)
                     }}
                     className={cn(
                       "w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-colors border-b border-border rounded-lg",
-                      selectedContactId === conversation.id && "bg-muted",
+                      selectedChatId === chat.id && "bg-muted",
                     )}
                   >
                     <div className="relative">
                       <Avatar className="h-12 w-12">
                         <AvatarImage
-                          src={conversation.profilePictureUrl || "/placeholder.svg"}
-                          alt={conversation.displayName || conversation.number}
+                          src={chat.contact?.profilePictureUrl || "/placeholder.svg"}
+                          alt={chat.contact?.displayName || chat.remoteJid}
                         />
-                        <AvatarFallback>
-                          {`${conversation.displayName || conversation.number}`.charAt(0)}
-                        </AvatarFallback>
+                        <AvatarFallback>{`${chat.contact?.displayName || chat.remoteJid}`.charAt(0)}</AvatarFallback>
                       </Avatar>
                     </div>
                     <div className="flex-1 min-w-0 text-left">
                       <div className="flex items-baseline justify-between mb-1">
-                        <p className="font-medium truncate">{conversation.displayName || conversation.number}</p>
+                        <p className="font-medium truncate">{chat.contact?.displayName || chat.remoteJid}</p>
                       </div>
                     </div>
                   </button>

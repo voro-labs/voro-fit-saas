@@ -9,11 +9,12 @@ namespace VoroFit.Application.Mappings
         public GeneralMappingProfile()
         {
             CreateMap<Chat, ChatDto>().ReverseMap();
-            CreateMap<Contact, ContactDto>()
-                .ForMember(
-                    dest => dest.LastMessage,
-                    opt => opt.MapFrom(src => src.LastMessage)
-                ).ReverseMap();
+            // CreateMap<Contact, ContactDto>()
+            //     .ForMember(
+            //         dest => dest.LastMessage,
+            //         opt => opt.MapFrom(src => src.LastMessage)
+            //     ).ReverseMap();
+            CreateMap<Contact, ContactDto>().ReverseMap();
             CreateMap<ContactIdentifierDto, ContactIdentifier>()
                 .ForPath(dest => dest.Contact.RemoteJid, opt => opt.MapFrom(src => src.RemoteJidAlt))
                 .ForMember(dest => dest.Jid, opt => opt.MapFrom(src => src.RemoteJid))

@@ -52,14 +52,14 @@ namespace VoroFit.Application.Services.Evolution
             {
                 Id = response.Instance?.InstanceId ?? Guid.NewGuid(),
                 Name = $"{response.Instance?.InstanceName}",
+                UserExtensionId = currentUserService.UserId ?? Guid.Empty,
                 InstanceExtension = new() 
                 {
                     PhoneNumber = $"{phoneNumber}",
                     Hash = $"{response.Hash}",
                     Status = InstanceStatusEnum.Unspecified,
                     Base64 = $"{response.Qrcode?.Base64}",
-                    Integration = $"{response.Instance?.Integration}",
-                    UserExtensionId = currentUserService.UserId ?? Guid.Empty
+                    Integration = $"{response.Instance?.Integration}"
                 }
             };
 

@@ -10,11 +10,6 @@
 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
-        public string LastMessage { get; set; } = string.Empty;
-        public bool LastMessageFromMe { get; set; }
-        public DateTimeOffset LastMessageAt { get; set; } = DateTimeOffset.UtcNow;
-
         public ICollection<GroupMember> Members { get; set; } = [];
-        public ICollection<Message> Messages { get; set; } = [];
     }
 }

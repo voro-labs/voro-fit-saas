@@ -1,4 +1,6 @@
-﻿namespace VoroFit.Domain.Entities.Evolution
+﻿using VoroFit.Domain.Enums;
+
+namespace VoroFit.Domain.Entities.Evolution
 {
     public class Contact
     {
@@ -13,18 +15,14 @@
         public string? ProfilePictureUrl { get; set; }
 
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
-        
-        public string LastMessage { get; set; } = string.Empty;
-        public bool LastMessageFromMe { get; set; }
-        public DateTimeOffset LastMessageAt { get; set; } = DateTimeOffset.UtcNow;
 
         public string? LastKnownPresence { get; set; }
         public DateTimeOffset LastPresenceAt { get; set; } = DateTimeOffset.UtcNow;
 
-        public ICollection<Chat> Chats { get; set; } = [];
-        public ICollection<ContactIdentifier> Identifiers { get; set; } = [];
+        public Guid? UserExtensionId { get; set; }
+        public UserExtension? UserExtension { get; set; }
 
-        public ICollection<Message> Messages { get; set; } = [];
+        public ICollection<ContactIdentifier> Identifiers { get; set; } = [];
         public ICollection<GroupMember> GroupMemberships { get; set; } = [];
     }
 }

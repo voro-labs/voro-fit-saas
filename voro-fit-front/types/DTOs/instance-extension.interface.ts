@@ -1,17 +1,13 @@
 import { InstanceStatusEnum } from "../Enums/instanceStatusEnum.enum"
-import { InstanceDto } from "./instance.interface"
-import { ChatDto } from "./chat.interface"
+import type { ChatDto } from "./chat.interface"
 
 export interface InstanceExtensionDto {
-  instanceId: string
-  instance: InstanceDto
-  base64?: string
-  hash?: string
-  integration?: string
+  id?: string
   phoneNumber?: string
+  profileName?: string
+  profilePictureUrl?: string
   status?: InstanceStatusEnum
-  createdAt?: string
-  updatedAt?: string
+  base64?: string
   connectedAt?: string
-  chats: ChatDto[]
+  chats?: ChatDto[]
 }

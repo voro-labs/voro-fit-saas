@@ -70,17 +70,17 @@ export default function InstancesPage() {
     if (!instance) return
 
     if (!instance.instanceExtension?.base64) {
-      refreshQrCode(instance.name)
+      refreshQrCode(`${instance.name}`)
     }
 
-    getStatus(instance.name)
+    getStatus(`${instance.name}`)
 
     if (statusIntervalRef.current) {
       clearInterval(statusIntervalRef.current)
     }
 
     statusIntervalRef.current = setInterval(() => {
-      getStatus(instance.name).then((updatedInstance) => {
+      getStatus(`${instance.name}`).then((updatedInstance) => {
         if (updatedInstance?.instanceExtension?.status === InstanceStatusEnum.Connected) {
           setQrDialogOpen(false)
           if (statusIntervalRef.current) {
@@ -150,7 +150,7 @@ export default function InstancesPage() {
 
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button disabled={instances.length > 0}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nova Instância
               </Button>
@@ -267,7 +267,7 @@ export default function InstancesPage() {
                         size="sm"
                         className="flex-1 bg-transparent"
                         onClick={() => {
-                          setSelectedInstanceId(instance.id)
+                          setSelectedInstanceId(`${instance.id}`)
                           setQrDialogOpen(true)
                         }}
                       >
@@ -293,7 +293,7 @@ export default function InstancesPage() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => deleteInstance(instance.name)}
+                            onClick={() => deleteInstance(`${instance.name}`)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
                             Excluir
@@ -348,7 +348,7 @@ export default function InstancesPage() {
             <DialogFooter className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => selectedInstance && refreshQrCode(selectedInstance.name)}
+                onClick={() => selectedInstance && refreshQrCode(`${selectedInstance.name}`)}
                 disabled={loading}
               >
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />

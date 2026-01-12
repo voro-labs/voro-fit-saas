@@ -142,7 +142,7 @@ export function MessageContent({ message, isFromMe }: MessageContentProps) {
       {message.quotedMessage && (
         <div className={`mb-2 pl-3 border-l-2 ${isFromMe ? 'border-primary-foreground/50' : 'border-primary/50'} py-1`}>
           <p className={`text-xs font-medium ${isFromMe ? 'text-primary-foreground/80' : 'text-primary'}`}>
-            {message.quotedMessage.isFromMe ? "Você" : message.quotedMessage.contact?.displayName || "Contato"}
+            {message.quotedMessage.isFromMe ? "Você" : message.quotedMessage.chat?.contact?.displayName || "Contato"}
           </p>
           <p className={`text-xs ${isFromMe ? 'text-primary-foreground/60' : 'text-muted-foreground'} truncate`}>
             {message.quotedMessage.content}

@@ -11,6 +11,7 @@ using VoroFit.Application.DTOs.Evolution.API.Response;
 using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Enums;
 using VoroFit.Shared.Utils;
+using VoroFit.Application.Services.Interfaces;
 
 namespace VoroFit.API.Controllers.Evolution
 {
@@ -18,7 +19,7 @@ namespace VoroFit.API.Controllers.Evolution
     [Tags("Evolution")]
     [ApiController]
     [Authorize]
-    public class InstanceController(IMapper mapper, IInstanceService instanceService,
+    public class InstanceController(IMapper mapper, ICurrentUserService currentUserService, IInstanceService instanceService,
         IEvolutionService evolutionService, IOptions<EvolutionUtil> evolutionUtil) : ControllerBase
     {
 
@@ -28,7 +29,8 @@ namespace VoroFit.API.Controllers.Evolution
         {
             try
             {
-                var instances = await instanceService.Query()
+                var instances = await instanceService.Query(i => i.InstanceExtension != null &&
+                        i.UserExtensionId == currentUserService.UserId)
                     .Include(i => i.InstanceExtension).ToListAsync();
 
                 var instancesDto = mapper.Map<IEnumerable<InstanceDto>>(instances);

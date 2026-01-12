@@ -14,7 +14,7 @@ namespace VoroFit.API.Controllers.Evolution
     [Tags("Evolution")]
     [ApiController]
     [AllowAnonymous]
-    public class WebhookController(IChatService chatService, IGroupService groupService,
+    public class WebhookController(IChatService chatService,
         IContactService contactService, IContactIdentifierService contactIdentifierService,
         IMessageService messageService, IConversationService conversationService) : ControllerBase
     {
@@ -134,7 +134,6 @@ namespace VoroFit.API.Controllers.Evolution
             // JID final que representa o usuário
             var normalizedJid = remoteJid;
 
-
             // -------- VALIDAR MENSAGEM ---------
             string? fileUrl = string.Empty;
             string? content = string.Empty;
@@ -155,6 +154,8 @@ namespace VoroFit.API.Controllers.Evolution
             byte[]? thumbnail = [];
 
             var lastMessage = "";
+
+            content = data.Message?.Conversation ?? string.Empty;
 
             if (messageType == MessageTypeEnum.Image)
             {
@@ -192,8 +193,6 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 lastMessage = content;
             }
-
-            content = data.Message?.Conversation ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(base64) && string.IsNullOrWhiteSpace(content))
                 return NoContent();
@@ -257,8 +256,6 @@ namespace VoroFit.API.Controllers.Evolution
                         Type = messageType,
                         FileUrl = fileUrl,
                         ChatId = chat.Id,
-                        ContactId = senderContact?.Id,
-                        GroupId = group?.Id,
                         MimeType = mimeType,
                         FileLength = fileLength,
                         Width = width,
@@ -301,28 +298,17 @@ namespace VoroFit.API.Controllers.Evolution
                 await messageService.SaveChangesAsync();
             }
 
-            if (senderContact != null && senderContact.Id != Guid.Empty)
+            if (!string.IsNullOrEmpty(lastMessage))
             {
-                senderContact.LastMessage = lastMessage;
+                chat.LastMessage = lastMessage;
 
-                senderContact.LastMessageFromMe = fromMe;
+                chat.LastMessageStatus = fromMe ? MessageStatusEnum.Sent : MessageStatusEnum.Delivered;
 
-                senderContact.LastMessageAt = DateTimeOffset.UtcNow;
+                chat.LastMessageFromMe = fromMe;
 
-                contactService.Update(senderContact);
+                chat.LastMessageAt = DateTimeOffset.UtcNow;
             }
-
-            if (group != null)
-            {
-                group.LastMessage = lastMessage;
-                
-                group.LastMessageFromMe = fromMe;
-
-                group.LastMessageAt = DateTimeOffset.UtcNow;
-                
-                groupService.Update(group);
-            }
-            
+ 
             chatService.Update(chat);
 
             await contactService.SaveChangesAsync();
@@ -335,7 +321,10 @@ namespace VoroFit.API.Controllers.Evolution
         {
             var data = eventDto.Data;
 
-            var message = await messageService.Query(m => m.ExternalId == data.KeyId).FirstOrDefaultAsync();
+            var message = await messageService
+                .Query(m => m.ExternalId == data.KeyId)
+                .Include(m => m.Chat)
+                .FirstOrDefaultAsync();
 
             if (message == null)
                 return NotFound(new { success = false, message = "Mensagem não encontrada." });
@@ -352,6 +341,9 @@ namespace VoroFit.API.Controllers.Evolution
             };
 
             message.Status = messageStatus;
+
+            if (message.Chat != null && message.Content.Equals(message.Chat.LastMessage, StringComparison.CurrentCultureIgnoreCase))
+                message.Chat.LastMessageStatus = messageStatus;
 
             messageService.Update(message);
 

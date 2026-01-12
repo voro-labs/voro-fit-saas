@@ -20,9 +20,6 @@ namespace VoroFit.Domain.Entities.Evolution
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? ConnectedAt { get; set; }
         
-        public Guid UserExtensionId { get; set; }
-        public UserExtension UserExtension { get; set; } = null!;
-        
         public ICollection<Chat> Chats { get; set; } = [];
     }
 }

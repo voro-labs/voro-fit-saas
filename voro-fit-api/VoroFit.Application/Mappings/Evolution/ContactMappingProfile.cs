@@ -24,10 +24,6 @@ namespace VoroFit.Application.Mappings
             // profilePicUrl → ProfilePictureUrl
             .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfilePicUrl))
 
-            // createdAt → LastMessageAt (opcional, depende da sua regra)
-            .ForMember(dest => dest.LastMessageAt,
-                opt => opt.MapFrom(src => ParseDate(src.CreatedAt)))
-
             // updatedAt → UpdatedAt
             .ForMember(dest => dest.UpdatedAt,
                 opt => opt.MapFrom(src => ParseDate(src.UpdatedAt)))
@@ -38,7 +34,6 @@ namespace VoroFit.Application.Mappings
                 opt => opt.MapFrom(_ => DateTimeOffset.UtcNow))
 
             // coleções vazias
-            .ForMember(dest => dest.Messages, opt => opt.Ignore())
             .ForMember(dest => dest.GroupMemberships, opt => opt.Ignore());
         }
 

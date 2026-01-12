@@ -60,6 +60,15 @@ namespace VoroFit.Infrastructure.Factories
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<Chat>()
+                .HasKey(c => c.Id);
+
+            builder.Entity<ContactIdentifier>()
+                .HasOne(c => c.Contact)
+                .WithMany(c => c.Identifiers)
+                .HasForeignKey(m => m.ContactId)
+                .OnDelete(DeleteBehavior.Cascade);
             
             // ---------------------------
             // USER EXTENSION
@@ -267,6 +276,23 @@ namespace VoroFit.Infrastructure.Factories
                 .WithMany(e => e.WorkoutHistoryExercises)
                 .HasForeignKey(whe => whe.ExerciseId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------------------------
+            // EVOLUTION
+            // ---------------------------
+            builder.Entity<ContactIdentifier>()
+                .HasKey(c => c.Id);
+
+            builder.Entity<Contact>()
+                .HasKey(c => c.Id);
+
+            builder.Entity<Contact>()
+                .HasOne(c => c.UserExtension)
+                .WithOne(ue => ue.Contact)
+                .HasForeignKey<Contact>(c => c.UserExtensionId)
+                .HasPrincipalKey<UserExtension>(ue => ue.UserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
             
             // ---------------------------
             // IDENTITY CONFIG

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { API_CONFIG, secureApiCall } from "@/lib/api"
-import { InstanceDto } from "@/types/DTOs/instance.interface"
-import { QrCodeJsonDto } from "@/types/DTOs/qr-code-json.interface"
+import type { InstanceDto } from "@/types/DTOs/instance.interface"
+import type { QrCodeJsonDto } from "@/types/DTOs/qr-code-json.interface"
 
 export function useInstances() {
   const [instances, setInstances] = useState<InstanceDto[]>([])
@@ -15,10 +15,7 @@ export function useInstances() {
     setError(null)
 
     try {
-      const response = await secureApiCall<InstanceDto[]>(
-        API_CONFIG.ENDPOINTS.INSTANCE,
-        { method: "GET" }
-      )
+      const response = await secureApiCall<InstanceDto[]>(API_CONFIG.ENDPOINTS.INSTANCE, { method: "GET" })
 
       if (response.hasError) {
         throw new Error(response.message ?? "Erro ao carregar instâncias")
@@ -32,154 +29,133 @@ export function useInstances() {
     }
   }, [])
 
-  const createInstance = useCallback(
-    async (instanceName: string, number: string): Promise<InstanceDto | null> => {
-      setLoading(true)
-      setError(null)
+  const createInstance = useCallback(async (instanceName: string, number: string): Promise<InstanceDto | null> => {
+    setLoading(true)
+    setError(null)
 
-      try {
-        const response = await secureApiCall<InstanceDto>(
-          `${API_CONFIG.ENDPOINTS.INSTANCE}/${number}`,
-          {
-            method: "POST",
-            body: JSON.stringify({ instanceName }),
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+    try {
+      const response = await secureApiCall<InstanceDto>(`${API_CONFIG.ENDPOINTS.INSTANCE}/${number}`, {
+        method: "POST",
+        body: JSON.stringify({ instanceName }),
+        headers: { "Content-Type": "application/json" },
+      })
 
-        if (response.hasError) {
-          throw new Error(response.message ?? "Erro ao criar instância")
-        }
-
-        if (response.data) {
-          setInstances((prev) => [...prev, response.data!])
-        }
-
-        return response.data ?? null
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido")
-        return null
-      } finally {
-        setLoading(false)
+      if (response.hasError) {
+        throw new Error(response.message ?? "Erro ao criar instância")
       }
-    },
-    []
-  )
 
-  const deleteInstance = useCallback(
-    async (instanceName: string): Promise<boolean> => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const response = await secureApiCall<void>(
-          `${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}`,
-          { method: "DELETE" }
-        )
-
-        if (response.hasError) {
-          throw new Error(response.message ?? "Erro ao excluir instância")
-        }
-
-        setInstances((prev) => prev.filter((inst) => inst.name !== instanceName))
-        return true
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido")
-        return false
-      } finally {
-        setLoading(false)
+      if (response.data) {
+        setInstances((prev) => [...prev, response.data!])
       }
-    },
-    []
-  )
 
-  const getStatus = useCallback(
-    async (instanceName: string): Promise<InstanceDto | null> => {
-      setLoading(true)
-      setError(null)
+      return response.data ?? null
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro desconhecido")
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-      try {
-        const response = await secureApiCall<InstanceDto>(
-          `${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}/status`,
-          { method: "GET" }
-        )
+  const deleteInstance = useCallback(async (instanceName: string): Promise<boolean> => {
+    setLoading(true)
+    setError(null)
 
-        if (response.hasError) {
-          throw new Error(response.message ?? "Erro ao atualizar QR Code")
-        }
+    try {
+      const response = await secureApiCall<void>(`${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}`, {
+        method: "DELETE",
+      })
 
-        if (response.data) {
-          setInstances(prev =>
-            prev.map(inst =>
-              inst.name === instanceName
-                ? {
-                    ...inst,
-                    instanceExtension: inst.instanceExtension
-                      ? {
-                          ...inst.instanceExtension,
-                          status: response.data?.instanceExtension?.status,
-                        }
-                      : null
-                  }
-                : inst
-            )
-          )
-        }
-
-        return response.data ?? null
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido")
-        return null
-      } finally {
-        setLoading(false)
+      if (response.hasError) {
+        throw new Error(response.message ?? "Erro ao excluir instância")
       }
-    },
-    []
-  )
 
-  const refreshQrCode = useCallback(
-    async (instanceName: string): Promise<QrCodeJsonDto | null> => {
-      setLoading(true)
-      setError(null)
+      setInstances((prev) => prev.filter((inst) => inst.name !== instanceName))
+      return true
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro desconhecido")
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-      try {
-        const response = await secureApiCall<QrCodeJsonDto>(
-          `${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}/qrcode`,
-          { method: "GET" }
-        )
+  const getStatus = useCallback(async (instanceName: string): Promise<InstanceDto | null> => {
+    setError(null)
 
-        if (response.hasError) {
-          throw new Error(response.message ?? "Erro ao atualizar QR Code")
-        }
+    try {
+      const response = await secureApiCall<InstanceDto>(`${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}/status`, {
+        method: "GET",
+      })
 
-        if (response.data) {
-          setInstances(prev =>
-            prev.map(inst =>
-              inst.name === instanceName
-                ? {
-                    ...inst,
-                    instanceExtension: inst.instanceExtension
-                      ? {
-                          ...inst.instanceExtension,
-                          base64: response.data?.base64,
-                        }
-                      : null
-                  }
-                : inst
-            )
-          )
-        }
-
-        return response.data ?? null
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido")
-        return null
-      } finally {
-        setLoading(false)
+      if (response.hasError) {
+        throw new Error(response.message ?? "Erro ao atualizar QR Code")
       }
-    },
-    []
-  )
+
+      if (response.data) {
+        setInstances((prev) =>
+          prev.map((inst) =>
+            inst.name === instanceName
+              ? {
+                  ...inst,
+                  instanceExtension: inst.instanceExtension
+                    ? {
+                        ...inst.instanceExtension,
+                        status: response.data?.instanceExtension?.status,
+                      }
+                    : response.data?.instanceExtension,
+                }
+              : inst,
+          ),
+        )
+      }
+
+      return response.data ?? null
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro desconhecido")
+      return null
+    }
+  }, [])
+
+  const refreshQrCode = useCallback(async (instanceName: string): Promise<QrCodeJsonDto | null> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await secureApiCall<QrCodeJsonDto>(`${API_CONFIG.ENDPOINTS.INSTANCE}/${instanceName}/qrcode`, {
+        method: "GET",
+      })
+
+      if (response.hasError) {
+        throw new Error(response.message ?? "Erro ao atualizar QR Code")
+      }
+
+      if (response.data) {
+        setInstances((prev) =>
+          prev.map((inst) =>
+            inst.name === instanceName
+              ? {
+                  ...inst,
+                  instanceExtension: inst.instanceExtension
+                    ? {
+                        ...inst.instanceExtension,
+                        base64: response.data?.base64,
+                      }
+                    : { base64: response.data?.base64 },
+                }
+              : inst,
+          ),
+        )
+      }
+
+      return response.data ?? null
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro desconhecido")
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     loadInstances()

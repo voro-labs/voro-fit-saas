@@ -1,9 +1,12 @@
 export enum MessageStatusEnum
 {
   Unspecified = 0,
-  Created = 100,
-  Sent = 200,
-  Delivered = 300,
-  Read = 400,
-  Error = 500
+  Pending = 100,
+  Created = 200,
+  Sent = 300,
+  Delivered = 400,
+  Server = 500,
+  Read = 600,
+  Failed = 700,
+  Deleted = 800
 }

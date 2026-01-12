@@ -10,6 +10,7 @@ namespace VoroFit.Domain.Entities
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
 
+        public Contact? Contact { get; set; }
         public Student? Student { get; set; }
         public ICollection<Instance> Instances { get; set; } = [];
         public ICollection<Exercise> Exercises { get; set; } = [];

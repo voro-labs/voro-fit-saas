@@ -5,32 +5,26 @@ namespace VoroFit.Application.DTOs.Evolution
 {
     public class MessageReactionDto
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid? Id { get; set; }
 
-        // A reação em si, ex: "❤️", "👍"
-        public string Reaction { get; set; } = string.Empty;
+        public string? Reaction { get; set; }
 
-        // Quem enviou a reação
-        public string RemoteFrom { get; set; } = string.Empty;
+        public string? RemoteFrom { get; set; }
 
-        // Quem recebeu a reação
-        public string RemoteTo { get; set; } = string.Empty;
+        public string? RemoteTo { get; set; }
 
-        public bool IsFromMe { get; set; }
+        public bool? IsFromMe { get; set; }
 
-        // Quando a reação foi enviada
-        public DateTimeOffset SentAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? SentAt { get; set; }
 
-        // Quem recebeu a reação
         public Guid? ContactId { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public Contact? Contact { get; set; }
 
-        // A mensagem relacionada
-        public Guid MessageId { get; set; }
+        public Guid? MessageId { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public Message Message { get; set; } = null!;
+        public Message? Message { get; set; }
     }
 }

@@ -25,13 +25,8 @@ namespace VoroFit.Application.Mappings.Evolution
             .ForMember(dest => dest.CreatedAt,
                 opt => opt.MapFrom(src => DateTimeOffset.FromUnixTimeSeconds(src.Creation)))
 
-            // subjectTime(timestamp unix) → LastMessageAt (ou outra lógica que preferir)
-            .ForMember(dest => dest.LastMessageAt,
-                opt => opt.MapFrom(src => DateTimeOffset.FromUnixTimeSeconds(src.SubjectTime)))
-
             // coleções
-            .ForMember(dest => dest.Members, opt => opt.Ignore())
-            .ForMember(dest => dest.Messages, opt => opt.Ignore());
+            .ForMember(dest => dest.Members, opt => opt.Ignore());
         }
     }
 }

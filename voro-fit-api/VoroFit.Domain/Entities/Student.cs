@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VoroFit.Domain.Entities.Evolution;
 using VoroFit.Domain.Enums;
 
 namespace VoroFit.Domain.Entities

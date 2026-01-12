@@ -7,7 +7,7 @@ namespace VoroFit.Application.DTOs
     public class StudentDto
     {
         public Guid? UserExtensionId { get; set; }
-        public UserExtensionDto? UserExtension { get; set; } = null!;
+        public UserExtensionDto? UserExtension { get; set; }
 
         public Guid? TrainerId { get; set; }
         public UserExtensionDto? Trainer { get; set; }
@@ -17,11 +17,10 @@ namespace VoroFit.Application.DTOs
 
         public decimal? Weight { get; set; }
 
-        public StudentStatusEnum? Status { get; set; } 
-            = StudentStatusEnum.Active;
+        public StudentStatusEnum? Status { get; set; } = StudentStatusEnum.Active;
 
-        public string? Goal { get; set; } = string.Empty;
-        public string? Notes { get; set; } = string.Empty;
+        public string? Goal { get; set; }
+        public string? Notes { get; set; }
 
         // ===============================
         // RELACIONAMENTOS IMPORTANTES

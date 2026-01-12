@@ -30,18 +30,12 @@ namespace VoroFit.Domain.Entities.Evolution
         public int? DurationSeconds { get; set; }
         public byte[]? Thumbnail { get; set; }
 
-        public Guid? ContactId { get; set; }
-        public Contact? Contact { get; set; }
-
-        public Guid? GroupId { get; set; }
-        public Group? Group { get; set; }
-
         public Guid ChatId { get; set; }
         public Chat Chat { get; set; } = null!;
 
-        public ICollection<MessageReaction> MessageReactions { get; set; } = [];
-
         public Guid? QuotedMessageId { get; set; }
         public Message? QuotedMessage { get; set; }
+
+        public ICollection<MessageReaction> MessageReactions { get; set; } = [];
     }
 }

@@ -8,6 +8,8 @@ using VoroFit.Application.Services.Interfaces;
 using VoroFit.Application.Services.Interfaces.Identity;
 using VoroFit.Shared.Constants;
 using VoroFit.Shared.Helpers;
+using Microsoft.EntityFrameworkCore;
+using VoroFit.Application.Services.Interfaces.Evolution;
 
 namespace VoroFit.API.Controllers
 {
@@ -15,7 +17,9 @@ namespace VoroFit.API.Controllers
     [Tags("Students")]
     [ApiController]
     [Authorize]
-    public class StudentsController(IStudentService studentService, IUserService userService) : ControllerBase
+    public class StudentsController(IConversationService conversationService,
+        IContactService contactService, IChatService chatService,
+        IStudentService studentService, IUserService userService) : ControllerBase
     {
 
         // ---------------------------------------------
@@ -73,6 +77,33 @@ namespace VoroFit.API.Controllers
                 var user = await userService
                     .CreateAsync(model, RandomTextHelper.GenerateRandomText, [RoleConstant.Student]) 
                         ?? throw new KeyNotFoundException("User não encontrado.");
+
+                var trainer = await userService.GetByIdAsync(
+                    t => t.Id == model.TrainerId,
+                    t => t.Include(t => t.UserExtension)
+                        .ThenInclude(ue => ue!.Instances));
+
+                var instances = trainer?.UserExtension?.Instances ?? [];
+
+                foreach (var instance in instances)
+                {
+                    var countryCode = $"{user.CountryCode}".Replace("+", "");
+
+                    var (senderContact, chat) = await conversationService.CreateChatAndGroupOrContactAsync(
+                        $"{instance.Name}", $"{countryCode}{user.PhoneNumber}@s.whatsapp.net",
+                        $"{countryCode}{user.PhoneNumber}@s.whatsapp.net", user);
+
+                    if (senderContact != null)
+                    {
+                        senderContact.UserExtensionId = user.Id;
+                        contactService.Update(senderContact);
+                    }
+
+                    chatService.Update(chat);
+
+                    await contactService.SaveChangesAsync();
+                    await chatService.SaveChangesAsync();
+                }
 
                 return ResponseViewModel<StudentDto>
                     .SuccessWithMessage("Aluno criado com sucesso.", model)

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using VoroFit.Shared.Utils;
 using Microsoft.Extensions.Options;
 using VoroFit.Application.DTOs.Evolution.API.Request;
+using VoroFit.Domain.Entities.Identity;
 
 namespace VoroFit.Application.Services
 {
@@ -76,15 +77,52 @@ namespace VoroFit.Application.Services
 
                 // Normalizar sender
                 var sendIdentifier = await _contactService.FindByAnyAsync(senderJid);
-                var normalizedSenderJid = senderJid;
+                var normalizedSenderJid = sendIdentifier?.RemoteJid ?? senderJid;
 
                 contactIdentifier = await _contactIdentifierService
-                    .GetOrCreateAsync(pushName, normalizedSenderJid, remoteJid);
+                    .GetOrCreateAsync(pushName, normalizedSenderJid, remoteJid, "");
 
                 chat.ContactId = contactIdentifier.Contact.Id;
             }
 
-            return (contactIdentifier.Contact, group, chat);
+            var contact = await _contactService.GetByIdAsync(contactIdentifier.ContactId) 
+                ?? throw new Exception("Contato não encontrado!");
+                
+            return (contact, group, chat);
+        }
+
+        public async Task<(Contact senderContact, Chat chat)> CreateChatAndGroupOrContactAsync(
+            string instanceName, string normalizedJid, string remoteJid, User user)
+        {
+            var instanceRequestDto = new InstanceRequestDto() { InstanceName = instanceName };
+
+            instanceRequestDto.SetWebhookUrl(_evolutionUtil);
+
+            var instance = await _instanceService.GetOrCreateInstance(instanceRequestDto);
+
+            // Chat sempre vincula ao JID NORMALIZADO
+            var chat = await _chatService.GetOrCreateChat(normalizedJid, instance, false);
+
+            // -------- CONTATO DO REMETENTE ---------
+
+            ContactIdentifier contactIdentifier;
+
+            // Mensagem direta
+            var senderJid = normalizedJid;
+
+            // Normalizar sender
+            var sendIdentifier = await _contactService.FindByAnyAsync(senderJid);
+            var normalizedSenderJid = sendIdentifier?.RemoteJid ?? senderJid;
+
+            contactIdentifier = await _contactIdentifierService
+                .GetOrCreateAsync($"{user.FirstName} {user.LastName}", normalizedSenderJid, remoteJid, user.AvatarUrl, user);
+
+            chat.ContactId = contactIdentifier.Contact.Id;
+
+            var contact = await _contactService.GetByIdAsync(contactIdentifier.ContactId) 
+                ?? throw new Exception("Contato não encontrado!");
+                
+            return (contact, chat);
         }
     }
 }

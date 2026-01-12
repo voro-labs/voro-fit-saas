@@ -166,7 +166,7 @@ export default function StudentDetailPage() {
 
                 <div className="flex gap-2">
                   <Button variant="outline" asChild>
-                    <Link href={`/messages?student=${student?.userExtensionId}`}>
+                    <Link href={`/messages?contact=${student?.userExtension?.contact?.id}`}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mensagem
                     </Link>

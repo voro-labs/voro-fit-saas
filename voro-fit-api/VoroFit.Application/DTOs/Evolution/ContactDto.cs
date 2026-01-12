@@ -1,33 +1,35 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
+using VoroFit.Domain.Enums;
 
 namespace VoroFit.Application.DTOs.Evolution
 {
     public class ContactDto
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public string RemoteJid { get; set; } = string.Empty;
-        public string Number { get; set; } = string.Empty;
+        public Guid? Id { get; set; }
+
+        public string? RemoteJid { get; set; }
+
+        public string? Number { get; set; }
 
         public string? DisplayName { get; set; }
         public string? ProfilePictureUrl { get; set; }
-        
         public IFormFile? ProfilePicture { get; set; }
 
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
-
-        public string LastMessage { get; set; } = string.Empty;
-        public bool LastMessageFromMe { get; set; }
-        public DateTimeOffset LastMessageAt { get; set; } = DateTimeOffset.UtcNow;
-
-        public int Unread { get; set; } = 0;
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public string? LastKnownPresence { get; set; }
-        public DateTimeOffset LastPresenceAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? LastPresenceAt { get; set; }
 
+        public Guid? UserExtensionId { get; set; }
+        
         [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public ICollection<MessageDto> Messages { get; set; } = [];
+        public UserExtensionDto? UserExtension { get; set; }
+        
         [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public ICollection<GroupMemberDto> GroupMemberships { get; set; } = [];
+        public ICollection<ContactIdentifierDto>? Identifiers { get; set; }
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+        public ICollection<GroupMemberDto>? GroupMemberships { get; set; }
     }
 }

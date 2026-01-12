@@ -2,60 +2,62 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { API_CONFIG, secureApiCall } from "@/lib/api"
-import type { ContactDto } from "@/types/DTOs/contact.interface"
+import type { ChatDto } from "@/types/DTOs/chat.interface"
 import type { MessageDto } from "@/types/DTOs/message.interface"
 import { MessageStatusEnum } from "@/types/Enums/messageStatusEnum.enum"
 
 export function useEvolutionChat(instanceId: string) {
-  const [contacts, setContacts] = useState<ContactDto[]>([])
+  const [chats, setChats] = useState<ChatDto[]>([])
   const [messages, setMessages] = useState<Record<string, MessageDto[]>>({})
-  const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 🔹 Buscar contatos
-  const fetchContacts = useCallback(async () => {
+  // 🔹 Buscar chats
+  const fetchChats = useCallback(async () => {
     if (!instanceId) return
     setError(null)
 
     try {
-      const response = await secureApiCall<ContactDto[]>(`${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/contacts`, {
+      const response = await secureApiCall<ChatDto[]>(`${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}`, {
         method: "GET",
       })
 
-      if (response.hasError) throw new Error(response.message ?? "Erro ao carregar contatos")
+      if (response.hasError) throw new Error(response.message ?? "Erro ao carregar chats")
 
-      setContacts(response.data ?? [])
+      setChats(response.data ?? [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido")
     }
   }, [instanceId])
 
-  // 🔹 Salvar contato
-  const saveContact = useCallback(
-    async (displayName: string, number: string) => {
-      if (!displayName || !number || !instanceId) return
+  // 🔹 Salvar chat
+  const saveChat = useCallback(
+    async (name: string, remoteJid: string) => {
+      if (!name || !remoteJid || !instanceId) return
       setError(null)
 
       try {
-        const body = { DisplayName: displayName, Number: number, InstanceId: instanceId }
+        const body = { name: name, remoteJid: remoteJid, instanceId: instanceId }
 
-        const response = await secureApiCall<ContactDto>(`${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/contacts/save`, {
+        const response = await secureApiCall<ChatDto>(`${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/chats/save`, {
           method: "POST",
           body: JSON.stringify(body),
         })
 
-        if (response.hasError) throw new Error(response.message ?? "Erro ao salvar contato")
+        if (response.hasError) throw new Error(response.message ?? "Erro ao salvar chat")
 
-        let newContact: ContactDto = {
+        let newChat: ChatDto = {
           id: Date.now().toString(),
-          displayName,
-          number: number,
+          contact: {
+            displayName: name
+          },
+          remoteJid: remoteJid,
         }
 
-        if (response.data) newContact = response.data
+        if (response.data) newChat = response.data
 
-        setContacts((prev) => [...prev, newContact])
+        setChats((prev) => [...prev, newChat])
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
       }
@@ -63,45 +65,47 @@ export function useEvolutionChat(instanceId: string) {
     [instanceId],
   )
 
-  // 🔹 Atualizar contato
-  const updateContact = useCallback(
-    async (contactId: string, displayName: string, number: string, profilePicture: File | null) => {
-      if (!displayName || !number || !instanceId) return
+  // 🔹 Atualizar chat
+  const updateChat = useCallback(
+    async (chatId: string, name: string, remoteJid: string, profilePicture: File | null) => {
+      if (!name || !remoteJid || !instanceId) return
       setError(null)
 
       try {
         const form = new FormData()
 
-        form.append("displayName", displayName)
-        form.append("number", number)
+        form.append("name", name)
+        form.append("remoteJid", remoteJid)
         form.append("instanceId", instanceId)
 
         if (profilePicture) form.append("profilePicture", profilePicture)
 
-        const response = await secureApiCall<ContactDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/contacts/${contactId}/update`,
+        const response = await secureApiCall<ChatDto>(
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/chats/${chatId}/update`,
           {
             method: "PUT",
             body: form,
           },
         )
 
-        if (response.hasError) throw new Error(response.message ?? "Erro ao salvar contato")
+        if (response.hasError) throw new Error(response.message ?? "Erro ao salvar chat")
 
-        let newContact: ContactDto = {
-          id: contactId,
-          displayName,
-          number: number,
+        let newChat: ChatDto = {
+          id: chatId,
+          contact: {
+            displayName: name
+          },
+          remoteJid: remoteJid,
         }
 
-        if (response.data) newContact = response.data
+        if (response.data) newChat = response.data
 
-        setContacts((prev) => {
-          const exists = prev.some((c) => c.id === newContact.id)
+        setChats((prev) => {
+          const exists = prev.some((c) => c.id === newChat.id)
           if (exists) {
-            return prev.map((c) => (c.id === newContact.id ? newContact : c))
+            return prev.map((c) => (c.id === newChat.id ? newChat : c))
           }
-          return [...prev, newContact]
+          return [...prev, newChat]
         })
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -110,15 +114,15 @@ export function useEvolutionChat(instanceId: string) {
     [instanceId],
   )
 
-  // 🔹 Buscar mensagens com um contato
+  // 🔹 Buscar mensagens com um chat
   const fetchMessages = useCallback(
-    async (contactId: string) => {
-      if (!contactId || !instanceId) return
+    async (chatId: string) => {
+      if (!chatId || !instanceId) return
       setError(null)
 
       try {
         const response = await secureApiCall<MessageDto[]>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}`,
           {
             method: "GET",
           },
@@ -128,7 +132,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: response.data ?? [],
+          [chatId]: response.data ?? [],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -139,15 +143,15 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Enviar mensagem
   const sendMessage = useCallback(
-    async (contactId: string, text: string) => {
-      if (!contactId || !text || !instanceId) return
+    async (chatId: string, text: string) => {
+      if (!chatId || !text || !instanceId) return
       setError(null)
 
       try {
         const body = { text: text }
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/send`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/send`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -162,11 +166,7 @@ export function useEvolutionChat(instanceId: string) {
           sentAt: new Date(),
           status: MessageStatusEnum.Created,
           isFromMe: true,
-          contactId: contactId,
-          contact: {
-            lastMessage: text,
-            lastMessageAt: Date.now().toString(),
-          } as ContactDto,
+          chatId: chatId,
           messageReactions: [],
         }
 
@@ -174,7 +174,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: [...(prev[contactId] || []), newMessage],
+          [chatId]: [...(prev[chatId] || []), newMessage],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -185,8 +185,8 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Enviar anexo
   const sendAttachment = useCallback(
-    async (contactId: string, attachment: File) => {
-      if (!contactId || !attachment || !instanceId) return
+    async (chatId: string, attachment: File) => {
+      if (!chatId || !attachment || !instanceId) return
       setError(null)
 
       try {
@@ -195,7 +195,7 @@ export function useEvolutionChat(instanceId: string) {
         form.append("attachment", attachment)
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/send/attachment`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/send/attachment`,
           {
             method: "POST",
             body: form,
@@ -213,11 +213,7 @@ export function useEvolutionChat(instanceId: string) {
           sentAt: new Date(),
           status: MessageStatusEnum.Created,
           isFromMe: true,
-          contactId: contactId,
-          contact: {
-            lastMessage: "Anexo enviado",
-            lastMessageAt: Date.now().toString(),
-          } as ContactDto,
+          chatId: chatId,
           messageReactions: [],
         }
 
@@ -225,7 +221,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: [...(prev[contactId] || []), newMessage],
+          [chatId]: [...(prev[chatId] || []), newMessage],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -236,15 +232,15 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Deletar mensagem
   const deleteMessage = useCallback(
-    async (contactId: string, message: MessageDto) => {
-      if (!contactId || !message.id || !instanceId) return
+    async (chatId: string, message: MessageDto) => {
+      if (!chatId || !message.id || !instanceId) return
       setError(null)
 
       try {
         const body = { id: message.id }
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/delete`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/delete`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -255,7 +251,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: [...(prev[contactId].filter((m) => m.id !== message.id) || [])],
+          [chatId]: [...(prev[chatId].filter((m) => m.id !== message.id) || [])],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -266,15 +262,15 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Encaminhar mensagem
   const forwardMessage = useCallback(
-    async (contactId: string, message: MessageDto | null) => {
-      if (!contactId || !message?.id || !instanceId) return
+    async (chatId: string, message: MessageDto | null) => {
+      if (!chatId || !message?.id || !instanceId) return
       setError(null)
 
       try {
         const body = { id: message.id }
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/forward`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/forward`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -285,7 +281,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: [...(prev[contactId] || [])],
+          [chatId]: [...(prev[chatId] || [])],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -296,15 +292,15 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Enviar mensagem com citação
   const sendQuotedMessage = useCallback(
-    async (contactId: string, message: MessageDto, text: string) => {
-      if (!contactId || !message.id || !text || !instanceId) return
+    async (chatId: string, message: MessageDto, text: string) => {
+      if (!chatId || !message.id || !text || !instanceId) return
       setError(null)
 
       try {
         const body = { text, quoted: { key: { id: message.id } } }
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/send/quoted`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/send/quoted`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -319,13 +315,9 @@ export function useEvolutionChat(instanceId: string) {
           sentAt: new Date(),
           status: MessageStatusEnum.Created,
           isFromMe: true,
-          contactId: contactId,
+          chatId: chatId,
           quotedMessage: message,
           quotedMessageId: message.id,
-          contact: {
-            lastMessage: text,
-            lastMessageAt: Date.now().toString(),
-          } as ContactDto,
           messageReactions: [],
         }
 
@@ -333,7 +325,7 @@ export function useEvolutionChat(instanceId: string) {
 
         setMessages((prev) => ({
           ...prev,
-          [contactId]: [...(prev[contactId] || []), newMessage],
+          [chatId]: [...(prev[chatId] || []), newMessage],
         }))
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro desconhecido")
@@ -344,15 +336,15 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Enviar reação
   const sendReactionMessage = useCallback(
-    async (contactId: string, message: MessageDto, reaction: string) => {
-      if (!contactId || !message.id || !reaction || !instanceId) return
+    async (chatId: string, message: MessageDto, reaction: string) => {
+      if (!chatId || !message.id || !reaction || !instanceId) return
       setError(null)
 
       try {
         const body = { reaction: reaction, key: { id: message.id } }
 
         const response = await secureApiCall<MessageDto>(
-          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${contactId}/send/reaction`,
+          `${API_CONFIG.ENDPOINTS.CHAT}/${instanceId}/messages/${chatId}/send/reaction`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -362,7 +354,7 @@ export function useEvolutionChat(instanceId: string) {
         if (response.hasError) throw new Error(response.message ?? "Erro ao enviar a reação da mensagem")
 
         setMessages((prev) => {
-          const messages = prev[contactId] || []
+          const messages = prev[chatId] || []
           const updated = messages.map((m) => {
             if (m.id !== message.id) return m
 
@@ -381,7 +373,7 @@ export function useEvolutionChat(instanceId: string) {
 
           return {
             ...prev,
-            [contactId]: updated,
+            [chatId]: updated,
           }
         })
       } catch (err) {
@@ -393,29 +385,29 @@ export function useEvolutionChat(instanceId: string) {
 
   // 🔹 Atualizar mensagens periodicamente (simulação de webhook)
   useEffect(() => {
-    if (!selectedContactId || !instanceId) return
+    if (!selectedChatId || !instanceId) return
     const interval = setInterval(() => {
-      fetchMessages(selectedContactId)
-      fetchContacts()
+      fetchMessages(selectedChatId)
+      fetchChats()
     }, 5000)
     return () => clearInterval(interval)
-  }, [selectedContactId, fetchMessages, fetchContacts, instanceId])
+  }, [selectedChatId, fetchMessages, fetchChats, instanceId])
 
-  // 🔹 Buscar contatos e conversas ao iniciar
+  // 🔹 Buscar chats ao iniciar
   useEffect(() => {
     if (instanceId) {
-      fetchContacts()
+      fetchChats()
     }
-  }, [fetchContacts, instanceId])
+  }, [fetchChats, instanceId])
 
   return {
-    contacts,
+    chats,
     messages,
-    selectedContactId,
-    setSelectedContactId,
-    fetchContacts,
-    saveContact,
-    updateContact,
+    selectedChatId,
+    setSelectedChatId,
+    fetchChats,
+    saveChat,
+    updateChat,
     fetchMessages,
     sendMessage,
     sendAttachment,

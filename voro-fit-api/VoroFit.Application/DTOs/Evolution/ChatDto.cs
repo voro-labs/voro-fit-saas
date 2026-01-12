@@ -1,33 +1,30 @@
 ﻿using System.Text.Json.Serialization;
+using VoroFit.Domain.Enums;
 
 namespace VoroFit.Application.DTOs.Evolution
 {
     public class ChatDto
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public string RemoteJid { get; set; } = string.Empty;
-        public bool IsGroup { get; set; }
+        public Guid? Id { get; set; }
+        public string? RemoteJid { get; set; }
+        public bool? IsGroup { get; set; }
 
-        public string InstanceId { get; set; } = null!;
+        public Guid? InstanceExtensionId { get; set; }
+        public InstanceExtensionDto? InstanceExtension { get; set; }
 
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public InstanceDto Instance { get; set; } = null!;
+        public string? LastMessage { get; set; }
+        public bool? LastMessageFromMe { get; set; }
+        public MessageStatusEnum? LastMessageStatus { get; set; }
+        public DateTimeOffset? LastMessageAt { get; set; }
 
-        public DateTimeOffset LastMessageAt { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public Guid? ContactId { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public ContactDto? Contact { get; set; }
 
         public Guid? GroupId { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public GroupDto? Group { get; set; }
-
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public ICollection<MessageDto> Messages { get; set; } = [];
+        
+        public ICollection<MessageDto>? Messages { get; set; }
     }
 }

@@ -53,7 +53,7 @@ export function DatePicker({
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
-  const years = Array.from({ length: 20 }, (_, i) => new Date().getUTCFullYear() - 10 + i)
+  const years = Array.from({ length: 60 }, (_, i) => new Date().getUTCFullYear() - 40 + i)
 
   // Format date to Brazilian format (dd/MM/yyyy)
   const formatDateToBR = (isoDate: string): string => {

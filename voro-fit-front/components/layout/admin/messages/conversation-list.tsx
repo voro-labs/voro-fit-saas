@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,42 +17,42 @@ import { Search, Plus, CheckCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { type ChangeEvent, useEffect, useState } from "react"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
-import { ContactDto } from "@/types/DTOs/contact.interface"
+import type { ChatDto } from "@/types/DTOs/chat.interface"
 import { flags } from "@/lib/flag-utils"
 
 interface ConversationListProps {
-  contacts: ContactDto[]
+  chats: ChatDto[]
   selectedId: string | null
-  onAddContact: (contactName: string, phoneNumber: string) => void
+  onAddChat: (chatName: string, phoneNumber: string) => void
   onSelect: (id: string) => void
 }
 
-export function ConversationList({ contacts, selectedId, onAddContact, onSelect }: ConversationListProps) {
-  const [filtered, setFiltered] = useState<ContactDto[]>([])
+export function ConversationList({ chats, selectedId, onAddChat, onSelect }: ConversationListProps) {
+  const [filtered, setFiltered] = useState<ChatDto[]>([])
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
-  const [contactName, setContactName] = useState("")
+  const [chatName, setChatName] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [countryCode, setCountryCode] = useState("BR")
 
   useEffect(() => {
     if (!search) {
-      setFiltered(contacts)
+      setFiltered(chats)
     } else {
-      const result = contacts.filter((conv) =>
-        (conv.displayName || conv.number).toLowerCase().includes(search.toLowerCase()),
+      const result = chats.filter((chat) =>
+        (chat.contact?.displayName || chat.remoteJid || "").toLowerCase().includes(search.toLowerCase()),
       )
       setFiltered(result)
     }
-  }, [contacts, search])
+  }, [chats, search])
 
   function inputChange(event: ChangeEvent<HTMLInputElement>): void {
     setSearch(event.currentTarget.value)
   }
 
-  function handleAddContact() {
-    onAddContact(contactName, `${flags[countryCode].dialCodeOnlyNumber}${phoneNumber}`)
-    setContactName("")
+  function handleAddChat() {
+    onAddChat(chatName, `${flags[countryCode].dialCodeOnlyNumber}${phoneNumber}`)
+    setChatName("")
     setPhoneNumber("")
     setOpen(false)
   }
@@ -70,24 +69,24 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="icon" variant="default">
+              <Button size="icon" variant="default" disabled>
                 <Plus className="h-4 w-4" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Adicionar novo contato</DialogTitle>
-                <DialogDescription>Preencha os dados do novo contato para iniciar uma conversa.</DialogDescription>
+                <DialogTitle>Adicionar novo chat</DialogTitle>
+                <DialogDescription>Preencha os dados do novo chat para iniciar uma conversa.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Nome do contato</Label>
+                  <Label htmlFor="name">Nome do chat</Label>
                   <Input
                     id="name"
                     placeholder="Digite o nome..."
                     autoComplete="off"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
+                    value={chatName}
+                    onChange={(e) => setChatName(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -105,7 +104,7 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
                 <Button variant="outline" onClick={() => setOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={handleAddContact}>Adicionar contato</Button>
+                <Button onClick={handleAddChat}>Adicionar chat</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -113,50 +112,47 @@ export function ConversationList({ contacts, selectedId, onAddContact, onSelect 
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {filtered.map((conversation) => (
+        {filtered.map((chat) => (
           <button
-            key={conversation.id}
-            onClick={() => onSelect(`${conversation.id}`)}
+            key={chat.id}
+            onClick={() => onSelect(`${chat.id}`)}
             className={cn(
               "w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-colors border-b border-border",
-              selectedId === conversation.id && "bg-muted",
+              selectedId === chat.id && "bg-muted",
             )}
           >
             <div className="relative">
               <Avatar className="h-12 w-12">
                 <AvatarImage
-                  src={conversation.profilePictureUrl || "/placeholder.svg"}
-                  alt={conversation.displayName || conversation.number}
+                  src={chat.contact?.profilePictureUrl || "/placeholder.svg"}
+                  alt={chat.contact?.displayName || chat.remoteJid || "Chat"}
                 />
-                <AvatarFallback>{`${conversation.displayName || conversation.number}`.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{`${chat.contact?.displayName || chat.remoteJid || "?"}`.charAt(0)}</AvatarFallback>
               </Avatar>
-              {conversation.lastKnownPresence && (
-                <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-card" />
-              )}
             </div>
 
             <div className="flex-1 min-w-0 text-left">
               <div className="flex items-baseline justify-between gap-2 mb-1">
-                <p className="font-medium truncate">{conversation.displayName || conversation.number}</p>
+                <p className="font-medium truncate">{chat.contact?.displayName || chat.remoteJid || "Desconhecido"}</p>
                 <span className="text-xs text-muted-foreground shrink-0">
-                  {conversation.lastMessageAt != null
-                    ? new Date(conversation.lastMessageAt).toLocaleDateString("pt-BR", { timeZone: "UTC" })
-                    : null}
+                  {chat.lastMessageAt != null
+                    ? new Date(chat.lastMessageAt).toLocaleDateString("pt-BR", { timeZone: "UTC" })
+                    : ""}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground flex items-center gap-1 truncate">
-                  {conversation.lastMessageFromMe && <CheckCheck className="h-3.5 w-3.5 shrink-0" />}
-                  <span className="truncate">{conversation.lastMessage}</span>
+                  {chat.lastMessageFromMe && <CheckCheck className="h-3.5 w-3.5 shrink-0" />}
+                  <span className="truncate">{chat.lastMessage || ""}</span>
                 </p>
-                {(conversation.unread || 0) > 0 && (
+                {/* {(chat.unread || 0) > 0 && (
                   <Badge
                     variant="default"
                     className="h-5 min-w-5 rounded-full flex items-center justify-center px-1.5 bg-primary"
                   >
-                    {conversation.unread}
+                    {chat.unread}
                   </Badge>
-                )}
+                )} */}
               </div>
             </div>
           </button>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send, Phone, Video, MoreVertical, Mic, X, Edit } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { MessageDto } from "@/types/DTOs/message.interface"
+import type { MessageDto } from "@/types/DTOs/message.interface"
 import { MessageStatus } from "./message-status"
 import { MessageReactions } from "./message-reactions"
 import { MessageContent } from "./message-content"
@@ -23,13 +23,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { ContactDto } from "@/types/DTOs/contact.interface"
+import type { ChatDto } from "@/types/DTOs/chat.interface"
 import { AttachmentActions } from "./attachment-actions"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { flags } from "@/lib/flag-utils"
 
 interface ChatAreaProps {
-  contact?: ContactDto
+  chat?: ChatDto
   messages: MessageDto[]
   onSendMessage: (text: string, quotedMessage?: MessageDto) => void
   onSendAttachment: (file: File) => void
@@ -38,11 +38,11 @@ interface ChatAreaProps {
   onForward?: (message: MessageDto) => void
   onDelete?: (message: MessageDto) => void
   isTyping?: boolean
-  onEditContact?: (contactId: string, contactName: string, phoneNumber: string, profilePicture: File | null) => void
+  onEditChat?: (chatId: string, chatName: string, phoneNumber: string, profilePicture: File | null) => void
 }
 
 export function ChatArea({
-  contact,
+  chat,
   messages,
   onSendMessage,
   onSendAttachment,
@@ -51,7 +51,7 @@ export function ChatArea({
   onForward,
   onDelete,
   isTyping = false,
-  onEditContact,
+  onEditChat,
 }: ChatAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [inputValue, setInputValue] = useState("")
@@ -67,13 +67,13 @@ export function ChatArea({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    if (isEditDialogOpen && contact) {
-      setEditedName(contact.displayName || "")
-      setEditedNumber(contact.number?.slice(2) ?? "")
-      setPreviewUrl(contact.profilePictureUrl || "")
+    if (isEditDialogOpen && chat) {
+      setEditedName(chat.contact?.displayName || "")
+      setEditedNumber(chat.remoteJid?.slice(2) ?? "")
+      setPreviewUrl(chat.contact?.profilePictureUrl || "")
       setEditedPhoto(null)
     }
-  }, [isEditDialogOpen, contact, messages])
+  }, [isEditDialogOpen, chat, messages])
 
   function triggerFilePicker(accept: string) {
     if (fileInputRef.current) {
@@ -100,8 +100,8 @@ export function ChatArea({
   }
 
   const handleSaveContact = () => {
-    if (!contact) return
-    onEditContact?.(`${contact.id}`, editedName, `${flags[countryCode].dialCodeOnlyNumber}${editedNumber}`, editedPhoto)
+    if (!chat) return
+    onEditChat?.(`${chat.id}`, editedName, `${flags[countryCode].dialCodeOnlyNumber}${editedNumber}`, editedPhoto)
     setIsEditDialogOpen(false)
   }
 
@@ -129,7 +129,7 @@ export function ChatArea({
     navigator.clipboard.writeText(content)
   }
 
-  if (!contact) {
+  if (!chat) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
         <div className="text-center">
@@ -147,22 +147,19 @@ export function ChatArea({
           <div className="relative">
             <Avatar className="h-10 w-10">
               <AvatarImage
-                src={contact.profilePictureUrl || "/placeholder.svg"}
-                alt={contact.displayName || contact.number}
+                src={chat.contact?.profilePictureUrl || "/placeholder.svg"}
+                alt={chat.contact?.displayName || chat.remoteJid || "Chat"}
               />
-              <AvatarFallback>{(contact.displayName || contact.number).charAt(0)}</AvatarFallback>
+              <AvatarFallback>{(chat.contact?.displayName || chat.remoteJid || "?").charAt(0)}</AvatarFallback>
             </Avatar>
-            {contact.lastKnownPresence && (
-              <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-card" />
-            )}
           </div>
           <div>
-            <p className="font-medium">{contact.displayName || contact.number}</p>
+            <p className="font-medium">{chat.contact?.displayName || chat.remoteJid || "Desconhecido"}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} disabled>
             <Edit className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" disabled>
@@ -199,9 +196,9 @@ export function ChatArea({
                   message.isFromMe ? "bg-primary text-primary-foreground" : "bg-card border border-border",
                 )}
               >
-                {!message.isFromMe && message.group && (
+                {!message.isFromMe && message.chat?.isGroup && (
                   <p className="text-xs font-medium text-primary mb-1">
-                    {message.contact?.displayName || message.remoteFrom}
+                    {message.chat.contact?.displayName || message.remoteFrom || "Desconhecido"}
                   </p>
                 )}
 
@@ -253,8 +250,7 @@ export function ChatArea({
             <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-primary mb-1">
-                  Respondendo a{" "}
-                  {quotedMessage.isFromMe ? "você mesmo" : quotedMessage.contact?.displayName || "contato"}
+                  Respondendo a {quotedMessage.isFromMe ? "você mesmo" : quotedMessage.chat?.contact?.displayName || "contato"}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{quotedMessage.content}</p>
               </div>
@@ -300,8 +296,8 @@ export function ChatArea({
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Editar Contato</DialogTitle>
-            <DialogDescription>Atualize as informações do contato aqui.</DialogDescription>
+            <DialogTitle>Editar Chat</DialogTitle>
+            <DialogDescription>Atualize as informações do chat aqui.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col items-center gap-4">
@@ -320,7 +316,7 @@ export function ChatArea({
                 id="name"
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
-                placeholder="Nome do contato"
+                placeholder="Nome do chat"
               />
             </div>
             <div className="grid gap-2">

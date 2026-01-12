@@ -29,7 +29,7 @@ export default function StudentsPage() {
     const searchLower = search.toLowerCase()
     return students.filter(
       (student) =>
-        student.userExtension?.user?.firstName.toLowerCase().includes(searchLower) ||
+        student.userExtension?.user?.firstName?.toLowerCase().includes(searchLower) ||
         student.goal?.toLowerCase().includes(searchLower) ||
         student.userExtension?.user?.email?.toLowerCase().includes(searchLower),
     )
@@ -108,7 +108,7 @@ export default function StudentsPage() {
                 {filteredStudents.map((student) => (
                   <StudentCard
                     key={`${student.userExtensionId}`}
-                    id={student.userExtensionId}
+                    id={`${student.userExtensionId}`}
                     name={student.userExtension?.user?.firstName || ""}
                     age={calculateAge(student.userExtension?.user?.birthDate)}
                     height={student.height}
@@ -164,8 +164,8 @@ export default function StudentsPage() {
                         <TableCell>{student.weight ? `${student.weight} kg` : "-"}</TableCell>
                         <TableCell>{student.goal || "-"}</TableCell>
                         <TableCell>
-                          <Badge className={statusConfig[student.status].color}>
-                            {statusConfig[student.status].label}
+                          <Badge className={statusConfig[student.status ?? StudentStatusEnum.Pending].color}>
+                            {statusConfig[student.status ?? StudentStatusEnum.Pending].label}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
