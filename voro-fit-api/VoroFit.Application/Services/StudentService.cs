@@ -12,11 +12,6 @@ namespace VoroFit.Application.Services
 {
     public class StudentService(IStudentRepository studentRepository, IMapper mapper) : ServiceBase<Student>(studentRepository), IStudentService
     {
-        public Task<MeasurementDto> AddMeasurementAsync(Guid studentId, MeasurementDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task DeleteAsync(Guid id)
         {
             return base.DeleteAsync(id);
@@ -44,6 +39,7 @@ namespace VoroFit.Application.Services
                     .ThenInclude(s => s.User)
                 .Include(s => s.UserExtension)
                     .ThenInclude(s => s.Contact)
+                        .ThenInclude(c => c!.Chats)
                 .Include(s => s.WorkoutHistories)
                     .ThenInclude(wh => wh.WorkoutPlanDay)
                 .Include(s => s.FavoriteExercises)

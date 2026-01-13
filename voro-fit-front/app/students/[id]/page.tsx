@@ -18,13 +18,13 @@ import {
   Phone,
   TrendingUp,
   Edit,
-  Loader2,
+  Plus,
 } from "lucide-react"
 import Link from "next/link"
 import { useStudents } from "@/hooks/use-students.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
-import { StudentDto } from "@/types/DTOs/student.interface"
+import type { StudentDto } from "@/types/DTOs/student.interface"
 import { Loading } from "@/components/ui/custom/loading/loading"
 import { DayOfWeekEnum } from "@/types/Enums/dayOfWeekEnum.enum"
 
@@ -42,7 +42,7 @@ export default function StudentDetailPage() {
   }, [params.id, fetchStudentById])
 
   const statusConfig = {
-    [StudentStatusEnum.Unspecified]: { label: "Não definido", color: "bg-muted text-muted-foreground", },
+    [StudentStatusEnum.Unspecified]: { label: "Não definido", color: "bg-muted text-muted-foreground" },
     [StudentStatusEnum.Active]: { label: "Ativo", color: "bg-accent text-accent-foreground" },
     [StudentStatusEnum.Inactive]: { label: "Inativo", color: "bg-muted text-muted-foreground" },
     [StudentStatusEnum.Pending]: { label: "Pendente", color: "bg-destructive/10 text-destructive" },
@@ -132,7 +132,10 @@ export default function StudentDetailPage() {
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"} alt={`${student?.userExtension?.user?.firstName}`} />
+                    <AvatarImage
+                      src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"}
+                      alt={`${student?.userExtension?.user?.firstName}`}
+                    />
                     <AvatarFallback>
                       {`${student?.userExtension?.user?.firstName}`
                         .split(" ")
@@ -144,7 +147,9 @@ export default function StudentDetailPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.firstName} ${student?.userExtension?.user?.lastName}`}</h1>
-                      <Badge className={statusConfig[student?.status ?? 100].color}>{statusConfig[student?.status ?? 100].label}</Badge>
+                      <Badge className={statusConfig[student?.status ?? 100].color}>
+                        {statusConfig[student?.status ?? 100].label}
+                      </Badge>
                     </div>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
@@ -166,7 +171,7 @@ export default function StudentDetailPage() {
 
                 <div className="flex gap-2">
                   <Button variant="outline" asChild>
-                    <Link href={`/messages?contact=${student?.userExtension?.contact?.id}`}>
+                    <Link href={`/messages?student=${student?.userExtensionId}`}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mensagem
                     </Link>
@@ -264,7 +269,9 @@ export default function StudentDetailPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">Idade</p>
                         <p className="font-medium">
-                          {calculateAge(student?.userExtension?.user?.birthDate) ? `${calculateAge(student?.userExtension?.user?.birthDate)} anos` : "-"}
+                          {calculateAge(student?.userExtension?.user?.birthDate)
+                            ? `${calculateAge(student?.userExtension?.user?.birthDate)} anos`
+                            : "-"}
                         </p>
                       </div>
                       <div>
@@ -323,7 +330,10 @@ export default function StudentDetailPage() {
                       {student?.workoutHistories.map((workout) => (
                         <div key={workout.id} className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-1">
-                            <p className="font-medium">{getWeek(workout.workoutPlanDay?.workoutPlanWeek?.weekNumber)} · {getDayOfWeek(workout.workoutPlanDay?.dayOfWeek)}</p>
+                            <p className="font-medium">
+                              {getWeek(workout.workoutPlanDay?.workoutPlanWeek?.weekNumber)} ·{" "}
+                              {getDayOfWeek(workout.workoutPlanDay?.dayOfWeek)}
+                            </p>
                             <p className="text-sm text-muted-foreground">{formatDate(workout.createdAt)}</p>
                           </div>
                           <div className="text-right">
@@ -342,15 +352,28 @@ export default function StudentDetailPage() {
 
             <TabsContent value="measurements">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Histórico de Medições</CardTitle>
+                  <Button asChild>
+                    <Link href={`/students/${student?.userExtensionId}/measurements/new`}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Nova Medição
+                    </Link>
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {student?.measurements && student?.measurements.length > 0 ? (
                     <div className="space-y-4">
                       {student?.measurements.map((measure) => (
                         <div key={measure.id} className="rounded-lg border p-4">
-                          <p className="font-medium mb-3">{formatDate(measure.date)}</p>
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-medium">{formatDate(measure.date)}</p>
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link href={`/students/${student?.userExtensionId}/measurements/${measure.id}/edit`}>
+                                <Edit className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </div>
                           <div className="grid grid-cols-3 gap-4">
                             <div>
                               <p className="text-sm text-muted-foreground">Peso</p>
@@ -367,11 +390,50 @@ export default function StudentDetailPage() {
                               </p>
                             </div>
                           </div>
+                          {(measure.waist || measure.chest || measure.arm || measure.thigh) && (
+                            <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t">
+                              {measure.waist && (
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Cintura</p>
+                                  <p className="text-sm font-medium">{measure.waist}cm</p>
+                                </div>
+                              )}
+                              {measure.chest && (
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Peitoral</p>
+                                  <p className="text-sm font-medium">{measure.chest}cm</p>
+                                </div>
+                              )}
+                              {measure.arm && (
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Braço</p>
+                                  <p className="text-sm font-medium">{measure.arm}cm</p>
+                                </div>
+                              )}
+                              {measure.thigh && (
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Coxa</p>
+                                  <p className="text-sm font-medium">{measure.thigh}cm</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {measure.notes && (
+                            <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">{measure.notes}</p>
+                          )}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-center py-8">Nenhuma medição registrada</p>
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">Nenhuma medição registrada</p>
+                      <Button asChild variant="outline">
+                        <Link href={`/students/${student?.userExtensionId}/measurements/new`}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Adicionar Primeira Medição
+                        </Link>
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>

@@ -1,3 +1,4 @@
+import { ChatDto } from "./chat.interface"
 import type { ContactIdentifierDto } from "./contact-identifier.interface"
 import type { GroupMemberDto } from "./group-member.interface"
 
@@ -14,4 +15,5 @@ export interface ContactDto {
   lastKnownPresence?: boolean
   identifiers?: ContactIdentifierDto[]
   groupMemberships?: GroupMemberDto[]
+  chats: ChatDto[]
 }

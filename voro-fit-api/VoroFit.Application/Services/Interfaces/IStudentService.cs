@@ -10,6 +10,5 @@ namespace VoroFit.Application.Services.Interfaces
         Task<StudentDto?> GetByIdAsync(Guid id);
         Task<StudentDto> UpdateAsync(Guid id, StudentDto model);
         Task DeleteAsync(Guid id);
-        Task<MeasurementDto> AddMeasurementAsync(Guid studentId, MeasurementDto model);
     }
 }

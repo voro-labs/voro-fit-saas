@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { redirect, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,6 +13,7 @@ import type { ExerciseDto } from "@/types/DTOs/exercise.interface"
 import { ExerciseTypeEnum } from "@/types/Enums/exerciseTypeEnum.enum"
 import { Loading } from "@/components/ui/custom/loading/loading"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { FadeImage } from "@/components/fade-image"
 
 export default function ExerciseDetailPage() {
   const params = useParams()
@@ -142,23 +143,22 @@ export default function ExerciseDetailPage() {
                           <video
                             src={exercise?.mediaUrl || exercise?.media}
                             controls
-                            className="w-full h-full object-cover"
+
                           />
                         ) : (
-                          <img
+                          <FadeImage
                             src={exercise?.mediaUrl || exercise?.media || "/placeholder.svg"}
                             alt={`${exercise?.name} - Demonstração`}
-                            className="w-full h-full object-cover"
+
                           />
                         )}
                       </div>
                     </TabsContent>
                     <TabsContent value="thumbnail" className="mt-0">
                       <div className="aspect-video bg-muted">
-                        <img
+                        <FadeImage
                           src={exercise?.thumbnail || exercise?.thumbnail || "/placeholder.svg"}
                           alt={`${exercise?.name} - Thumbnail`}
-                          className="w-full h-full object-cover"
                         />
                       </div>
                     </TabsContent>
@@ -170,23 +170,20 @@ export default function ExerciseDetailPage() {
                       <video
                         src={exercise?.mediaUrl || exercise?.media}
                         controls
-                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <img
+                      <FadeImage
                         src={exercise?.mediaUrl || exercise?.media || "/placeholder.svg"}
                         alt={exercise?.name}
-                        className="w-full h-full object-cover"
                       />
                     )}
                   </div>
                 ) : (
                   // Only thumbnail available
                   <div className="aspect-video bg-muted">
-                    <img
+                    <FadeImage
                       src={exercise?.thumbnail || exercise?.thumbnail || "/placeholder.svg"}
                       alt={exercise?.name}
-                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}

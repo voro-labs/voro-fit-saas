@@ -22,6 +22,7 @@ import {
   FileText,
   Save,
   Info,
+  AlertCircle,
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -33,6 +34,8 @@ import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { StudentDto } from "@/types/DTOs/student.interface"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
 import { useAuth } from "@/contexts/auth.context"
+import { useInstances } from "@/hooks/use-instance.hook"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -47,6 +50,7 @@ export default function EditStudentPage() {
   const params = useParams()
   const router = useRouter()
   const { user: trainer } = useAuth()
+  const { instances } = useInstances()
   const { fetchStudentById, updateStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -63,6 +67,9 @@ export default function EditStudentPage() {
     goal: "",
     notes: "",
   })
+
+  const hasInstances = !instances ? true : instances.length > 0
+
   const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
@@ -218,6 +225,7 @@ export default function EditStudentPage() {
                         id="firstName"
                         placeholder="Ex: Carlos"
                         required
+                        autoComplete="off"
                         className="h-12 text-base"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -233,6 +241,7 @@ export default function EditStudentPage() {
                         id="lastName"
                         placeholder="Ex: Silva"
                         required
+                        autoComplete="off"
                         className="h-12 text-base"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -249,6 +258,7 @@ export default function EditStudentPage() {
                       <Input
                         id="email"
                         type="email"
+                        autoComplete="off"
                         placeholder="email@exemplo.com"
                         className="h-12 text-base"
                         value={formData.email}
@@ -259,25 +269,43 @@ export default function EditStudentPage() {
                       <Label htmlFor="phone" className="text-base flex items-center gap-2">
                         <Phone className="h-4 w-4" />
                         Telefone
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        {hasInstances ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <p className="text-sm">Para cadastrar telefone, é necessário ter uma{" "}
+                                  <Link href="/instances" className="font-medium underline underline-offset-2">
+                                    instância cadastrada
+                                  </Link>.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                       </Label>
                       <PhoneInput
                         id="phone"
                         value={formData.phoneNumber}
-                        autoComplete="tel"
+                        autoComplete="off"
                         onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
                         countryCode="BR"
                         placeholder="(11) 9999-9999"
                         className="h-12"
+                        disabled={!hasInstances}
                       />
                     </div>
                   </div>
@@ -356,6 +384,7 @@ export default function EditStudentPage() {
                       className="h-12 text-base"
                       value={formData.goal}
                       onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
+                      autoComplete="off"
                     />
                   </div>
 

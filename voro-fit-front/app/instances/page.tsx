@@ -17,6 +17,7 @@ import {
   Clock,
   X,
   MessageSquare,
+  RefreshCcw,
 } from "lucide-react"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import {
@@ -45,6 +46,8 @@ import { InstanceStatusEnum } from "@/types/Enums/instanceStatusEnum.enum"
 import { useRouter } from "next/navigation"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { applyMask, phoneMasks } from "@/lib/mask-utils"
+import Link from "next/link"
+import { Loading } from "@/components/ui/custom/loading/loading"
 
 export default function InstancesPage() {
   const { instances, loading, error, loadInstances, createInstance, deleteInstance, getStatus, refreshQrCode } =
@@ -139,8 +142,29 @@ export default function InstancesPage() {
     }
   }
 
+  if (error) {
+    return (
+      <div className="flex h-screen">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 p-6">
+            <Button variant="ghost" asChild className="mb-4">
+              <Link href="/instances">
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Recarregar pagina
+              </Link>
+            </Button>
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
+              {error || "Plano de treino não encontrado"}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
+      <Loading isLoading={loading}></Loading>
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -148,9 +172,16 @@ export default function InstancesPage() {
             <p className="text-muted-foreground">Gerencie suas conexões do WhatsApp para envio de mensagens</p>
           </div>
 
-          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <Dialog open={createDialogOpen} onOpenChange={(open) => {
+            setCreateDialogOpen(open);
+
+            if (open) {
+              setNewInstanceName("");
+              setNewInstancePhoneNumber("");
+            }
+          }}>
             <DialogTrigger asChild>
-              <Button disabled={instances.length > 0}>
+              <Button disabled={instances.length > 0 || loading}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nova Instância
               </Button>
@@ -194,7 +225,7 @@ export default function InstancesPage() {
                     var instance = createInstance(newInstanceName, newInstancePhoneNumber)
                     if (instance !== null) setCreateDialogOpen(false)
                   }}
-                  disabled={!newInstanceName.trim() || loading}
+                  disabled={loading}
                 >
                   {loading ? "Criando..." : "Criar Instância"}
                 </Button>
@@ -213,7 +244,14 @@ export default function InstancesPage() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Smartphone className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-4">Nenhuma instância criada ainda</p>
-              <Button onClick={() => setCreateDialogOpen(true)}>
+              <Button onClick={() => {
+                setCreateDialogOpen(true);
+
+                if (true) {
+                  setNewInstanceName("");
+                  setNewInstancePhoneNumber("");
+                }
+              }} disabled={loading}>
                 <Plus className="mr-2 h-4 w-4" />
                 Criar Primeira Instância
               </Button>
@@ -270,6 +308,7 @@ export default function InstancesPage() {
                           setSelectedInstanceId(`${instance.id}`)
                           setQrDialogOpen(true)
                         }}
+                        disabled={loading}
                       >
                         <QrCode className="mr-2 h-4 w-4" />
                         Ver QR Code
@@ -278,7 +317,7 @@ export default function InstancesPage() {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
+                        <Button variant="destructive" size="sm" disabled={loading}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>

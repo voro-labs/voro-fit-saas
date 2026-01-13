@@ -22,7 +22,7 @@ export default function SignInPage() {
   })
 
   const [showPassword, setShowPassword] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<SignInDto>({
+  const [fieldErrors, setFieldErrors] = useState({
     email: "",
     password: ""
   })
@@ -35,7 +35,7 @@ export default function SignInPage() {
   }, [user, router])
 
   const validateForm = (): boolean => {
-    const errors: SignInDto = {
+    const errors: any = {
       email: "",
       password: ""
     }
@@ -53,7 +53,7 @@ export default function SignInPage() {
     }
 
     setFieldErrors(errors)
-    return Object.keys(errors).length === 0
+    return Object.keys(errors).values.length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

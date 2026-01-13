@@ -22,14 +22,11 @@ namespace VoroFit.Application.DTOs.Evolution
         public DateTimeOffset? LastPresenceAt { get; set; }
 
         public Guid? UserExtensionId { get; set; }
-        
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public UserExtensionDto? UserExtension { get; set; }
         
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+        public ICollection<MessageReactionDto>? MessageReactions { get; set; }
         public ICollection<ContactIdentifierDto>? Identifiers { get; set; }
-        
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
         public ICollection<GroupMemberDto>? GroupMemberships { get; set; }
+        public ICollection<ChatDto>? Chats { get; set; }
     }
 }

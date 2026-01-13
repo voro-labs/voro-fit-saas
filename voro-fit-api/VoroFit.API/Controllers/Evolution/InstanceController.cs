@@ -12,6 +12,7 @@ using VoroFit.Application.Services.Interfaces.Evolution;
 using VoroFit.Domain.Enums;
 using VoroFit.Shared.Utils;
 using VoroFit.Application.Services.Interfaces;
+using System.Net;
 
 namespace VoroFit.API.Controllers.Evolution
 {
@@ -79,7 +80,17 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 evolutionService.SetInstanceName(instanceName);
 
-                await evolutionService.DeleteInstanceAsync();
+                try
+                {
+                    await evolutionService.DeleteInstanceAsync();
+                }
+                catch(HttpRequestException ex)
+                {
+                    if (ex.StatusCode != HttpStatusCode.NotFound)
+                    {
+                        throw;
+                    }
+                }
 
                 var instanceRequestDto = new InstanceRequestDto() { InstanceName = instanceName };
 

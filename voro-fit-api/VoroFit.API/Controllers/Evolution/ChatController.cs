@@ -40,8 +40,7 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 var chats = await chatService
                     .Query(c => !c.IsGroup)
-                    .Where(item => item.InstanceExtensionId == instanceId && 
-                        item.Messages != null && item.Messages.Any())
+                    .Where(item => item.InstanceExtensionId == instanceId)
                     .Include(item => item.Contact)
                     .Include(item => item.Group)
                     .OrderByDescending(c => c.LastMessageAt)

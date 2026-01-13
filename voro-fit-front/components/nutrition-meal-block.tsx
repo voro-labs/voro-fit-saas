@@ -130,6 +130,7 @@ export function MealBlock({ meals, onMealsChange }: MealBlockProps) {
                     value={meal.quantity || ""}
                     onChange={(e) => updateMeal(index, "quantity", e.target.value)}
                     className="h-9"
+                    autoComplete="off"
                   />
                 </div>
 

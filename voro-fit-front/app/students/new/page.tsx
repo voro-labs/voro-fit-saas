@@ -22,6 +22,7 @@ import {
   Target,
   FileText,
   Info,
+  AlertCircle,
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -33,6 +34,8 @@ import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
 import { useAuth } from "@/contexts/auth.context"
 import { StudentDto } from "@/types/DTOs/student.interface"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useInstances } from "@/hooks/use-instance.hook"
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -46,6 +49,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 export default function NewStudentPage() {
   const router = useRouter()
   const { user: trainer } = useAuth()
+  const { instances } = useInstances()
   const { createStudent, loading, error } = useStudents()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -62,6 +66,8 @@ export default function NewStudentPage() {
     goal: "",
     notes: "",
   })
+
+  const hasInstances = !instances ? true : instances.length > 0
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -227,16 +233,33 @@ export default function NewStudentPage() {
                       <Label htmlFor="phone" className="text-base flex items-center gap-2">
                         <Phone className="h-4 w-4" />
                         Telefone
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        {hasInstances ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <p className="text-sm">Para cadastrar telefone, é necessário ter uma{" "}
+                                  <Link href="/instances" className="font-medium underline underline-offset-2">
+                                    instância cadastrada
+                                  </Link>.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                       </Label>
                       <PhoneInput
                         id="phone"
@@ -246,6 +269,7 @@ export default function NewStudentPage() {
                         countryCode="BR"
                         placeholder="(11) 9999-9999"
                         className="h-12"
+                        disabled={!hasInstances}
                       />
                     </div>
                   </div>

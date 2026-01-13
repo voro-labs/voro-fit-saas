@@ -22,7 +22,9 @@ namespace VoroFit.Domain.Entities.Evolution
         public Guid? UserExtensionId { get; set; }
         public UserExtension? UserExtension { get; set; }
 
+        public ICollection<MessageReaction> MessageReactions { get; set; } = [];
         public ICollection<ContactIdentifier> Identifiers { get; set; } = [];
         public ICollection<GroupMember> GroupMemberships { get; set; } = [];
+        public ICollection<Chat> Chats { get; set; } = [];
     }
 }

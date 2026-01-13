@@ -19,7 +19,7 @@ namespace VoroFit.API.Controllers
     [Authorize]
     public class StudentsController(IConversationService conversationService,
         IContactService contactService, IChatService chatService,
-        IStudentService studentService, IUserService userService) : ControllerBase
+        IStudentService studentService, IMeasurementService measurementService, IUserService userService) : ControllerBase
     {
 
         // ---------------------------------------------
@@ -136,13 +136,40 @@ namespace VoroFit.API.Controllers
                 };
 
                 var user = await userService.UpdateAsync(id, userDto);
+                await userService.SaveChangesAsync();
 
                 model.UserExtensionId = user.Id;
                 model.UserExtension = null;
 
                 var updated = await studentService.UpdateAsync(id, model);
-
                 await studentService.SaveChangesAsync();
+
+                var trainer = await userService.GetByIdAsync(
+                    t => t.Id == model.TrainerId,
+                    t => t.Include(t => t.UserExtension)
+                        .ThenInclude(ue => ue!.Instances));
+
+                var instances = trainer?.UserExtension?.Instances ?? [];
+
+                foreach (var instance in instances)
+                {
+                    var countryCode = $"{user.CountryCode}".Replace("+", "");
+
+                    var (senderContact, chat) = await conversationService.CreateChatAndGroupOrContactAsync(
+                        $"{instance.Name}", $"{countryCode}{user.PhoneNumber}@s.whatsapp.net",
+                        $"{countryCode}{user.PhoneNumber}@s.whatsapp.net", user);
+
+                    if (senderContact != null)
+                    {
+                        senderContact.UserExtensionId = user.Id;
+                        contactService.Update(senderContact);
+                    }
+
+                    chatService.Update(chat);
+
+                    await contactService.SaveChangesAsync();
+                    await chatService.SaveChangesAsync();
+                }
 
                 return ResponseViewModel<StudentDto>
                     .SuccessWithMessage("Aluno atualizado com sucesso.", updated)
@@ -180,6 +207,34 @@ namespace VoroFit.API.Controllers
             }
         }
 
+        // GET /api/v1/students/{id}/measurements/{measurementId}
+        [HttpGet("{id:guid}/measurements/{measurementId:guid}")]
+        public async Task<IActionResult> GetById(Guid id, Guid measurementId)
+        {
+            try
+            {
+                var result = await measurementService
+                    .GetByIdAsync(measurementId, id);
+
+                if (result is null)
+                {
+                    return ResponseViewModel<MeasurementDto>
+                        .Fail("Medição não encontrada.")
+                        .ToActionResult();
+                }
+
+                return ResponseViewModel<MeasurementDto>
+                    .SuccessWithMessage("Medição carregada com sucesso.", result)
+                    .ToActionResult();
+            }
+            catch (Exception ex)
+            {
+                return ResponseViewModel<MeasurementDto>
+                    .Fail(ex.Message)
+                    .ToActionResult();
+            }
+        }
+
         // ---------------------------------------------
         // POST /students/{id}/measurements
         // ---------------------------------------------
@@ -188,7 +243,14 @@ namespace VoroFit.API.Controllers
         {
             try
             {
-                var measurement = await studentService.AddMeasurementAsync  (id, model);
+                if (id != model.StudentId)
+                    return ResponseViewModel<MeasurementDto>
+                    .Fail("Usuario não condiz com o codigo informado!")
+                    .ToActionResult();
+
+                var measurement = await measurementService.CreateAsync(model);
+
+                await measurementService.SaveChangesAsync();
 
                 return ResponseViewModel<MeasurementDto>
                     .Success(measurement)

@@ -1,7 +1,7 @@
 export interface MeasurementDto {
-  id: string
-  studentId: string
-  date: Date
+  id?: string
+  studentId?: string
+  date?: Date
   weight?: number
   bodyFat?: number
   muscleMass?: number
@@ -10,5 +10,5 @@ export interface MeasurementDto {
   arm?: number
   thigh?: number
   notes?: string
-  createdAt: Date
+  createdAt?: Date
 }

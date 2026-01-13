@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Eye, Globe, User, ImageIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { FadeImage } from "./fade-image"
 
 interface ExerciseCardProps {
   id: string
@@ -28,21 +30,11 @@ export function ExerciseCard({
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
       {/* Thumbnail */}
-      <div className="relative aspect-video bg-muted overflow-hidden">
-        {imgSrc ? (
-          <Image
-            src={imgSrc}
-            alt={name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
-            onError={() => setImgSrc(undefined)}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-            <ImageIcon className="h-14 w-14" />
-          </div>
-        )}
+      <div className="aspect-video">
+        <FadeImage
+          src={imgSrc}
+          alt={name}
+        />
 
         {/* Badge */}
         <div className="absolute top-2 right-2">

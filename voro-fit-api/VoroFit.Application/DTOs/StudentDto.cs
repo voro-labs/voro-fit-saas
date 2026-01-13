@@ -19,8 +19,8 @@ namespace VoroFit.Application.DTOs
 
         public StudentStatusEnum? Status { get; set; } = StudentStatusEnum.Active;
 
-        public string? Goal { get; set; }
-        public string? Notes { get; set; }
+        public string? Goal { get; set; } = string.Empty;
+        public string? Notes { get; set; } = string.Empty;
 
         // ===============================
         // RELACIONAMENTOS IMPORTANTES

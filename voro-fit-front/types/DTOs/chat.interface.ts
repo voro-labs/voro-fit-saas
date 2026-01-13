@@ -15,5 +15,6 @@ export interface ChatDto {
   group?: GroupDto
   contact?: ContactDto
   messages?: MessageDto[]
+  instanceExtensionId?: string
   instanceExtension?: InstanceExtensionDto
 }
