@@ -12,7 +12,7 @@ namespace VoroFit.Application.DTOs.Evolution
         public string? RemoteTo { get; set; }
 
         public string? Content { get; set; }
-        public string? Base64 { get; set; }
+        public string? Base64 { get; set; } = string.Empty;
         public string? RawJson { get; set; }
 
         public DateTimeOffset? SentAt { get; set; }
