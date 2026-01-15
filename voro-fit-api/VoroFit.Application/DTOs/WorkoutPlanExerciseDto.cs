@@ -1,0 +1,25 @@
+﻿namespace VoroFit.Application.DTOs
+{
+    public class WorkoutPlanExerciseDto
+    {
+        public Guid? Id { get; set; }
+
+        public Guid? WorkoutPlanDayId { get; set; }
+        public WorkoutPlanDayDto? WorkoutPlanDay { get; set; }
+
+        public Guid? ExerciseId { get; set; }
+        public ExerciseDto? Exercise { get; set; }
+
+        public int? Order { get; set; }
+        public int? Sets { get; set; }
+        public int? Reps { get; set; }
+        public int? RestInSeconds { get; set; }
+        public float? Weight { get; set; }
+
+        public string? Notes { get; set; }
+        public string? Alternative { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
+    }
+}
