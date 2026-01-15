@@ -15,5 +15,5 @@ export interface ContactDto {
   lastKnownPresence?: boolean
   identifiers?: ContactIdentifierDto[]
   groupMemberships?: GroupMemberDto[]
-  chats: ChatDto[]
+  chats?: ChatDto[]
 }
