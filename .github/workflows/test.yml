@@ -20,7 +20,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          cd voro-lp-api
+          cd ${{ secrets.FOLDER__API }}
           dotnet restore
 
       - name: Build solution
