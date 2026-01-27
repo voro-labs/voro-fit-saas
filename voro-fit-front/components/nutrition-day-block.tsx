@@ -51,12 +51,12 @@ export function NutritionDayBlock({ day, onRemove, onChange }: NutritionDayBlock
   return (
     <Card className="bg-muted/30">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-primary" />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-primary shrink-0" />
             Dia Alimentar
           </CardTitle>
-          <Button type="button" size="sm" onClick={onRemove} variant="destructive">
+          <Button type="button" size="sm" onClick={onRemove} variant="destructive" className="w-full sm:w-auto text-xs sm:text-sm">
             Remover Dia
           </Button>
         </div>
@@ -85,13 +85,13 @@ export function NutritionDayBlock({ day, onRemove, onChange }: NutritionDayBlock
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-              <UtensilsCrossed className="h-4 w-4" />
+              <UtensilsCrossed className="h-4 w-4 shrink-0" />
               <span>Refeições do Dia</span>
             </div>
-            <Button type="button" size="sm" onClick={addMeal} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button type="button" size="sm" onClick={addMeal} variant="outline" className="w-full sm:w-auto text-xs sm:text-sm bg-transparent">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
               Adicionar Refeição
             </Button>
           </div>

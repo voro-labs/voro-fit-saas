@@ -61,8 +61,8 @@ export default function NewWorkoutPage() {
 
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
-      <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
-        <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 overflow-x-hidden">
+        <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6 w-full">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
               <Link href="/workouts">
@@ -71,13 +71,13 @@ export default function NewWorkoutPage() {
               </Link>
             </Button>
 
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                <Dumbbell className="h-7 w-7 text-primary" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+                <Dumbbell className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-balance">Montar Plano de Treino</h1>
-                <p className="text-muted-foreground">Crie um plano de treino com semanas e dias personalizados</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-balance">Montar Plano de Treino</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Crie um plano com semanas e dias personalizados</p>
               </div>
             </div>
           </div>
@@ -89,12 +89,12 @@ export default function NewWorkoutPage() {
           )}
 
           <Card className="border-border/50 shadow-lg">
-            <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-2xl">Informações do Plano</CardTitle>
-              <CardDescription>Selecione o aluno e monte o plano de treino</CardDescription>
+            <CardHeader className="space-y-1 pb-4 sm:pb-6 p-4 sm:p-6">
+              <CardTitle className="text-xl sm:text-2xl">Informações do Plano</CardTitle>
+              <CardDescription className="text-sm">Selecione o aluno e monte o plano de treino</CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-8">
+            <CardContent className="p-4 sm:p-6">
+              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                 {/* Basic Information Section */}
                 <div className="space-y-6">
                   <div className="flex items-center gap-2 text-sm font-semibold text-primary">
@@ -164,11 +164,11 @@ export default function NewWorkoutPage() {
                   )}
                 </div>
 
-                <div className="flex gap-3 justify-end pt-6 border-t">
-                  <Button type="button" variant="outline" size="lg" asChild>
+                <div className="flex flex-col-reverse gap-3 pt-6 border-t sm:flex-row sm:justify-end">
+                  <Button type="button" variant="outline" size="lg" asChild className="w-full sm:w-auto bg-transparent">
                     <Link href="/workouts">Cancelar</Link>
                   </Button>
-                  <Button type="submit" size="lg" disabled={loading || !selectedStudentId} className="min-w-[180px]">
+                  <Button type="submit" size="lg" disabled={loading || !selectedStudentId} className="w-full sm:w-auto sm:min-w-[180px]">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />

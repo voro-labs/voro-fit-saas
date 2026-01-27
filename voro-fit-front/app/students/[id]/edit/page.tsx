@@ -21,20 +21,17 @@ import {
   Target,
   FileText,
   Save,
-  Info,
   AlertCircle,
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
+import { useInstances } from "@/hooks/use-instance.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { Loading } from "@/components/ui/custom/loading/loading"
 import { DatePicker } from "@/components/ui/custom/date-picker"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
-import { StudentDto } from "@/types/DTOs/student.interface"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
-import { useAuth } from "@/contexts/auth.context"
-import { useInstances } from "@/hooks/use-instance.hook"
+import type { StudentDto } from "@/types/DTOs/student.interface"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -49,9 +46,8 @@ const fileToBase64 = (file: File): Promise<string> => {
 export default function EditStudentPage() {
   const params = useParams()
   const router = useRouter()
-  const { user: trainer } = useAuth()
-  const { instances } = useInstances()
   const { fetchStudentById, updateStudent, loading, error } = useStudents()
+  const { instances } = useInstances()
   const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
 
@@ -67,10 +63,9 @@ export default function EditStudentPage() {
     goal: "",
     notes: "",
   })
-
-  const hasInstances = !instances ? true : instances.length > 0
-
   const [loadingData, setLoadingData] = useState(true)
+
+  const hasInstances = instances.length > 0
 
   useEffect(() => {
     if (params.id) {
@@ -128,14 +123,13 @@ export default function EditStudentPage() {
           phoneNumber: formData.phoneNumber,
           countryCode: formData.countryCode,
           birthDate: formData.birthDate ? new Date(formData.birthDate) : undefined,
-          avatarUrl: avatarBase64 || avatarPreview || undefined
-        }
+          avatarUrl: avatarBase64 || avatarPreview || undefined,
+        },
       },
-      trainerId: `${trainer?.userId}`,
       height: formData.height ? Number(formData.height) : undefined,
       weight: formData.weight ? Number(formData.weight) : undefined,
       goal: formData.goal || undefined,
-      notes: formData.notes || undefined
+      notes: formData.notes || undefined,
     }
 
     const result = await updateStudent(params.id as string, studentData)
@@ -150,8 +144,8 @@ export default function EditStudentPage() {
 
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
-      <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
-        <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 overflow-x-hidden">
+        <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6 w-full">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="group">
               <Link href={`/students/${params.id}`}>
@@ -160,13 +154,13 @@ export default function EditStudentPage() {
               </Link>
             </Button>
 
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                <User className="h-7 w-7 text-primary" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+                <User className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-balance">Editar Aluno</h1>
-                <p className="text-muted-foreground">Atualize as informações do aluno</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-balance">Editar Aluno</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Atualize as informações do aluno</p>
               </div>
             </div>
           </div>
@@ -185,26 +179,26 @@ export default function EditStudentPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Avatar Section */}
-                <div className="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-xl bg-muted/50 border border-border/50">
-                  <Avatar className="h-28 w-28 ring-4 ring-background shadow-lg">
+                <div className="flex flex-col items-center gap-4 p-4 sm:p-6 rounded-xl bg-muted/50 border border-border/50 sm:flex-row sm:gap-6">
+                  <Avatar className="h-20 w-20 sm:h-28 sm:w-28 ring-4 ring-background shadow-lg shrink-0">
                     <AvatarImage src={avatarPreview || "/placeholder.svg"} alt="Avatar" />
                     <AvatarFallback className="bg-primary/10">
-                      <User className="h-14 w-14 text-primary" />
+                      <User className="h-10 w-10 sm:h-14 sm:w-14 text-primary" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 w-full">
+                  <div className="flex-1 w-full min-w-0">
                     <Label htmlFor="avatar" className="cursor-pointer block">
-                      <div className="flex items-center gap-3 rounded-xl border-2 border-dashed border-border p-5 hover:border-primary hover:bg-primary/5 transition-all duration-200">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                          <Upload className="h-6 w-6 text-primary" />
+                      <div className="flex items-center gap-3 rounded-xl border-2 border-dashed border-border p-4 sm:p-5 hover:border-primary hover:bg-primary/5 transition-all duration-200">
+                        <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                          <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium">Clique para alterar a foto</p>
-                          <p className="text-sm text-muted-foreground">PNG, JPG até 5MB</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm sm:text-base">Clique para alterar a foto</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">PNG, JPG até 5MB</p>
                         </div>
                       </div>
                     </Label>
-                    <Input id="avatar" type="file" accept="image/*" className="sr-only" onChange={handleAvatarChange} />
+                    <Input id="avatar" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                   </div>
                 </div>
 
@@ -225,7 +219,6 @@ export default function EditStudentPage() {
                         id="firstName"
                         placeholder="Ex: Carlos"
                         required
-                        autoComplete="off"
                         className="h-12 text-base"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -241,7 +234,6 @@ export default function EditStudentPage() {
                         id="lastName"
                         placeholder="Ex: Silva"
                         required
-                        autoComplete="off"
                         className="h-12 text-base"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -258,7 +250,6 @@ export default function EditStudentPage() {
                       <Input
                         id="email"
                         type="email"
-                        autoComplete="off"
                         placeholder="email@exemplo.com"
                         className="h-12 text-base"
                         value={formData.email}
@@ -269,44 +260,41 @@ export default function EditStudentPage() {
                       <Label htmlFor="phone" className="text-base flex items-center gap-2">
                         <Phone className="h-4 w-4" />
                         Telefone
-                        {hasInstances ? (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="max-w-xs">
-                                <p className="text-sm">O número de telefone é obrigatório para integração via WhatsApp</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        ) : (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="max-w-xs">
-                                <p className="text-sm">Para cadastrar telefone, é necessário ter uma{" "}
-                                  <Link href="/instances" className="font-medium underline underline-offset-2">
-                                    instância cadastrada
-                                  </Link>.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                        {!hasInstances && (
+                          <span className="text-xs text-muted-foreground font-normal">(requer instância)</span>
                         )}
                       </Label>
-                      <PhoneInput
-                        id="phone"
-                        value={formData.phoneNumber}
-                        autoComplete="off"
-                        onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
-                        countryCode="BR"
-                        placeholder="(11) 9999-9999"
-                        className="h-12"
-                        disabled={!hasInstances}
-                      />
+                      {hasInstances ? (
+                        <PhoneInput
+                          id="phone"
+                          value={formData.phoneNumber}
+                          autoComplete="tel"
+                          onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
+                          countryCode="BR"
+                          placeholder="(11) 9999-9999"
+                          className="h-12"
+                        />
+                      ) : (
+                        <div className="relative">
+                          <Input
+                            id="phone"
+                            value={formData.phoneNumber}
+                            placeholder="(11) 9999-9999"
+                            className="h-12 text-base"
+                            disabled
+                          />
+                          <Alert className="mt-2 border-amber-500/50 bg-amber-500/10">
+                            <AlertCircle className="h-4 w-4 text-amber-500" />
+                            <AlertDescription className="text-sm text-amber-700 dark:text-amber-400">
+                              Para editar telefone, é necessário ter uma{" "}
+                              <Link href="/instances" className="font-medium underline underline-offset-2">
+                                instância cadastrada
+                              </Link>
+                              .
+                            </AlertDescription>
+                          </Alert>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -384,7 +372,6 @@ export default function EditStudentPage() {
                       className="h-12 text-base"
                       value={formData.goal}
                       onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
-                      autoComplete="off"
                     />
                   </div>
 
@@ -404,11 +391,11 @@ export default function EditStudentPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-3 justify-end pt-6 border-t">
-                  <Button type="button" variant="outline" size="lg" asChild>
+                <div className="flex flex-col-reverse gap-3 pt-6 border-t sm:flex-row sm:justify-end">
+                  <Button type="button" variant="outline" size="lg" asChild className="w-full sm:w-auto bg-transparent">
                     <Link href={`/students/${params.id}`}>Cancelar</Link>
                   </Button>
-                  <Button type="submit" size="lg" disabled={loading} className="min-w-[180px]">
+                  <Button type="submit" size="lg" disabled={loading} className="w-full sm:w-auto sm:min-w-[180px]">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />

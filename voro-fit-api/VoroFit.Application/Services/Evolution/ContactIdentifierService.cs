@@ -20,8 +20,8 @@ namespace VoroFit.Application.Services.Evolution
             return base.AddAsync(contactIdentifier);
         }
 
-        // Cria ou retorna um Contact já existente
-        public async Task<ContactIdentifier> GetOrCreateAsync(string pushName, string remoteJid, string? remoteJidAlt, string? profilePicture, User? user = null)
+        // Retorna um Contact já existente
+        public async Task<ContactIdentifier?> GetAsync(string remoteJid, string? remoteJidAlt)
         {
             Contact? contact = null;
 
@@ -31,7 +31,7 @@ namespace VoroFit.Application.Services.Evolution
             {
                 contact = await contactRepository
                     .Include(c => c.Identifiers)
-                    .FirstOrDefaultAsync(c => c.Id == existingIdentifier.ContactId);
+                    .FirstOrDefaultAsync(c => c.Id == existingIdentifier.ContactId && c.UserExtension != null);
 
                 // Alt pode ser novo -> criar
                 if (!string.IsNullOrWhiteSpace(remoteJidAlt))
@@ -48,13 +48,26 @@ namespace VoroFit.Application.Services.Evolution
                 {
                     contact = await contactRepository
                         .Include(c => c.Identifiers)
-                        .FirstOrDefaultAsync(c => c.Id == altIdentifier.ContactId);
+                        .FirstOrDefaultAsync(c => c.Id == altIdentifier.ContactId && c.UserExtension != null);
 
                     // Adicionar remoteJid como novo identifier
                     await EnsureIdentifier(contact!, remoteJid);
                     return altIdentifier;
                 }
             }
+
+            return null;
+        }
+
+        public async Task<ContactIdentifier> GetOrCreateAsync(string pushName, string remoteJid, string? remoteJidAlt, string? profilePicture, User? user = null)
+        {
+            Contact? contact = null;
+
+            // 1. Se já existe
+            var existingIdentifier = await GetAsync(remoteJid, remoteJidAlt);
+
+            if (existingIdentifier != null)
+                return existingIdentifier;
 
             // 3. Nenhum existe → criar novo Contact
             contact = new Contact

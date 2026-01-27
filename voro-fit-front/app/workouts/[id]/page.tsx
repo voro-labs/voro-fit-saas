@@ -181,13 +181,13 @@ export default function WorkoutDetailPage() {
                     <AccordionContent className="px-6 pb-6">
                       {week.days && week.days.length > 0 ? (
                         <Tabs defaultValue={String(week.days[0].dayOfWeek)} className="space-y-4">
-                          <TabsList className="flex-wrap h-auto">
+                          <TabsList className="flex flex-wrap h-auto gap-1 w-full justify-start">
                             {week.days
                               .sort((a, b) => (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0))
                               .map((day) => {
                                 const dayLabel = daysOfWeek.find((d) => d.key === day.dayOfWeek)?.label || "Dia"
                                 return (
-                                  <TabsTrigger key={day.id} value={String(day.dayOfWeek)}>
+                                  <TabsTrigger key={day.id} value={String(day.dayOfWeek)} className="text-xs sm:text-sm px-2 sm:px-3">
                                     {dayLabel}
                                   </TabsTrigger>
                                 )
@@ -219,24 +219,24 @@ export default function WorkoutDetailPage() {
                                           </div>
                                         </CardHeader>
                                         <CardContent className="space-y-3">
-                                          <div className="grid grid-cols-4 gap-4">
-                                            <div className="rounded-lg border p-3">
-                                              <p className="text-xs text-muted-foreground mb-1">Séries</p>
-                                              <p className="text-lg font-bold">{exercise.sets}</p>
+                                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                                            <div className="rounded-lg border p-2 sm:p-3">
+                                              <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Séries</p>
+                                              <p className="text-base sm:text-lg font-bold">{exercise.sets}</p>
                                             </div>
-                                            <div className="rounded-lg border p-3">
-                                              <p className="text-xs text-muted-foreground mb-1">Repetições</p>
-                                              <p className="text-lg font-bold">{exercise.reps}</p>
+                                            <div className="rounded-lg border p-2 sm:p-3">
+                                              <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Reps</p>
+                                              <p className="text-base sm:text-lg font-bold">{exercise.reps}</p>
                                             </div>
-                                            <div className="rounded-lg border p-3">
-                                              <p className="text-xs text-muted-foreground mb-1">Peso</p>
-                                              <p className="text-lg font-bold">
+                                            <div className="rounded-lg border p-2 sm:p-3">
+                                              <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Peso</p>
+                                              <p className="text-base sm:text-lg font-bold">
                                                 {exercise.weight ? `${exercise.weight}kg` : "-"}
                                               </p>
                                             </div>
-                                            <div className="rounded-lg border p-3">
-                                              <p className="text-xs text-muted-foreground mb-1">Descanso</p>
-                                              <p className="text-lg font-bold">
+                                            <div className="rounded-lg border p-2 sm:p-3">
+                                              <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1">Descanso</p>
+                                              <p className="text-base sm:text-lg font-bold">
                                                 {exercise.restInSeconds ? `${exercise.restInSeconds}s` : "-"}
                                               </p>
                                             </div>

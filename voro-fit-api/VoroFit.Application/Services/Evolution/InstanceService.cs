@@ -31,7 +31,7 @@ namespace VoroFit.Application.Services.Evolution
             return base.AddRangeAsync(instances);
         }
 
-        public async Task<Instance> GetOrCreateInstance(InstanceRequestDto instanceRequestDto, string? phoneNumber = null)
+        public async Task<Instance?> GetAsync(InstanceRequestDto instanceRequestDto)
         {
             var name = instanceRequestDto.InstanceName.ToLower();
 
@@ -39,6 +39,17 @@ namespace VoroFit.Application.Services.Evolution
                 .Query(i => i.Name.ToLower() == name.ToLower())
                 .Include(i => i.InstanceExtension)
                 .FirstOrDefaultAsync();
+
+            if (instance != null)
+                return instance;
+
+            return null;
+        }
+
+
+        public async Task<Instance> GetOrCreateAsync(InstanceRequestDto instanceRequestDto, string? phoneNumber = null)
+        {
+            var instance = await GetAsync(instanceRequestDto);
 
             if (instance != null)
                 return instance;

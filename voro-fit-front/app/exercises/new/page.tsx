@@ -259,7 +259,7 @@ export default function NewExercisePage() {
                     id="thumbnail"
                     type="file"
                     accept="image/jpg,image/jpeg,image/png"
-                    className="sr-only"
+                    className="hidden"
                     onChange={handleThumbnailChange}
                   />
                 </div>
@@ -359,7 +359,7 @@ export default function NewExercisePage() {
                         id="media"
                         type="file"
                         accept="image/gif,image/jpg,image/jpeg,image/png,video/mp4"
-                        className="sr-only"
+                        className="hidden"
                         onChange={handleMediaFileChange}
                       />
                     </TabsContent>
@@ -404,11 +404,11 @@ export default function NewExercisePage() {
                   </div>
                 </div>
 
-                <div className="flex gap-3 justify-end pt-6 border-t">
-                  <Button type="button" variant="outline" size="lg" asChild>
+                <div className="flex flex-col-reverse gap-3 pt-6 border-t sm:flex-row sm:justify-end">
+                  <Button type="button" variant="outline" size="lg" asChild className="w-full sm:w-auto bg-transparent">
                     <Link href="/exercises">Cancelar</Link>
                   </Button>
-                  <Button type="submit" size="lg" disabled={loading || !muscleGroup} className="min-w-[180px]">
+                  <Button type="submit" size="lg" disabled={loading || !muscleGroup} className="w-full sm:w-auto sm:min-w-[180px]">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />

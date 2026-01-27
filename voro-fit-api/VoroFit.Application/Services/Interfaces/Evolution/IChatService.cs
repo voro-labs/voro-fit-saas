@@ -5,6 +5,7 @@ namespace VoroFit.Application.Services.Interfaces.Evolution
 {
     public interface IChatService : IServiceBase<Chat>
     {
-        Task<Chat> GetOrCreateChat(string remoteJid, Instance instance, bool isGroup);
+        Task<Chat?> GetAsync(string remoteJid);
+        Task<Chat> GetOrCreateAsync(string remoteJid, Instance instance, bool isGroup);
     }
 }

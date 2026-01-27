@@ -12,10 +12,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useStudents } from "@/hooks/use-students.hook"
 import { AuthGuard } from "@/components/auth/auth.guard"
 import { StudentStatusEnum } from "@/types/Enums/studentStatusEnum.enum"
+import { useSearchParams } from "next/navigation"
 
 export default function StudentsPage() {
   const { students, loading, error } = useStudents()
   const [search, setSearch] = useState("")
+  const searchParams = useSearchParams()
 
   const statusConfig = {
     [StudentStatusEnum.Unspecified]: { label: "Não definido", color: "bg-muted text-muted-foreground", },
@@ -49,14 +51,14 @@ export default function StudentsPage() {
 
   return (
     <AuthGuard requiredRoles={["Trainer"]}>
-      <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="min-h-screen bg-background p-4 md:p-8 overflow-x-hidden">
         <div className="max-w-6xl mx-auto space-y-6">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 flex flex-col gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-balance">Alunos</h1>
-              <p className="text-muted-foreground">Gerencie todos os seus alunos em um só lugar</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-balance">Alunos</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">Gerencie todos os seus alunos em um só lugar</p>
             </div>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-auto sm:self-end">
               <Link href="/students/new">
                 <Plus className="mr-2 h-4 w-4" />
                 Adicionar Aluno
@@ -65,12 +67,12 @@ export default function StudentsPage() {
           </div>
 
           <div className="mb-6">
-            <div className="relative max-w-md">
+            <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Buscar por nome, email, objetivo..."
-                className="pl-10"
+                className="pl-10 w-full"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -127,7 +129,7 @@ export default function StudentsPage() {
               </div>
 
               {/* Table View - Desktop */}
-              <div className="hidden lg:block border rounded-lg overflow-hidden">
+              <div className="hidden lg:block border rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

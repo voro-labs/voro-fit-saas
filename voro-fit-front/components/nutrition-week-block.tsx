@@ -59,27 +59,27 @@ export function NutritionWeekBlock({ meal, days = [], onChange }: NutritionWeekB
   return (
     <Card className="border-2 border-primary/20">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="h-8 w-8"
+              className="h-8 w-8 shrink-0"
             >
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Dias da Semana
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
+              <span className="truncate">Dias da Semana</span>
             </CardTitle>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               ({days.length} {days.length === 1 ? "dia" : "dias"})
             </span>
           </div>
-          <Button type="button" size="sm" onClick={addDay} variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
+          <Button type="button" size="sm" onClick={addDay} variant="outline" className="text-xs sm:text-sm w-full sm:w-auto bg-transparent">
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
             Adicionar Dia
           </Button>
         </div>

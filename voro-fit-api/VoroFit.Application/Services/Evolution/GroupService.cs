@@ -24,11 +24,21 @@ namespace VoroFit.Application.Services.Evolution
             return base.AddRangeAsync(groups);
         }
 
-        public async Task<Group> GetOrCreateGroup(string groupJid, string? displayName)
+        public async Task<Group?> GetAsync(string groupJid)
         {
             var group = await this
                 .Query(g => g.RemoteJid == groupJid)
                 .FirstOrDefaultAsync();
+
+            if (group != null)
+                return group;
+
+            return null;
+        }
+
+        public async Task<Group> GetOrCreateAsync(string groupJid, string? displayName)
+        {
+            var group = await GetAsync(groupJid);
 
             if (group != null)
                 return group;

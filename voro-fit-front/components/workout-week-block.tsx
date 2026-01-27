@@ -60,34 +60,34 @@ export function WorkoutWeekBlock({ week, weekIndex, onRemove, onChange }: Workou
 
   return (
     <Card className="border-2 border-primary/20">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button type="button" variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)} className="h-8 w-8">
+      <CardHeader className="pb-3 p-3 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Button type="button" variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)} className="h-8 w-8 shrink-0">
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Semana {weekIndex + 1}
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2 flex-wrap">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
+              <span>Semana {weekIndex + 1}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground font-normal">
+                ({days.length} {days.length === 1 ? "dia" : "dias"})
+              </span>
             </CardTitle>
-            <span className="text-sm text-muted-foreground">
-              ({days.length} {days.length === 1 ? "dia" : "dias"})
-            </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button type="button" size="sm" onClick={addDay} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar Dia
+            <Button type="button" size="sm" onClick={addDay} variant="outline" className="flex-1 sm:flex-none bg-transparent">
+              <Plus className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Adicionar Dia</span>
             </Button>
-            <Button type="button" size="sm" onClick={onRemove} variant="destructive">
-              Remover Semana
+            <Button type="button" size="sm" onClick={onRemove} variant="destructive" className="flex-1 sm:flex-none">
+              <span className="text-sm">Remover</span>
             </Button>
           </div>
         </div>
       </CardHeader>
 
       {isExpanded && (
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-3 sm:p-6">
           {days.length === 0 ? (
             <Card className="border-2 border-dashed border-border/50 bg-muted/20">
               <CardContent className="flex flex-col items-center justify-center py-12">

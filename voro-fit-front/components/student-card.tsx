@@ -26,42 +26,44 @@ export function StudentCard({ id, name, age, height, weight, status, avatar, goa
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
       <CardContent className="p-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14">
-            <AvatarImage src={avatar || "/placeholder.svg"} alt={`${name}`} />
-            <AvatarFallback>
-              {`${name}`
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-12 w-12 shrink-0 sm:h-14 sm:w-14">
+              <AvatarImage src={avatar || "/placeholder.svg"} alt={`${name}`} />
+              <AvatarFallback>
+                {`${name}`
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
 
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate">{`${name}`}</h3>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-              {age && <span>{age} anos</span>}
-              {age && weight && <span>•</span>}
-              {weight && <span>{weight}kg</span>}
-              {goal && (
-                <>
-                  {(age || weight) && <span>•</span>}
-                  <span className="truncate">{goal}</span>
-                </>
-              )}
-              {!age && !weight && !goal && <span>Sem informações adicionais</span>}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-semibold truncate">{`${name}`}</h3>
+                <Badge className={`${statusConfig[status].color} shrink-0`}>{statusConfig[status].label}</Badge>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 flex-wrap">
+                {age && <span>{age} anos</span>}
+                {age && weight && <span>•</span>}
+                {weight && <span>{weight}kg</span>}
+                {goal && (
+                  <>
+                    {(age || weight) && <span>•</span>}
+                    <span className="truncate max-w-[150px]">{goal}</span>
+                  </>
+                )}
+                {!age && !weight && !goal && <span>Sem informações</span>}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Badge className={statusConfig[status].color}>{statusConfig[status].label}</Badge>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/students/${id}`}>
-                <Eye className="h-4 w-4 mr-2" />
-                Ver
-              </Link>
-            </Button>
-          </div>
+          <Button asChild size="sm" variant="outline" className="w-full sm:w-auto shrink-0 bg-transparent">
+            <Link href={`/students/${id}`}>
+              <Eye className="h-4 w-4 mr-2" />
+              Ver detalhes
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -66,10 +66,10 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
               Adicionar Exercício
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Selecionar Exercício</DialogTitle>
-              <DialogDescription>Escolha um exercício da biblioteca</DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Selecionar Exercício</DialogTitle>
+              <DialogDescription className="text-sm">Escolha um exercício da biblioteca</DialogDescription>
             </DialogHeader>
             {loading ? (
               <div className="flex items-center justify-center py-8">
@@ -80,16 +80,16 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
                 <p className="text-muted-foreground">Nenhum exercício cadastrado</p>
               </div>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-2 sm:gap-3 sm:grid-cols-2">
                 {availableExercises.map((exercise) => (
                   <Card
                     key={exercise.id}
-                    className="cursor-pointer hover:border-primary transition-colors"
+                    className="cursor-pointer hover:border-primary active:bg-muted transition-colors"
                     onClick={() => addExercise(exercise)}
                   >
-                    <CardContent className="p-4">
-                      <h4 className="font-medium text-balance">{exercise.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{exercise.muscleGroup}</p>
+                    <CardContent className="p-3 sm:p-4">
+                      <h4 className="font-medium text-sm sm:text-base text-balance">{exercise.name}</h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">{exercise.muscleGroup}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -110,26 +110,26 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
         <div className="space-y-3">
           {exercises.map((exercise, index) => (
             <Card key={exercise.id || index} className="bg-background">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2 p-3 sm:pb-3 sm:p-6">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-1 cursor-grab">
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
+                    <div className="mt-1 cursor-grab hidden sm:block">
                       <GripVertical className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-sm">{exercise.exercise?.name || "Exercício"}</CardTitle>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-sm truncate">{exercise.exercise?.name || "Exercício"}</CardTitle>
                       <Badge variant="secondary" className="mt-1 text-xs">
                         {exercise.exercise?.muscleGroup || "-"}
                       </Badge>
                     </div>
                   </div>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeExercise(index)}>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeExercise(index)} className="shrink-0">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid gap-3 grid-cols-4">
+              <CardContent className="space-y-3 p-3 sm:p-6">
+                <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-4">
                   <div className="space-y-1">
                     <Label htmlFor={`sets-${index}`} className="text-xs">
                       Séries
@@ -140,7 +140,7 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
                       placeholder="3"
                       value={exercise.sets || ""}
                       onChange={(e) => updateExercise(index, "sets", Number(e.target.value))}
-                      className="h-9"
+                      className="h-9 text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -153,7 +153,7 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
                       placeholder="12"
                       value={exercise.reps || ""}
                       onChange={(e) => updateExercise(index, "reps", Number(e.target.value))}
-                      className="h-9"
+                      className="h-9 text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -166,7 +166,7 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
                       placeholder="80"
                       value={exercise.weight || ""}
                       onChange={(e) => updateExercise(index, "weight", Number(e.target.value))}
-                      className="h-9"
+                      className="h-9 text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -179,7 +179,7 @@ export function WorkoutExerciseBlock({ exercises, onExercisesChange }: WorkoutEx
                       placeholder="60"
                       value={exercise.restInSeconds || ""}
                       onChange={(e) => updateExercise(index, "restInSeconds", Number(e.target.value))}
-                      className="h-9"
+                      className="h-9 text-sm"
                     />
                   </div>
                 </div>

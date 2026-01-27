@@ -36,18 +36,18 @@ export function WorkoutDayBlock({ day, onRemove, onChange }: WorkoutDayBlockProp
 
   return (
     <Card className="bg-muted/30">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 p-3 sm:p-6">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-primary" />
-            Dia de Treino
+          <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-primary shrink-0" />
+            <span>Dia de Treino</span>
           </CardTitle>
-          <Button type="button" size="sm" onClick={onRemove} variant="destructive">
-            Remover Dia
+          <Button type="button" size="sm" onClick={onRemove} variant="destructive" className="shrink-0">
+            <span className="text-xs sm:text-sm">Remover</span>
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-3 sm:p-6">
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />

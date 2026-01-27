@@ -166,10 +166,10 @@ export default function InstancesPage() {
     <AuthGuard requiredRoles={["Trainer"]}>
       <Loading isLoading={loading}></Loading>
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-balance">Instâncias WhatsApp</h1>
-            <p className="text-muted-foreground">Gerencie suas conexões do WhatsApp para envio de mensagens</p>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-balance">Instâncias WhatsApp</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Gerencie suas conexões do WhatsApp para envio de mensagens</p>
           </div>
 
           <Dialog open={createDialogOpen} onOpenChange={(open) => {
@@ -258,7 +258,7 @@ export default function InstancesPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {instances.map((instance) => (
               <Card key={instance.id}>
                 <CardHeader>
@@ -272,9 +272,9 @@ export default function InstancesPage() {
                     {getStatusBadge(instance.instanceExtension?.status || InstanceStatusEnum.Disconnected)}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 p-4 sm:p-6">
                   <div className="flex flex-col gap-2 text-sm">
-                    <div>
+                    <div className="break-all">
                       <span className="text-muted-foreground">Chave: </span>
                       <span className="text-xs">{instance.id}</span>
                     </div>
@@ -288,12 +288,12 @@ export default function InstancesPage() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     {instance.instanceExtension?.status == InstanceStatusEnum.Connected ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 bg-transparent"
+                        className="flex-1 bg-transparent justify-center"
                         onClick={() => router.push(`/messages/${instance.id}`)}
                       >
                         <MessageSquare className="mr-2 h-4 w-4" />
@@ -303,12 +303,11 @@ export default function InstancesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 bg-transparent"
+                        className="flex-1 bg-transparent justify-center"
                         onClick={() => {
                           setSelectedInstanceId(`${instance.id}`)
                           setQrDialogOpen(true)
                         }}
-                        disabled={loading}
                       >
                         <QrCode className="mr-2 h-4 w-4" />
                         Ver QR Code
@@ -317,7 +316,7 @@ export default function InstancesPage() {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm" disabled={loading}>
+                        <Button variant="destructive" size="sm" className="w-full sm:w-auto">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>

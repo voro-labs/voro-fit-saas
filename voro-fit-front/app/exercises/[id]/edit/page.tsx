@@ -297,7 +297,7 @@ export default function EditExercisePage() {
                     id="thumbnail"
                     type="file"
                     accept="image/jpg,image/jpeg,image/png"
-                    className="sr-only"
+                    className="hidden"
                     onChange={handleThumbnailChange}
                   />
                 </div>
@@ -397,7 +397,7 @@ export default function EditExercisePage() {
                         id="media"
                         type="file"
                         accept="image/gif,image/jpg,image/jpeg,image/png,video/mp4"
-                        className="sr-only"
+                        className="hidden"
                         onChange={handleMediaFileChange}
                       />
                     </TabsContent>

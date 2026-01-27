@@ -56,7 +56,7 @@ namespace VoroFit.API.Controllers.Evolution
             {
                 dto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await instanceService.GetOrCreateInstance(dto, phoneNumber);
+                var instance = await instanceService.GetOrCreateAsync(dto, phoneNumber);
 
                 var instanceDto = mapper.Map<InstanceDto>(instance);
 
@@ -96,7 +96,7 @@ namespace VoroFit.API.Controllers.Evolution
 
                 instanceRequestDto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await instanceService.GetOrCreateInstance(instanceRequestDto);
+                var instance = await instanceService.GetOrCreateAsync(instanceRequestDto);
 
                 await instanceService.DeleteAsync(instance.Id);
 
@@ -157,7 +157,7 @@ namespace VoroFit.API.Controllers.Evolution
 
                 instanceRequestDto.SetWebhookUrl(evolutionUtil.Value);
 
-                var instance = await instanceService.GetOrCreateInstance(instanceRequestDto);
+                var instance = await instanceService.GetOrCreateAsync(instanceRequestDto);
                 
                 var instanceDto = mapper.Map<InstanceDto>(instance);
                 

@@ -128,10 +128,10 @@ export default function StudentDetailPage() {
 
           {/* Student Header */}
           <Card className="mb-6">
-            <CardContent className="p-6">
-              <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-20 w-20">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <Avatar className="h-16 w-16 shrink-0 sm:h-20 sm:w-20">
                     <AvatarImage
                       src={student?.userExtension?.user?.avatarUrl || "/placeholder.svg"}
                       alt={`${student?.userExtension?.user?.firstName}`}
@@ -144,24 +144,24 @@ export default function StudentDetailPage() {
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold">{`${student?.userExtension?.user?.firstName} ${student?.userExtension?.user?.lastName}`}</h1>
-                      <Badge className={statusConfig[student?.status ?? 100].color}>
+                  <div className="space-y-2 min-w-0 flex-1">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                      <h1 className="text-xl sm:text-2xl font-bold truncate">{`${student?.userExtension?.user?.firstName} ${student?.userExtension?.user?.lastName}`}</h1>
+                      <Badge className={`${statusConfig[student?.status ?? 100].color} w-fit shrink-0`}>
                         {statusConfig[student?.status ?? 100].label}
                       </Badge>
                     </div>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
                       {student?.userExtension?.user?.email && (
-                        <p className="flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          {student?.userExtension?.user?.email}
+                        <p className="flex items-center gap-2 truncate">
+                          <Mail className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{student?.userExtension?.user?.email}</span>
                         </p>
                       )}
                       {student?.userExtension?.user?.phoneNumber && (
                         <p className="flex items-center gap-2">
-                          <Phone className="h-4 w-4" />
+                          <Phone className="h-4 w-4 shrink-0" />
                           {student?.userExtension?.user?.phoneNumber}
                         </p>
                       )}
@@ -169,14 +169,14 @@ export default function StudentDetailPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" asChild>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                  <Button variant="outline" asChild className="w-full sm:w-auto bg-transparent">
                     <Link href={`/messages?student=${student?.userExtensionId}`}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mensagem
                     </Link>
                   </Button>
-                  <Button asChild>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href={`/students/${student?.userExtensionId}/edit`}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
@@ -188,15 +188,15 @@ export default function StudentDetailPage() {
           </Card>
 
           {/* Quick Stats */}
-          <div className="grid gap-6 md:grid-cols-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-4 mb-6">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <TrendingUp className="h-5 w-5 text-primary" />
+                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{student?.weight ? `${student?.weight}kg` : "-"}</p>
+                  <div className="min-w-0">
+                    <p className="text-xl sm:text-2xl font-bold truncate">{student?.weight ? `${student?.weight}kg` : "-"}</p>
                     <p className="text-xs text-muted-foreground">Peso Atual</p>
                   </div>
                 </div>
@@ -204,13 +204,13 @@ export default function StudentDetailPage() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                    <Dumbbell className="h-5 w-5 text-accent" />
+                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-accent/10 shrink-0">
+                    <Dumbbell className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{student?.workoutHistories?.length || 0}</p>
+                  <div className="min-w-0">
+                    <p className="text-xl sm:text-2xl font-bold">{student?.workoutHistories?.length || 0}</p>
                     <p className="text-xs text-muted-foreground">Treinos</p>
                   </div>
                 </div>
@@ -218,13 +218,13 @@ export default function StudentDetailPage() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-2/10">
-                    <Calendar className="h-5 w-5 text-chart-2" />
+                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-chart-2/10 shrink-0">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-chart-2" />
                   </div>
-                  <div>
-                    <p className="text-sm font-bold">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold truncate">
                       {student?.workoutHistories?.[0]?.updatedAt
                         ? formatDate(student?.workoutHistories[0].updatedAt)
                         : "-"}
@@ -236,13 +236,13 @@ export default function StudentDetailPage() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-3/10">
-                    <FileText className="h-5 w-5 text-chart-3" />
+                  <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-chart-3/10 shrink-0">
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-chart-3" />
                   </div>
-                  <div>
-                    <p className="text-sm font-bold">{formatDate(student?.createdAt)}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold truncate">{formatDate(student?.createdAt)}</p>
                     <p className="text-xs text-muted-foreground">Data Início</p>
                   </div>
                 </div>
@@ -252,10 +252,10 @@ export default function StudentDetailPage() {
 
           {/* Detailed Info */}
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-              <TabsTrigger value="workouts">Histórico de Treinos</TabsTrigger>
-              <TabsTrigger value="measurements">Medições</TabsTrigger>
+            <TabsList className="w-full flex-wrap h-auto gap-1 sm:w-auto sm:flex-nowrap">
+              <TabsTrigger value="overview" className="flex-1 sm:flex-none">Visão Geral</TabsTrigger>
+              <TabsTrigger value="workouts" className="flex-1 sm:flex-none">Treinos</TabsTrigger>
+              <TabsTrigger value="measurements" className="flex-1 sm:flex-none">Medições</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
@@ -352,9 +352,9 @@ export default function StudentDetailPage() {
 
             <TabsContent value="measurements">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <CardTitle>Histórico de Medições</CardTitle>
-                  <Button asChild>
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href={`/students/${student?.userExtensionId}/measurements/new`}>
                       <Plus className="mr-2 h-4 w-4" />
                       Nova Medição
@@ -365,7 +365,7 @@ export default function StudentDetailPage() {
                   {student?.measurements && student?.measurements.length > 0 ? (
                     <div className="space-y-4">
                       {student?.measurements.map((measure) => (
-                        <div key={measure.id} className="rounded-lg border p-4">
+                        <div key={measure.id} className="rounded-lg border p-3 sm:p-4">
                           <div className="flex items-center justify-between mb-3">
                             <p className="font-medium">{formatDate(measure.date)}</p>
                             <Button variant="ghost" size="sm" asChild>
@@ -374,24 +374,24 @@ export default function StudentDetailPage() {
                               </Link>
                             </Button>
                           </div>
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-3 gap-2 sm:gap-4">
                             <div>
-                              <p className="text-sm text-muted-foreground">Peso</p>
-                              <p className="text-lg font-semibold">{measure.weight ? `${measure.weight}kg` : "-"}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">Peso</p>
+                              <p className="text-base sm:text-lg font-semibold">{measure.weight ? `${measure.weight}kg` : "-"}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-muted-foreground">% Gordura</p>
-                              <p className="text-lg font-semibold">{measure.bodyFat ? `${measure.bodyFat}%` : "-"}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">% Gordura</p>
+                              <p className="text-base sm:text-lg font-semibold">{measure.bodyFat ? `${measure.bodyFat}%` : "-"}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-muted-foreground">Massa Muscular</p>
-                              <p className="text-lg font-semibold">
+                              <p className="text-xs sm:text-sm text-muted-foreground">Massa Musc.</p>
+                              <p className="text-base sm:text-lg font-semibold">
                                 {measure.muscleMass ? `${measure.muscleMass}kg` : "-"}
                               </p>
                             </div>
                           </div>
                           {(measure.waist || measure.chest || measure.arm || measure.thigh) && (
-                            <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 pt-4 border-t">
                               {measure.waist && (
                                 <div>
                                   <p className="text-xs text-muted-foreground">Cintura</p>

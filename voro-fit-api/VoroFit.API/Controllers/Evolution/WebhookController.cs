@@ -126,9 +126,10 @@ namespace VoroFit.API.Controllers.Evolution
             if (!string.IsNullOrWhiteSpace(remoteJidAlt))
             {
                 identifier = await contactIdentifierService
-                    .GetOrCreateAsync(pushName, remoteJid, remoteJidAlt);
+                    .GetAsync(remoteJid, remoteJidAlt);
 
-                remoteJid = identifier.Contact.RemoteJid;
+                if (identifier != null)
+                    remoteJid = identifier.Contact.RemoteJid;
             }
 
             // JID final que representa o usuário
@@ -209,7 +210,7 @@ namespace VoroFit.API.Controllers.Evolution
 
             // -------- INSTÂNCIA / CHAT ---------
 
-            var (senderContact, group, chat) = await conversationService.CreateChatAndGroupOrContactAsync(
+            var (senderContact, group, chat) = await conversationService.GetChatAndGroupOrContactAsync(
                 eventDto.Instance, normalizedJid, pushName, remoteJid, isGroup, key.Participant);
 
             Message? message = await messageService.Query(item => item.ExternalId == messageKey).FirstOrDefaultAsync();
@@ -361,7 +362,10 @@ namespace VoroFit.API.Controllers.Evolution
                 return NoContent();
 
             var contactIdentifier = await contactIdentifierService
-                    .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
+                    .GetAsync(remoteJid, remoteJid);
+
+            if (contactIdentifier == null)
+                return NoContent();
 
             contactService.UpdateContact(
                 contactIdentifier.Contact,
@@ -385,7 +389,10 @@ namespace VoroFit.API.Controllers.Evolution
                     return NoContent();
 
                 var contactIdentifier = await contactIdentifierService
-                    .GetOrCreateAsync(data.PushName, remoteJid, remoteJid, data.ProfilePicUrl);
+                    .GetAsync(remoteJid, remoteJid);
+
+                if (contactIdentifier == null)
+                    continue;
 
                 contactService.UpdateContact(
                     contactIdentifier.Contact,
@@ -409,7 +416,10 @@ namespace VoroFit.API.Controllers.Evolution
                 var presenceInfo = presence.Value.LastKnownPresence;
 
                 var contactIdentifier = await contactIdentifierService
-                    .GetOrCreateAsync("", remoteJid, remoteJid, "");
+                    .GetAsync(remoteJid, remoteJid);
+
+                if (contactIdentifier == null)
+                    continue;
 
                 var contact = contactIdentifier.Contact;
 
@@ -425,7 +435,7 @@ namespace VoroFit.API.Controllers.Evolution
 
         //private async Task<IActionResult> ChatUpdate(ChatUpdateEventDto eventDto)
         //{
-        //    var instance = await instanceService.GetOrCreateInstance(eventDto.Instance);
+        //    var instance = await instanceService.GetInstance(eventDto.Instance);
 
         //    foreach (var data in eventDto.Data)
         //    {
@@ -435,19 +445,19 @@ namespace VoroFit.API.Controllers.Evolution
         //        if (!isContact && !isGroup)
         //            continue;
 
-        //        var chat = await chatService.GetOrCreateChat(remoteJid, instance, isGroup);
+        //        var chat = await chatService.GetChat(remoteJid, instance, isGroup);
         //        chat.UpdatedAt = DateTimeOffset.UtcNow;
 
         //        if (isContact)
         //        {
         //            // Garante contato e vincula ao chat
-        //            var contact = await contactService.GetOrCreateContact(remoteJid, "");
+        //            var contact = await contactService.GetContact(remoteJid, "");
         //            chat.ContactId = contact.Id;
         //        }
         //        else if (isGroup)
         //        {
         //            // Garante grupo e vincula ao chat
-        //            var group = await groupService.GetOrCreateGroup(remoteJid);
+        //            var group = await groupService.GetGroup(remoteJid);
         //            chat.GroupId = group.Id;
         //        }
         //    }

@@ -8,11 +8,21 @@ namespace VoroFit.Application.Services.Evolution
 {
     public class ChatService(IChatRepository chatRepository) : ServiceBase<Chat>(chatRepository), IChatService
     {
-        public async Task<Chat> GetOrCreateChat(string remoteJid, Instance instance, bool isGroup)
+        public async Task<Chat?> GetAsync(string remoteJid)
         {
             var chat = await this
                 .Query(c => c.RemoteJid == remoteJid)
                 .FirstOrDefaultAsync();
+
+            if (chat != null)
+                return chat;
+
+            return null;
+        }
+
+        public async Task<Chat> GetOrCreateAsync(string remoteJid, Instance instance, bool isGroup)
+        {
+            var chat = await GetAsync(remoteJid);
 
             if (chat != null)
                 return chat;

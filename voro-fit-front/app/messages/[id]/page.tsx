@@ -52,35 +52,47 @@ export default function MessagesPage({ params }: MessagesPageProps) {
       <div className="bg-background">
         <Loading isLoading={loading} />
 
-        <div className="flex min-h-screen flex-col">
-          <div className="border-b border-border bg-card px-6 py-4">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => router.push("/instances")}>
+        <div className="flex min-h-screen flex-col overflow-hidden">
+          {/* Header - Only show on mobile when no chat is selected OR on desktop */}
+          <div className={cn(
+            "border-b border-border bg-card px-4 py-3 sm:px-6 sm:py-4",
+            selectedChatId && "hidden lg:flex"
+          )}>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <Button variant="ghost" size="icon" onClick={() => router.push("/instances")} className="shrink-0">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div>
-                <h1 className="text-xl font-semibold">Mensagens</h1>
-                <p className="text-sm text-muted-foreground">Instância: {instanceId}</p>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-semibold truncate">Mensagens</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Instância: {instanceId}</p>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-1">
-            {/* Lista de conversas */}
-            <ConversationList
-              chats={chats}
-              selectedId={selectedChatId}
-              onSelect={(id) => {
-                fetchMessages(id)
-                setSelectedChatId(id)
-              }}
-              onAddChat={(name, remoteJid) => {
-                saveChat(name, remoteJid)
-              }}
-            />
+          <div className="flex flex-1 overflow-hidden">
+            {/* Lista de conversas - Hidden on mobile when chat is selected */}
+            <div className={cn(
+              "w-full lg:w-80 shrink-0",
+              selectedChatId && "hidden lg:block"
+            )}>
+              <ConversationList
+                chats={chats}
+                selectedId={selectedChatId}
+                onSelect={(id) => {
+                  fetchMessages(id)
+                  setSelectedChatId(id)
+                }}
+                onAddChat={(name, remoteJid) => {
+                  saveChat(name, remoteJid)
+                }}
+              />
+            </div>
 
-            <div className="h-screen w-full">
-              {/* Área do chat */}
+            {/* Área do chat - Full width on mobile when selected, half width on desktop */}
+            <div className={cn(
+              "w-full lg:h-screen",
+              !selectedChatId && "hidden lg:block"
+            )}>
               <ChatArea
                 chat={chats.find((c) => c.id === selectedChatId)}
                 messages={selectedMessages}
@@ -113,6 +125,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
                 onEditChat={(chatId: any, name: any, remoteJid: any, profilePicture: any) => {
                   updateChat(chatId, name, remoteJid, profilePicture)
                 }}
+                onBack={() => setSelectedChatId(null)}
               />
             </div>
           </div>

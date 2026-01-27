@@ -8,6 +8,7 @@ namespace VoroFit.Application.Services.Interfaces.Evolution
     {
         Task AddAsync(GroupDto entity);
         Task AddRangeAsync(IEnumerable<GroupDto> entities);
-        Task<Group> GetOrCreateGroup(string groupJid, string? displayName);
+        Task<Group?> GetAsync(string groupJid);
+        Task<Group> GetOrCreateAsync(string groupJid, string? displayName);
     }
 }

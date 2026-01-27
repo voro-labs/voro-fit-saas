@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { ArrowLeft } from "lucide-react" // Import ArrowLeft here
 
 import { useState, useRef, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -27,6 +28,7 @@ import type { ChatDto } from "@/types/DTOs/chat.interface"
 import { AttachmentActions } from "./attachment-actions"
 import { PhoneInput } from "@/components/ui/custom/phone-input"
 import { flags } from "@/lib/flag-utils"
+import { useIsMobile } from "@/hooks/use-mobile.hook"
 
 interface ChatAreaProps {
   chat?: ChatDto
@@ -39,6 +41,7 @@ interface ChatAreaProps {
   onDelete?: (message: MessageDto) => void
   isTyping?: boolean
   onEditChat?: (chatId: string, chatName: string, phoneNumber: string, profilePicture: File | null) => void
+  onBack?: () => void
 }
 
 export function ChatArea({
@@ -52,6 +55,7 @@ export function ChatArea({
   onDelete,
   isTyping = false,
   onEditChat,
+  onBack,
 }: ChatAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [inputValue, setInputValue] = useState("")
@@ -64,9 +68,13 @@ export function ChatArea({
   const [previewUrl, setPreviewUrl] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [countryCode, setCountryCode] = useState("BR")
+  const isMobile = useIsMobile()
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (!isMobile) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+    
     if (isEditDialogOpen && chat) {
       setEditedName(chat.contact?.displayName || "")
       setEditedNumber(chat.remoteJid?.slice(2) ?? "")
@@ -132,8 +140,8 @@ export function ChatArea({
   if (!chat) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-lg text-muted-foreground">Selecione uma conversa para começar</p>
+        <div className="text-center p-4">
+          <p className="text-base sm:text-lg text-muted-foreground">Selecione uma conversa para começar</p>
         </div>
       </div>
     )
@@ -142,10 +150,17 @@ export function ChatArea({
   return (
     <div className="flex-1 flex flex-col bg-background h-full max-h-screen">
       {/* Header */}
-      <div className="h-16 shrink-0 border-b border-border bg-card flex items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Avatar className="h-10 w-10">
+      <div className="h-14 sm:h-16 shrink-0 border-b border-border bg-card flex items-center justify-between px-3 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          {/* Back button - Only visible on mobile */}
+          {onBack && (
+            <Button variant="ghost" size="icon" onClick={onBack} className="lg:hidden shrink-0">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
+          
+          <div className="relative shrink-0">
+            <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
               <AvatarImage
                 src={chat.contact?.profilePictureUrl || "/placeholder.svg"}
                 alt={chat.contact?.displayName || chat.remoteJid || "Chat"}
@@ -153,23 +168,23 @@ export function ChatArea({
               <AvatarFallback>{(chat.contact?.displayName || chat.remoteJid || "?").charAt(0)}</AvatarFallback>
             </Avatar>
           </div>
-          <div>
-            <p className="font-medium">{chat.contact?.displayName || chat.remoteJid || "Desconhecido"}</p>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-sm sm:text-base truncate">{chat.contact?.displayName || chat.remoteJid || "Desconhecido"}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} disabled>
-            <Edit className="h-5 w-5" />
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} className="h-8 w-8 sm:h-10 sm:w-10">
+            <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
-          <Button variant="ghost" size="icon" disabled>
-            <Phone className="h-5 w-5" />
+          <Button variant="ghost" size="icon" disabled className="hidden sm:flex h-8 w-8 sm:h-10 sm:w-10">
+            <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
-          <Button variant="ghost" size="icon" disabled>
-            <Video className="h-5 w-5" />
+          <Button variant="ghost" size="icon" disabled className="hidden sm:flex h-8 w-8 sm:h-10 sm:w-10">
+            <Video className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
-          <Button variant="ghost" size="icon" disabled>
-            <MoreVertical className="h-5 w-5" />
+          <Button variant="ghost" size="icon" disabled className="hidden sm:flex h-8 w-8 sm:h-10 sm:w-10">
+            <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </div>
